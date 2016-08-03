@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.common.dao.ConfDao">
+	
+	<!-- 시스템 환경 설정 조회 -->
+	<select id="sysConfigDetail" resultType="Conf">
+		SELECT 
+			SKEY,SVAL,STYPE,IS_USE
+		FROM XR_SYSCONFIG
+		<where>
+			<if test="stype != null and stype != ''">
+				STYPE = #{stype}
+			</if>
+		</where>		
+	</select>
+	
+	<!-- 시스템 환경 설정 수정 -->
+	<update id="sysConfigUpdate" parameterType="HashMap" >
+		UPDATE XR_SYSCONFIG		
+		<set>
+			<if test="sval != null and sval != ''">
+				SVAL = #{sval} ,
+			</if>			
+			<if test="is_use != null and is_use != ''">
+				IS_USE = #{is_use} ,
+			</if>					
+		</set>			
+		<where>
+			<if test="skey != null and skey != ''">
+				SKEY = #{skey}
+			</if>
+			<if test="stype != null and stype != ''">
+				STYPE = #{stype}
+			</if>
+		</where>		
+	</update>
+
+	<!-- 감사 설정 정보 수정 -->
+	<update id="auditConfigUpdate" parameterType="HashMap" >
+		UPDATE XR_SYSCONFIG		
+		<set>
+			<if test="sval != null and sval != ''">
+				SVAL = #{sval} ,
+			</if>				
+		</set>			
+		WHERE STYPE='AUDIT' AND SKEY = #{skey}
+	</update>
+	
+	<!-- 휴지통 관리 정책 수정  :: 테이블변경 -->
+	<update id="trashConfigUpdate" parameterType="HashMap" >
+		UPDATE XR_SYSCONFIG		
+		<set>
+			<if test="is_use != null and is_use != ''">
+				IS_USE = #{is_use} ,
+			</if>			
+			<if test="decade != null and decade != ''">
+				SVAL = #{decade} ,
+			</if>			
+		</set>		
+		WHERE STYPE='TRASH'	 AND SKEY = #{doc_type}									
+	</update>
+	
+		
+	<!-- 버전관리 정책 :: 테이블변경. -->
+	<select id="versionConfigDetail" resultType="CaseMap">
+		SELECT 
+			SKEY AS VKEY,SVAL AS VAL,IS_USE
+		FROM XR_SYSCONFIG
+		WHERE STYPE='VERSION'		
+	</select>	
+	
+	<!-- URL 유효기간. :: 테이블변경 -->
+	<select id="urlConfigDetail" resultType="CaseMap">
+		SELECT 
+			SKEY AS VKEY,SVAL AS VAL
+		FROM XR_SYSCONFIG	
+		WHERE STYPE='URL'			
+	</select>	
+	
+	<!-- 버전관리 정책 수정. :: 테이블변경 -->
+	<update id="versionConfigUpdate" parameterType="HashMap" >
+		UPDATE XR_SYSCONFIG		
+		<set>
+			<if test="is_use != null and is_use != ''">
+				IS_USE = #{is_use} ,
+			</if>				
+			<if test="val != null and val != ''">
+				SVAL = #{val} ,
+			</if>						
+		</set>		
+		WHERE STYPE='VERSION' AND SKEY = #{vkey}								
+	</update>
+
+	<!-- 첨부파일 정책 수정. :: 테이블변경 -->
+	<update id="fileConfigUpdate" parameterType="HashMap" >
+		UPDATE XR_SYSCONFIG	
+		<set>
+			<if test="fval != null and fval != ''">
+				SVAL = #{fval} ,
+			</if>						
+			<if test="is_use != null and is_use != ''">
+				IS_USE = #{is_use} ,
+			</if>						
+		</set>		
+		WHERE STYPE='FILE' AND SKEY = #{fkey}
+	</update>
+	
+	<!-- URL 유효기간 수정.  :: 테이블변경 -->
+	<update id="urlConfigUpdate" parameterType="HashMap" >
+		UPDATE XR_SYSCONFIG	
+		<set>
+			<if test="val != null and val != ''">
+				SVAL = #{val} ,
+			</if>						
+		</set>		
+		WHERE STYPE='URL' AND SKEY = #{vkey}				
+	</update>
+	
+</mapper>
+	

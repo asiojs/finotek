@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+ 
+<form-validation>
+ 
+    <formset>
+ 		<!-- XR_ATTRITEM -->
+        <form name="attrItemVO">
+         	<field property="type_id" depends="required">
+				<arg0 key="attrItemVO.type_id" />
+			</field>          
+			<field property="attr_id" depends="required">
+				<arg0 key="attrItemVO.attr_id" />
+			</field>            
+			<field property="item_index" depends="required">
+				<arg0 key="attrItemVO.item_index" />
+			</field>            
+			<field property="item_name" depends="required">
+				<arg0 key="attrItemVO.item_name" />
+			</field>            
+        </form>
+ 
+    </formset>
+ 
+</form-validation>

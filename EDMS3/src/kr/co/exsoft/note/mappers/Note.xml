@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.note.dao.NoteDao">
+	<!-- 쪽지 등록 :: XR_NOTE -->
+	<insert id="noteWrite" parameterType="Note">
+		INSERT INTO XR_NOTE (
+				NOTE_ID, ROOT_ID, CREATE_DATE, CREATOR_ID,CONTENT,NOTE_FROM,
+				NOTE_FROM_USERID,NOTE_FROM_GROUPID,NOTE_FROM_PGROUPID
+		) VALUES (
+				#{note_id}, #{root_id},SYSDATE, #{creator_id}, #{content}, #{note_from},
+				#{note_from_userid}, #{note_from_groupid}, #{note_from_pgroupid}
+		)
+	</insert>
+	
+	<!-- 쪽지 등록 :: XR_MANAGENOTE -->
+	<insert id="noteManageWrite" parameterType="Note">
+		INSERT INTO XR_NOTEMANAGE (
+				MANAGE_ID,NOTE_ID, ROOT_ID, NOTE_TARGET_ID,NOTE_TYPE,NOTE_SAVE,NOTE_READ
+		) VALUES (
+				#{manage_id},#{note_id}, #{root_id},#{note_target_id},#{note_type}, #{note_save}, #{note_read}
+		)
+	</insert>
+	<!-- 쪽지 등록 :: XR_NOTE_QUEUE -->
+	<insert id="noteQueueWrite" parameterType="Note">
+		INSERT INTO XR_NOTE_QUEUE (
+				USER_ID,CREATE_DATE
+		) VALUES (
+				#{note_target_id},SYSDATE
+		)
+	</insert>
+	<!-- user_id로 읽지 않은 새쪽지 목록을 가져온다 :: RNK(ORACLE 전용) XR_NOTE-->
+	<select id="noteNewTopNInfoList"  parameterType="HashMap" resultType="Note">	
+	SELECT NOTE_ID,ROOT_ID,MANAGE_ID,RSENDER_NAME,CONTENT,RNK,NEWNOTE_CNT,CREATE_DATE,NOTE_TARGET_ID,NOTE_SAVE
+	FROM
+	(
+  		SELECT N.NOTE_ID, N.ROOT_ID,NM.MANAGE_ID, (SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID = N.CREATOR_ID) AS RSENDER_NAME,
+  		N.CONTENT, RANK() OVER ( PARTITION BY NM.NOTE_TARGET_ID ORDER BY N.CREATE_DATE DESC ) RNK,N.CREATE_DATE,NM.NOTE_TARGET_ID,NM.NOTE_SAVE,
+  		(SELECT COUNT(NOTE_ID) FROM XR_NOTEMANAGE WHERE NOTE_TYPE='R' and NOTE_READ='N' and NOTE_TARGET_ID=#{user_id}) AS NEWNOTE_CNT
+  	FROM XR_NOTE N, XR_NOTEMANAGE NM
+  	WHERE N.NOTE_ID = NM.NOTE_ID AND NM.NOTE_TYPE='R' and NM.NOTE_READ='N' and NM.NOTE_TARGET_ID= #{user_id}
+	)
+	<where>
+		<if test="new_count != null and new_count != ''">
+			<![CDATA[ RNK <= #{new_count} ]]>
+		</if>
+	</where>	
+	</select>
+	
+	
+	<!-- user_id로  모든쪽지 목록을 가져온다 :: XR_NOTE-->
+	
+	<select id="noteAllReceiveSendInfoList"  parameterType="HashMap" resultType="Note">	
+	SELECT N.NOTE_ID, N.ROOT_ID,NM.MANAGE_ID,N.NOTE_FROM, N.CONTENT, N.CREATE_DATE,	N.CREATOR_ID,NM.NOTE_SAVE, NM.NOTE_TYPE,NM.NOTE_READ,
+	(SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID =N.CREATOR_ID) AS RSENDER_NAME   
+  	FROM XR_NOTE N, XR_NOTEMANAGE NM
+  	<where>
+		N.NOTE_ID = NM.NOTE_ID
+		<if test="user_id != null and user_id != ''">
+			AND NM.NOTE_TARGET_ID = #{user_id}
+		</if>		
+		<if test="note_type != null and note_type != ''">
+			AND NM.NOTE_TYPE = #{note_type}
+		</if>
+		<if test="note_save != null and note_save != ''">
+			AND NM.NOTE_SAVE = #{note_save}
+		</if>
+		<if test="content != null and content != ''">
+			AND N.CONTENT LIKE '%${content}%'
+		</if>
+		<if test="rsender_name != null and rsender_name != ''">
+			AND (SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID =N.CREATOR_ID) LIKE '%${rsender_name}%'
+		</if>		
+		<if test="note_from != null and note_from != ''">
+			AND N.NOTE_FROM LIKE '%${note_from}%'
+		</if>
+	</where>
+	ORDER BY N.CREATE_DATE DESC
+  	</select>	
+	
+	<!-- 보관 쪽지 update -->
+	<update id="noteSaveUpdate" parameterType="HashMap">
+		UPDATE XR_NOTEMANAGE
+		SET	NOTE_SAVE = 'Y'
+		WHERE
+			MANAGE_ID = #{manage_id} AND NOTE_TARGET_ID= #{user_id}
+	</update>
+	
+	<!-- 읽은 쪽지 update -->
+	<update id="noteReadUpdate" parameterType="HashMap">
+		UPDATE XR_NOTEMANAGE
+		SET	NOTE_READ = 'Y'
+		WHERE
+			MANAGE_ID = #{manage_id} AND NOTE_TARGET_ID= #{user_id}
+	</update>
+	
+	<!-- 쪽지  삭제처리 :: XR_NOTEMANAGE-->
+	<delete id="noteManageDelete" parameterType="HashMap">
+		DELETE FROM XR_NOTEMANAGE
+		<choose>					
+			<when test="del_kbn != null and del_kbn != ''">
+				AND ROOT_ID = #{root_id} AND NOTE_TARGET_ID = #{user_id}
+			</when>
+			<otherwise>
+				AND MANAGE_ID = #{manage_id} AND NOTE_TARGET_ID = #{user_id}
+			</otherwise>			
+		</choose>
+	</delete>
+	
+	<!-- root_id로  XR_NOTEMANAGE의 COUTN를 구한다. :: XR_NOTEMANAGE-->
+	<select id="noteRootCount"  parameterType="HashMap" resultType="Int">
+		SELECT COUNT(MANAGE_ID) FROM XR_NOTEMANAGE WHERE ROOT_ID = #{root_id}
+  	</select>
+	
+	<!-- 쪽지  삭제처리 :: XR_NOT-->
+	<delete id="noteDelete" parameterType="HashMap">
+		DELETE FROM XR_NOTE
+		<where> 
+			<if test="note_id != null and note_id != ''">
+				NOTE_ID = #{note_id}
+			</if>
+		</where>      
+	</delete>
+	
+	<!-- user_id로  대화함 목록을 가져온다 :: XR_NOTE-->	
+	<select id="noteTalkList"  parameterType="HashMap" resultType="Note">	
+	select N1.*,NM1.*,(SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID= NM1.NOTE_TARGET_ID) AS RSENDER_NAME
+	from (SELECT note_id FROM XR_NOTE WHERE CREATOR_ID=#{user_id} group by note_id order by note_id ) result
+	inner join xr_note N1 on Result.note_id = N1.Root_ID
+	inner join xr_notemanage NM1 on N1.note_ID = NM1.note_ID and n1.creator_id=NM1.NOTE_TARGET_ID
+	<where> 
+	<if test="content != null and content != ''">
+			AND N1.CONTENT LIKE '%${content}%'
+		</if>
+		<if test="rsender_name != null and rsender_name != ''">
+			AND (SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID = NM1.NOTE_TARGET_ID) LIKE '%${rsender_name}%'
+		</if>	
+	</where> 
+	
+	order by N1.CREATE_DATE desc, N1.root_id 
+  	</select>	
+	<!-- user_id로  대화함 목록을 가져온다 :: XR_NOTE-->	
+	<select id="noteTalkDetailList"  parameterType="HashMap" resultType="Note">	
+	SELECT N.NOTE_ID, N.ROOT_ID,NM.MANAGE_ID, N.CONTENT,N.NOTE_FROM, N.CREATE_DATE,	N.CREATOR_ID,NM.NOTE_TARGET_ID,NM.NOTE_SAVE, NM.NOTE_TYPE,
+	(SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID =N.CREATOR_ID) AS RSENDER_NAME
+  	FROM XR_NOTE N, XR_NOTEMANAGE NM
+  	<where>
+		N.CREATOR_ID = #{user_id} AND N.ROOT_ID=NM.ROOT_ID
+	</where>
+	ORDER BY N.CREATE_DATE DESC, NM.NOTE_TYPE DESC
+	
+  	</select>	
+</mapper>	

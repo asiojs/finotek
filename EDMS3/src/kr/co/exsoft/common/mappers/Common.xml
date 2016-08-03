@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.common.dao.CommonDao">
+	
+	<!-- 함수 이용해서 증가값 가져오기 -->
+	<select id="comNextVal" parameterType="HashMap" statementType="CALLABLE" resultType="Int">
+		SELECT FNC_NEXTVAL( #{counter_id} ) FROM DUAL
+	</select>
+	
+	<!-- 함수 이용해서 현재값 가져오기 -->
+	<select id="comCurrentVal" parameterType="HashMap" statementType="CALLABLE" resultType="Int">
+		SELECT FNC_CURRVAL( #{counter_id} ) FROM DUAL
+	</select>
+	
+	<!-- 테이블 이용해서 현재값 가져오기 -->
+	<select id="comCurrvalTable" parameterType="HashMap" resultType="Int">
+		SELECT CURRENT_VALUE FROM XR_COUNTER
+		<where>
+			<if test="counter_id != null">
+					AND COUNTER_ID = #{counter_id}
+			</if>			
+		</where> 		
+	</select>
+	
+	<!-- 테이블 이용해서 카운터 증가시키기 -->
+	<update id="comNextValInc" parameterType="HashMap">
+		UPDATE XR_COUNTER SET CURRENT_VALUE = CURRENT_VALUE + NEXT_VALUE 
+		<where>
+			<if test="counter_id != null">
+					AND COUNTER_ID = #{counter_id}
+			</if>			
+		</where> 		
+	</update>
+	
+	<!-- Clob/NClob 처리 -->
+	<resultMap id="editorMap" type="CaseMap"> 
+		<result property="title" column="TITLE" /> 
+		<result property="content" column="CONTENT" javaType="java.lang.String" jdbcType="NCLOB" typeHandler="org.apache.ibatis.type.NClobTypeHandler" />
+		<result property="create_dt" column="CREATE_DT" />			
+	</resultMap>
+	
+	<!-- 다음에디터 CLOB 등록처리 -->
+	<insert id="editorWrite" parameterType="HashMap">
+		INSERT INTO XR_EDITOR(TITLE,CONTENT)  VALUES (#{subject},#{content,jdbcType=NCLOB})
+	</insert>
+	
+	<!-- 문서, 협업 등록 실패 시 exRep ECM에 등록된 파일은 XR_DELETEFILE_QUEUE에 삽입 -->
+	<insert id="insertDeleteFileQueue">
+		INSERT INTO XR_DELETEFILE_QUEUE (VOLUME_ID, CONTENT_PATH) VALUES (#{volume_id},#{contentPath})
+	</insert>
+	
+	<!-- 다음에디터 최신등록건 가져오기 -->
+	<select id="editorDetailInfo" parameterType="HashMap" resultMap="editorMap">
+		SELECT * 
+		FROM (	
+			SELECT TITLE,CONTENT,TO_CHAR(CREATE_DT, 'YYYY-MM-DD HH24:MI:SS') CREATE_DT	
+			FROM XR_EDITOR
+			ORDER BY CREATE_DT DESC 
+		) 
+		WHERE ROWNUM = 1 
+	</select>
+	
+	<!-- 사용자에 대한 최근 등록(문서,협업,폴더) 현황 -->
+	<select id="selectRecentlyObject" parameterType="RecentlyObject" resultType="RecentlyObject">
+		SELECT IDX, USER_ID, TARGET_ID, TARGET_TYPE, LAST_USED_DATE
+  		FROM XR_RECENTLY_OBJECT 
+ 		WHERE USER_ID = #{user_id}
+   		AND TARGET_TYPE = #{target_type}
+		ORDER BY LAST_USED_DATE DESC
+	</select>
+	
+	<!-- 최근 등록(문서,협업,폴더) 현황 등록 -->
+	<insert id="insertRecentlyObject" parameterType="RecentlyObject">
+		INSERT INTO XR_RECENTLY_OBJECT (IDX,USER_ID,TARGET_ID,TARGET_TYPE) 
+		VALUES(#{idx},#{user_id},#{target_id},#{target_type})
+	</insert>
+	
+	<!-- Delete Start... --> 
+	<!-- 최근 등록(문서,협업,폴더)에 대한 정보 삭제 -->
+	<delete id="deleteRecently" parameterType="HashMap">
+		DELETE FROM XR_RECENTLY_OBJECT
+		WHERE IDX = #{recently_id}
+	</delete>
+	<!-- Delete End... -->
+</mapper>

@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.document.dao.TypeDao">
+	
+	<sql id="whereTypeCommon">
+		<where>
+				<if test="is_hidden != null and is_hidden != ''">
+					AND IS_HIDDEN != #{is_hidden}
+				</if>		
+				<if test="is_admin != null and is_admin != ''">
+					AND IS_ADMIN = #{is_admin}
+				</if>		
+				<if test="strIndex != null and strIndex != ''">
+					<choose>
+						<when test="strIndex == 'ALL' ">
+							<if test="strKeyword != null and strKeyword != ''">
+								AND ( TYPE_NAME LIKE '%${strKeyword}%' OR TYPE_ID LIKE '%${strKeyword}%')
+							</if>
+						</when>
+						<when test="strIndex == 'TYPE_ID' ">
+							<if test="strKeyword != null and strKeyword != ''">
+								AND TYPE_ID LIKE '%${strKeyword}%'
+							</if>
+						</when>
+						<when test="strIndex == 'TYPE_NAME' ">
+							<if test="strKeyword != null and strKeyword != ''">
+								AND TYPE_NAME LIKE '%${strKeyword}%'
+							</if>
+						</when>
+					</choose>				
+				</if>				
+			</where>
+	</sql>
+	
+	<!-- 문서유형 목록 얻기. SELECT BOX  :: XR_TYPE -->
+	<select id="typeList" parameterType="HashMap" resultType="Type">
+		SELECT
+			TYPE_ID, TYPE_NAME, IS_BASE, IS_HIDDEN,
+			TBL_NAME, SORT_INDEX, CREATE_DATE,IS_MODIFY,IS_SYSTEM,IS_ADMIN 
+		FROM XR_TYPE
+		<where>
+			<if test="is_hidden != null and is_hidden != ''">
+				AND IS_HIDDEN != #{is_hidden}
+			</if>		
+			<if test="is_admin != null and is_admin != ''">
+				AND IS_ADMIN != #{is_admin}
+			</if>
+			<if test="is_system != null and is_system != ''">
+				AND (IS_HIDDEN = 'F' OR (IS_HIDDEN = 'T' AND IS_SYSTEM = #{is_system}))
+			</if>			
+			<choose>
+				<when test="is_doc != null and is_doc != ''">
+					AND TYPE_ID NOT IN ('RGATE','ALL_TYPE')					
+				</when>
+				<otherwise>
+					AND TYPE_ID != 'RGATE'
+				</otherwise>
+			</choose>				
+		</where>
+		ORDER BY SORT_INDEX
+	</select>
+	
+	<!-- 문서유형 목록 Coount :: XR_TYPE -->
+	<select id="typePagingCount" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(TYPE_ID) AS CNT
+		FROM
+		(
+			SELECT 
+				TYPE_ID, TYPE_NAME, IS_BASE, IS_HIDDEN,TBL_NAME, SORT_INDEX, 
+				CREATE_DATE,IS_MODIFY,IS_SYSTEM,IS_ADMIN
+			FROM XR_TYPE
+			<include refid="whereTypeCommon" />
+		) LIST				
+	</select>
+	
+	<!-- 문서유형 목록 얻기 PAGE :: XR_TYPE -->
+	<select id="typePagingList" parameterType="HashMap" resultType="Type">
+		SELECT 
+			TYPE_ID, TYPE_NAME, IS_BASE, IS_HIDDEN,TBL_NAME, SORT_INDEX,
+			TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') CREATE_DATE,IS_MODIFY,IS_SYSTEM,IS_ADMIN,
+			(SELECT CODE_NM FROM XR_CODE WHERE CODE_ID = LIST.IS_HIDDEN AND GCODE_ID='IS_STATUS') AS STATUS_NM
+		FROM
+		(
+			SELECT 
+				TYPE_ID, TYPE_NAME, IS_BASE, IS_HIDDEN,TBL_NAME, SORT_INDEX, 
+				CREATE_DATE,IS_MODIFY,IS_SYSTEM,IS_ADMIN,				
+				CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM		
+			FROM XR_TYPE
+			<include refid="whereTypeCommon" />
+		) LIST
+		WHERE LIST.PAGENUM = #{nPage}							
+	</select>
+		
+	<!-- 문서유형 테이블을 생성. :: DDL -->
+	<update id="createType" parameterType="HashMap">
+		CREATE TABLE ${tbl_name} (
+			DOC_ID VARCHAR2(16) NOT NULL,
+			<if test="attr_list != null"> 
+				<foreach item="item" index="index" collection="attr_list" separator="," close=",">
+					${item.attr_id} VARCHAR2(${item.attr_size})
+				</foreach>		
+			 </if>					
+			 PRIMARY KEY (DOC_ID)	
+		)
+	</update>
+	
+	<!-- 문서유형 테이블 삭제. :: DDL -->
+	<update id="dropType" parameterType="String">
+		DROP TABLE ${value}
+	</update>
+	
+			
+	<!-- 문서유형속성 테이블 수정 :: DDL -->
+	<update id="alterType" parameterType="HashMap">
+		ALTER TABLE ${tbl_name}
+		<choose>
+			<when test="attr_status == 'insert' ">
+				ADD ${attr_id} VARCHAR2(${attr_size})
+			</when>
+			<when test="attr_status == 'update' ">
+				MODIFY ( ${attr_id} VARCHAR2(${attr_size}) )
+			</when>
+			<when test="attr_status == 'delete' ">
+				DROP COLUMN ${attr_id}
+			</when>
+		</choose>
+	</update>
+
+	<!-- 문서유형 정보 조회 :: XR_TYPE -->
+	<select id="typeDetailInfo" parameterType="HashMap" resultType="Type">
+		SELECT
+			TYPE_ID, TYPE_NAME, IS_BASE,IS_HIDDEN,IS_SYSTEM,IS_MODIFY,
+			TBL_NAME, SORT_INDEX, TO_CHAR(CREATE_DATE,'YYYY-MM-DD') AS CREATE_DATE
+		FROM XR_TYPE
+		<where>
+			<choose>
+				<when test="isPart == 'update' ">
+					<if test="type_id != null and type_id != ''">
+						AND TYPE_ID != #{type_id}
+					</if>		
+					<if test="type_name != null and type_name != ''">
+						AND TYPE_NAME = #{type_name}
+					</if>		
+				</when>
+				<otherwise>
+					<if test="type_id != null and type_id != ''">
+						AND TYPE_ID = #{type_id}
+					</if>		
+					<if test="type_name != null and type_name != ''">
+						AND TYPE_NAME = #{type_name}
+					</if>		
+				</otherwise>
+			</choose>			
+		</where>
+	</select>
+	
+	<!-- 문서유형 등록  :: XR_TYPE -->
+	<insert id="typeWrite" parameterType="Type">
+		INSERT INTO XR_TYPE (
+			TYPE_ID, TYPE_NAME, IS_BASE, IS_HIDDEN,TBL_NAME, SORT_INDEX,IS_MODIFY,IS_SYSTEM,IS_ADMIN
+		) VALUES (
+			#{type_id},#{type_name},#{is_base},#{is_hidden},#{tbl_name},#{sort_index},#{is_modify},#{is_system},#{is_admin}		
+		)
+	</insert>
+	
+	<!-- 문서유형 수정 :: XR_TYPE -->
+	<update id="typeUpdate" parameterType="HashMap">
+		UPDATE XR_TYPE			
+		<set>
+			<if test="type_name != null and type_name != ''">
+				TYPE_NAME = #{type_name},
+			</if>			
+			<if test="is_hidden != null and is_hidden != ''">
+				IS_HIDDEN = #{is_hidden},
+			</if>			
+			<if test="sort_index != null and sort_index != ''">
+				SORT_INDEX = #{sort_index},
+			</if>			
+		</set>
+		<where>			
+			<if test="type_id != null and type_id != ''">
+				AND TYPE_ID = #{type_id}	
+			</if>			
+		</where> 				
+	</update>		
+	
+	
+	<!-- 문서유형 삭제 :: XR_TYPE -->
+	<delete id="typeDelete" parameterType="HashMap">
+		DELETE FROM XR_TYPE 
+		<where>			
+			<if test="type_id != null and type_id != ''">
+				AND TYPE_ID = #{type_id}	
+			</if>			
+		</where> 				
+	</delete>
+	
+	<!-- 문서유형 속성을 얻는다. :: XR_ATTR -->
+	<select id="attrList" parameterType="HashMap" resultType="Attr">
+		SELECT 
+			TYPE_ID, ATTR_ID, ATTR_NAME, ATTR_SIZE, IS_EXTENDED, IS_EDITABLE, 
+			IS_MANDATORY, IS_SEARCH, SORT_INDEX,DISPLAY_TYPE, HAS_ITEM, DEFAULT_ITEM_INDEX
+		FROM XR_ATTR
+		<where>			
+			<if test="type_id != null and type_id != ''">
+				AND TYPE_ID = #{type_id}	
+			</if>			
+			<if test="is_extended != null and is_extended != ''">
+				AND IS_EXTENDED = #{is_extended}	
+			</if>
+			<if test="is_search != null and is_search != ''">
+				AND IS_SEARCH = #{is_search}	
+			</if>			
+		</where> 				
+		ORDER BY SORT_INDEX ASC
+	</select>
+	
+		
+	<!-- 문서유형 속성을 등록한다. :: XR_ATTR -->
+	<insert id="attrWrite" parameterType="Attr">
+		INSERT INTO XR_ATTR (
+			TYPE_ID, ATTR_ID, ATTR_NAME, ATTR_SIZE, IS_EXTENDED, IS_EDITABLE, IS_MANDATORY, 
+			IS_SEARCH, SORT_INDEX,DISPLAY_TYPE, HAS_ITEM, DEFAULT_ITEM_INDEX
+		) VALUES (
+			#{type_id},#{attr_id},#{attr_name},#{attr_size},#{is_extended},#{is_editable},#{is_mandatory},
+			#{is_search},#{sort_index},#{display_type},#{has_item},			
+			<choose>
+				<when test="default_item_index != null and default_item_index != ''">
+					#{default_item_index}
+				</when>
+				<otherwise>
+					NULL
+				</otherwise>
+			</choose>
+		)
+	</insert>	
+	
+	<!-- 문서유형 속성 수정 :: XR_ATTR -->
+	<update id="attrUpdate" parameterType="HashMap">
+		UPDATE XR_ATTR			
+		<set>
+			<if test="attr_name != null and attr_name != ''">
+				ATTR_NAME = #{attr_name} ,		
+			</if>			
+			<if test="attr_size != null and attr_size != ''">
+				ATTR_SIZE = #{attr_size} ,		
+			</if>			
+			<if test="is_editable != null and is_editable != ''">
+				IS_EDITABLE = #{is_editable} ,		
+			</if>			
+			<if test="is_mandatory != null and is_mandatory != ''">
+				IS_MANDATORY = #{is_mandatory} ,		
+			</if>			
+			<if test="is_search != null and is_search != ''">
+				IS_SEARCH = #{is_search} ,		
+			</if>			
+			<if test="sort_index != null and sort_index != ''">
+				SORT_INDEX = #{sort_index} ,		
+			</if>			
+			<if test="display_type != null and display_type != ''">
+				DISPLAY_TYPE = #{display_type} ,		
+			</if>			
+			<if test="has_item != null and has_item != ''">
+				HAS_ITEM = #{has_item} ,		
+			</if>			
+			<if test="default_item_index != null and default_item_index != ''">
+				DEFAULT_ITEM_INDEX = #{default_item_index} ,		
+			</if>			
+		</set>
+		<where>			
+			<if test="type_id != null and type_id != ''">
+				AND TYPE_ID = #{type_id}	
+			</if>			
+			<if test="attr_id != null and attr_id != ''">
+				AND ATTR_ID = #{attr_id}	
+			</if>			
+		</where> 				
+	</update>		
+		
+	<!-- 문서유형 삭제. :: XR_ATTR -->
+	<delete id="attrDelete" parameterType="HashMap">
+		DELETE FROM XR_ATTR 
+		<where>			
+			<if test="type_id != null and type_id != ''">
+				AND TYPE_ID = #{type_id}	
+			</if>			
+			<if test="attr_id != null and attr_id != ''">
+				AND ATTR_ID = #{attr_id}	
+			</if>			
+		</where> 				
+	</delete>
+	
+	<!-- 속성 아이템 목록 얻기. :: XR_ATTRITEM -->
+	<select id="attrItemList" parameterType="HashMap" resultType="AttrItem">
+		SELECT 
+			TYPE_ID, ATTR_ID, ITEM_INDEX, ITEM_NAME
+		FROM XR_ATTRITEM
+		<where>			
+			<if test="type_id != null and type_id != ''">
+				AND TYPE_ID = #{type_id}	
+			</if>			
+			<if test="attr_id != null and attr_id != ''">
+				AND ATTR_ID = #{attr_id}	
+			</if>			
+		</where> 				
+		ORDER BY ITEM_INDEX
+	</select>
+	
+	<!-- 아이템을 등록한다. :: XR_ATTRITEM -->
+	<insert id="attrItemWrite" parameterType="AttrItem">
+		INSERT INTO XR_ATTRITEM	
+		(
+			TYPE_ID, ATTR_ID, ITEM_INDEX, ITEM_NAME
+		) 
+		VALUES 
+		( 
+			#{type_id}, #{attr_id}, #{item_index},#{item_name}
+		)
+	</insert>
+	
+	<!-- 아이템 삭제.  :: XR_ATTRITEM -->
+	<delete id="attrItemDelete" parameterType="HashMap">
+		 DELETE FROM XR_ATTRITEM 
+		<where>			
+			<if test="type_id != null and type_id != ''">
+				AND TYPE_ID = #{type_id}	
+			</if>			
+			<if test="attr_id != null and attr_id != ''">
+				AND ATTR_ID = #{attr_id}	
+			</if>			
+		</where> 			
+	</delete>
+	
+			
+	<!-- 속성 값을 등록한다. 문서등록 -->
+	<insert id="attrValueWrite" parameterType="HashMap">
+		INSERT INTO ${tbl_name} ( DOC_ID ) 
+        VALUES ( #{doc_id} )
+	</insert>	
+	
+	<!-- 속성 값을 얻는다. 문서조회-->
+	<select id="attrValueDetail" parameterType="HashMap" resultType="String">
+		SELECT ${attr_id} FROM ${tbl_name}
+		<where>			
+			<if test="doc_id != null and doc_id != ''">
+				AND DOC_ID = #{doc_id}	
+			</if>			
+		</where> 				
+	</select>
+	
+	<!-- 속성 값을 수정한다. 문서수정 -->
+	<update id="attrValueUpdate" parameterType="HashMap">
+		UPDATE ${tbl_name} 
+		SET ${attr_id} = #{attr_value}
+		<where>			
+			<if test="doc_id != null and doc_id != ''">
+				AND DOC_ID = #{doc_id}	
+			</if>			
+		</where> 			
+	</update>
+	
+	<!-- 속성 값을 삭제한다. 문서수정 -->
+	<delete id="attrValueDelete" parameterType="HashMap">
+		DELETE FROM ${tbl_name}
+		<where>			
+			<if test="doc_id != null and doc_id != ''">
+				AND DOC_ID = #{doc_id}	
+			</if>			
+		</where> 			
+	</delete>
+	
+	<!-- 테이블명 조회. 각 DB별로 별도처리 -->
+	<select id="tableInfo" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(OBJECT_NAME) AS CNT
+		FROM USER_OBJECTS		
+		WHERE OBJECT_TYPE = 'TABLE' AND OBJECT_NAME = #{object_name}	
+	</select>
+	
+	<!-- 확장문서유형 테이블에 속성값을 추가한다. -->
+	<insert id="insertAttrValue" parameterType="HashMap">
+		INSERT INTO ${tbl_name} (DOC_ID) VALUES(#{doc_id})
+	</insert>
+	
+	<!-- 확장문서유형 테이블에 속성값을 수정한다 :: 문서유형속성들이 동적이기때문에 이렇게 처리함 -->
+	<update id="updateAttrValue" parameterType="HashMap">
+		UPDATE ${tbl_name} 
+		SET ${attr_id} = #{attr_value}
+		<where>			
+			<if test="doc_id != null and doc_id != ''">
+				AND DOC_ID = #{doc_id}	
+			</if>			
+		</where> 			
+	</update>
+	
+</mapper>

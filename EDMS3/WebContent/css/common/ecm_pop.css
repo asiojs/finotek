@@ -1,0 +1,54 @@
+@charset "UTF-8";
+
+/* 레이아웃 */
+html, body{width:730px;max-width:730px;height:492px;max-height:492px;margin:0;padding:0;font-family:dotum;font-size:12px}
+.wrap{position:relative;display:block;height:100%}
+
+/* 환경설정 */
+.config_wrapper{position:absolute;width:100%;height:100%;top:0;left:0;background-color:rgba(0,0,0,0.5);z-index:40}
+.config{position:absolute;overflow:hidden;width:688px;top:20px;left:20px;border:1px solid #525252;border-radius:5px;background-color:#fff;z-index:50}
+.config_title{position:relative;padding:12px 14px 12px 20px;border-bottom:1px solid #525252;background-color:#ebebeb;color:#333;font-weight:bold}
+.config_cnts{padding:20px 20px 10px 20px}
+
+/* 비밀번호 변경*/
+.passwd_change{margin-top:5px;padding-top:30px;border-top:1px solid #eee}
+.config_btnGrp{padding:20px 0 30px 0;border-top:1px solid #b4b4b4;text-align:center}
+.config_btnGrp button{padding:5px 8px;border:1px solid #b7b7b7;border-radius:3px;cursor:pointer}
+.config_confirm_btn{border:1px solid #333!important;color:#333;font-weight:bold}
+.config_cancel_btn{margin-left:5px}
+
+
+/* 기본환경 설정 */
+.default_setting a.skin_set{display:inline-block;width:26px;height:26px;padding:4px;border:1px dotted #cacaca}
+.default_setting a.skin_set.pushed{border:1px solid #333}
+.default_setting label{margin-left:16px}
+.default_setting label:first-child{margin-left:0}
+
+.language{border:1px solid #cacaca;cursor:pointer}
+.pg_size{border:1px solid #cacaca;cursor:pointer}
+.doc_search{border:1px solid #cacaca;cursor:pointer}
+
+
+/* 탭 메뉴 */
+.tab_menu{position:relative;height:31px;margin-top:22px;padding-left:1px}
+.tab_btn_wrapper{position:absolute;display:inline-block;width:367px;right:0}
+.tab_btn_wrapper label{float:left} 
+.tab_btn_wrapper button{float:left;margin-left:6px;padding:5px 10px 5px 10px;border:1px solid #b7b7b7;border-radius:3px;color:#404040;cursor:pointer;font-size:12px}
+.tab_element{display:inline-block;float:left;margin-left:-1px;padding:8px 18px 8px 18px;border:1px solid #e7e7e7;border-bottom:0;background-color:#f5f5f5;cursor:pointer}
+.tab_element.selected{padding:8px 18px 9px 18px;border:1px solid #c9c9c9;border-bottom:0;background-color:#fff;font-weight:bold}
+.tab_form{border-top:1px solid #c9c9c9;padding-top:10px;}
+.tab_form > div.tbl_wrapper{position:relative}
+.tab_form table{width:100%}
+.tab_form table tr{height:29px}
+.tab_form table tr.line{border-bottom:1px solid #e5e5e5}
+.tab_form table th{padding:10px 0 10px 12px;color:#666;font-weight:bold}
+.tab_form table td{padding:10px 0 10px 12px;}
+
+/* 탭 메뉴 폼 영역 */
+input[type=text].input_txt_myInfo{width:461px;padding:6px 10px;border:1px solid #cacaca;border-radius:3px;color:#333}
+input[type=text].input_txt_passwd{width:461px;padding:6px 10px;border:1px solid #cacaca;border-radius:3px;color:#333}
+input[type=password].input_txt_passwd{width:461px;padding:6px 10px;border:1px solid #cacaca;border-radius:3px;color:#333}
+p.caution{margin-top:5px;color:#8a8a8a;line-height:16px;font-size:11px}
+
+.hide{display:none}
+.readonly{background-color:#e5e9f2}

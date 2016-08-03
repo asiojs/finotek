@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <title>index</title>
+  <script src="/js/jquery-2.1.3.min.js"></script>
+  <script src="/lib/jstree/jstree.js"></script>
+  <script src="/js/tree.js"></script>
+  <script src="/js/jquery-ui.js"></script>
+  <script src="/lib/jqgrid/js/jquery.jqGrid.min.js"></script>
+  <script src="/js/jquery.ddslick.custom.js"></script>
+  <script src="/js/jquery.cookie.js"></script>
+  <script src="/js/jquery.alerts.js"></script>
+  <script src="/js/admin/ecm.js"></script>
+  <script src="/lib/scrollbar/jquery.tinyscrollbar.js"></script>
+
+  <link rel="stylesheet" href="/css/admin/ecm.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/jqtree-custom.css">
+  <link rel="stylesheet" href="/css/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery.alerts.css">
+  <link rel="stylesheet" href="/css/jquery.ddslick.custom.css">
+  <link rel="stylesheet" href="/lib/jqgrid/css/ui.jqgrid.css">
+</head>
+
+<body>
+	<div class="wrap">
+	    <header class="header">
+	    	<div class="header_subWrapper">
+	    		<div class="logo">
+					<h1><a href="#"><img src="/img/logo.png"></a></h1>
+				</div>
+				<div class="header_menu_wrapper">
+					<div class="header_icon">
+						<ul class="header_icon_menu">
+							<li class="main_menu">
+								<a href="#" class="system selected">시스템 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#" class="selected">그룹관리</a></li>
+										<li><a href="#">사용자관리</a></li>
+										<li><a href="#">메뉴접근제한관리</a></li>
+										<li><a href="#">환경설정 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="document">문서 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">문서유형 관리</a></li>
+										<li><a href="#">폴더 관리</a></li>
+										<li><a href="#">권한 관리(ACL)</a></li>
+										<li><a href="#">만기 문서 관리</a></li>
+										<li><a href="#">소유권 변경</a></li>
+										<li><a href="#">휴지통 관리</a></li>
+										<li><a href="#">중복 파일 관리</a></li>
+										<li><a href="#">대량문서 열람 검사 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="rGate">rGate 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">저장금지 확장자 관리</a></li>
+										<li><a href="#">저장 허용 프로그램 관리</a></li>
+										<li><a href="#">로컬 저장 허용 관리</a></li>
+										<li><a href="#">USB 저장 허용 관리</a></li>
+									</ul>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="header_user">
+						<ul class="header_user_menu">
+							<li class="user_info">
+								<a href="#">
+									<img src="/img/icon/user_info.png" alt="">
+									<strong>관리자</strong>님 환영합니다.
+								</a>
+							</li>
+							<li class="user_account">
+								<a href="#"><img src="/img/icon/admin/pwd.png" alt=""></a>
+							</li>
+							<li class="user_logout">
+								<a href="#"><img src="/img/icon/user_logout.png" alt=""></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+	    	</div>
+		</header>
+		<div class="cnt_wrapper">
+			<div class="depth_navigation">
+				rGate 관리 &gt; 저장 허용 프로그램 관리
+			</div>
+			
+			<div class="rGate_config_menu">
+				<label class="rGate_srch_lbl1">정책유형</label>
+				<select id="rGate_policy">
+					<option>전체</option>
+					<option>제목</option>
+				</select>
+				
+				<label class="rGate_srch_lbl2">
+					부서/사용자
+					<input type="text" id="" name="" class="" value="">
+				</label>
+				<button type="button" id="" name="" class="rGate_info_srchBtn btn bold">검색</button>
+			</div>
+			
+			<div class="rGateConfig_sub_wrapper">
+				<div class="rGate_config_info">
+					<div>
+						<button type="button" id="" name="" class="app_add_btn btn1 bold">전사 추가</button>
+						<button type="button" id="" name="" class="app_deptUser_btn btn1 bold">부서/사용자 추가</button>
+						<button type="button" id="" name="" class="app_modify_btn btn1">정책 수정</button>
+						<button type="button" id="" name="" class="delete_app_policy btn1">정책 삭제</button>
+						<button type="button" id="" name="" class="regist_app_policy btn1">저장 허용 프로그램 목록관리</button>
+					</div>
+					
+					<div class="extension_list">
+					
+					</div>
+					jqGrid 영역
+					<!-- 
+					<table>
+						<colgroup>
+							<col width="36"/>
+							<col width="135"/>
+							<col width="135"/>
+							<col width="135"/>
+							<col width="865"/>
+						</colgroup>
+						<tr>
+							<th colspan="5" class="btnGrp left">
+								
+							</th>
+						</tr>							
+						<tr class="no_bg">
+							<th class="center"><input type="checkbox" id="" name="" class="checkAll" value=""></th>
+							<th class="no_bold">정책유형</th>
+							<th class="no_bold">부서명</th>
+							<th class="no_bold">사용자명</th>
+							<th class="no_bold">저장 금지 확장자</th>
+						</tr>	
+						<tr>
+							<td><input type="checkbox" id="" name="" class="" value=""></td>
+							<td>전사</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>doc;ppt;xls;hwp;docx;pptx;xlsx</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox" id="" name="" class="" value=""></td>
+							<td>부서</td>
+							<td>솔루션사업부</td>
+							<td>&nbsp;</td>
+							<td>doc;ppt;xls;rtf;dwg;hwp;gul;pdf;txt;docx;pptx;xlsx;</td>
+						</tr>
+					</table>
+					-->
+				</div>	
+			</div>	
+			<div class="pg_navi_wrapper">
+            	<ul class="pg_navi">
+                	<li class="first"><a href="#"><img src="/img/icon/pg_first.png" alt="" title=""></a></li>
+                    <li class="prev"><a href="#"><img src="/img/icon/pg_prev.png" alt="" title=""></a></li>
+                	<li class="curr"><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                    <li><a href="#">6</a></li>
+                    <li><a href="#">7</a></li>
+                    <li><a href="#">8</a></li>
+                    <li><a href="#">9</a></li>
+                    <li><a href="#">10</a></li>
+                    <li class="next"><a href="#"><img src="/img/icon/pg_next.png" alt="" title=""></a></li>
+					<li class="last"><a href="#"><img src="/img/icon/pg_last.png" alt="" title=""></a></li>
+                </ul>    
+           	</div>
+		</div>
+	   	<footer class="footer">
+			<p class="copyright">Copyright eXsoft All Rights Reserved.</p>
+		</footer>
+		
+		<!-- 저장 허용 프로그램 선택 시작 -->
+	   	<div class="rGate_application_wrapper hide"></div>
+	   	<div class="rGate_application hide">
+	   		<div class="window_title">
+	   			저장 허용 프로그램 선택
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="rGate_application_cnts">
+	        	<table>
+	        		<colgroup>
+	        			<col width="38"/>
+	        			<col width="267"/>
+	        		</colgroup>
+	        		<tr>
+	        			<th><input type="checkbox" id="" name="" class="checkAll" value=""></th>
+	        			<th>저장 허용 프로그램</th>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>excel.exe</td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>notepad.exe</td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>calc.exe</td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>powerpoint.exe</td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>format.com</td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>chrome.exe</td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>hwp.exe</td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>wordpad.exe</td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>photoshop.exe</td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>mspaint.exe</td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>services.msc</td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>msconfig</td>
+	        		</tr>
+	        	</table>
+	        </div>
+	        <div class="btnGrp">
+        		 <button type="button" id="" name="" class="btn1 bold" value="">저장</button>
+        		 <button type="button" id="" name="" class="btn1" value="">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 저장 허용 프로그램 선택 끝 -->
+		
+		<!-- 저장 허용 프로그램 목록 시작 -->
+	   	<div class="rGate_appList_wrapper hide"></div>
+	   	<div class="rGate_appList hide">
+	   		<div class="window_title">
+	   			저장 허용 프로그램 목록
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="rGate_appList_cnts">
+	        	<div>
+	        		<button type="button" id="" class="regist_rGate_appList">추가</button>
+	        		<button type="button" id="" class="delete_rGate_appList">삭제</button>
+	        	</div>
+	        	<div class="appList_cnts_subWrapper">
+	        		<table>
+		        		<colgroup>
+		        			<col width="38"/>
+		        			<col width="267"/>
+		        		</colgroup>
+		        		<tr>
+		        			<th><input type="checkbox" id="" name="" class="checkAll" value=""></th>
+		        			<th>저장 허용 프로그램</th>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>excel.exe</td>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>notepad.exe</td>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>calc.exe</td>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>powerpoint.exe</td>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>format.com</td>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>chrome.exe</td>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>hwp.exe</td>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>wordpad.exe</td>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>photoshop.exe</td>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>mspaint.exe</td>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>services.msc</td>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td>msconfig</td>
+		        		</tr>
+		        	</table>
+	        	</div>
+	        </div>
+	        <div class="btnGrp">
+        		 <button type="button" id="" name="" class="btn1 bold" value="">저장</button>
+        		 <button type="button" id="" name="" class="btn1" value="">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 저장 허용 프로그램 목록 끝 -->
+	   	
+		<!-- 프로그램 추가 시작 -->
+	   	<div class="rGate_registApplication_wrapper hide"></div>
+	   	<div class="rGate_registApplication hide">
+	   		<div class="window_subtitle">
+	   			저장 허용 프로그램 목록
+	            <a href="#" class="window_close"><img src="/img/icon/window_close1.png" alt="" title=""></a>
+	        </div>
+	        <div class="rGate_registApplication_cnts">
+	        	<p>
+		        	프로그램 명을 입력하세요!<br>
+		        	eg) iexplore.exe
+	        	</p>
+	        	<div class="registApplication_txt">
+		        	<form>
+		        		<input type="text" id="" name="" class="" value="">
+		        	</form>
+	        	</div>
+	        </div>
+	        <div class="btnGrp">
+        		 <button type="button" id="" name="" class="btn1 bold" value="">저장</button>
+        		 <button type="button" id="" name="" class="btn1" value="">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 프로그램 추가 끝 -->
+	   	
+		<!-- 부서/사용자 정책 설정 -->
+	   	<div class="rGate_deptUserPolicy_wrapper hide"></div>
+	   	<div class="rGate_deptUserPolicy hide">
+	   		<div class="window_title">
+	   			부서/사용자 정책 설정
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="rGate_deptUserPolicy_cnts">
+	        	<div class="deptUserPolicy_sub_wrapper">
+	        		<div class="deptUserPolicy_left">
+	        			<div class="deptUserPolicy_top">
+	        				<div class="dept">
+		        				<div class="dept_title">
+			        				부서
+			        			</div>
+			        			<div class="dept_tree">
+			        			
+			        			</div>
+		        			</div>
+		        			
+		        			<div class="user">
+			        			<div class="selected_user">
+			        				<table id="">
+			        					<colgroup>
+			        						<col width="38"/>
+			        						<col width="139"/>
+			        					</colgroup>
+			        					<tr>
+			        						<th><input type="checkbox" id="" name="" class="checkAll" value=""></th>
+			        						<th>사용자</th>
+			        					</tr>
+			        				</table>
+			        			</div>
+		        			</div>
+	        			</div>
+	        			
+	        			<div class="deptUserPolicy_bottom">
+	        				<div class="deptUserPolicy_subWrapper">
+		        				<div class="deptUser_srch_form">
+			        				<form>
+			        					<label>
+			        						<select class="user_type">
+				        						<option value="">사용자</option>
+				        						<option value="">부서</option>
+				        					</select>
+			        						<input type="text" id="" name="" class="srch_txt">
+			        					</label>
+			        					<button type="button" id="" name="" class="btn">선택</button>
+			        				</form>
+			        			</div>
+			        			<div class="deptUser_srch_result">
+			        				<table class="result">
+			        					<tr>
+			        						<th><input type="checkbox" id="" name="" class="checkAll" value=""></th>
+			        						<th>구분</th>
+			        						<th>성명/부서명</th>
+			        						<th>ID</th>
+			        					</tr>
+			        					<tr>
+			        						<td><input type="checkbox" name="" class="" value=""></td>
+			        						<td>사용자</td>
+			        						<td>경영정보팀</td>
+			        						<td>10001281</td>
+			        					</tr>
+			        				</table>
+			        			</div>
+		        			</div>
+		        			
+		        			<div class="pg_subWrapper">
+		        				<div class="pg_navi_wrapper">
+					            	<ul class="pg_navi">
+					                	<li class="first"><a href="#"><img src="/img/icon/pg_first.png" alt="" title=""></a></li>
+					                    <li class="prev"><a href="#"><img src="/img/icon/pg_prev.png" alt="" title=""></a></li>
+					                	<li class="curr"><a href="#">1</a></li>
+					                    <li><a href="#">2</a></li>
+					                    <li><a href="#">3</a></li>
+					                    <li><a href="#">4</a></li>
+					                    <li><a href="#">5</a></li>
+					                    <li class="next"><a href="#"><img src="/img/icon/pg_next.png" alt="" title=""></a></li>
+										<li class="last"><a href="#"><img src="/img/icon/pg_last.png" alt="" title=""></a></li>
+					                </ul>    
+					           	</div>
+		        			</div>
+	        			</div>
+	        		</div>
+	        		<div class="deptUserPolicy_center">
+	        			<div class="selected_btnGrp1">
+		        			<a href="#" class="">
+								<img src="/img/icon/add_user.png" alt="" title="">
+							</a>
+							<a href="#" class="">
+								<img src="/img/icon/sub_user.png" alt="" title="">
+							</a>
+		        		</div>
+	        		</div>
+	        		
+	        		
+	        		<div class="deptUserPolicy_right">
+	        			<div class="selected_applyUser1">
+							<div class="selected_cnts1">
+								<div class="selected_sub_wrapper1">
+									<table id="">
+										<tr>
+											<th><input type="checkbox" id="" name="" class="" value=""></th>
+											<th>사용자/부서</th>
+										</tr>
+										<tr>
+											<td><input type="checkbox" id="" name="" class="" value=""></td>
+											<td>홍길동</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+						
+	        			<div class="selected_prohibitedExt1">
+							<div class="selected_cnts1">
+								<div class="selected_sub_wrapper1">
+									<table id="">
+										<tr>
+											<th><input type="checkbox" id="" name="" class="" value=""></th>
+											<th>저장 허용 프로그램</th>
+										</tr>
+										<tr>
+											<td><input type="checkbox" id="" name="" class="" value=""></td>
+											<td>eclipse.exe</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+	        		</div>
+	        	</div>
+	        </div>
+	        <div class="btnGrp">
+        		 <button type="button" id="" name="" class="btn1 bold" value="">권한저장</button>
+        		 <button type="button" id="" name="" class="btn1" value="">닫기</button>
+        	</div>
+	    </div>
+	   	<!-- 저장금지 확장자 끝 -->
+	</div>
+</body>
+</html>

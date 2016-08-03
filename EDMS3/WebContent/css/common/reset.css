@@ -1,0 +1,52 @@
+/** kres_nik(2014.04.21) */
+@CHARSET "UTF-8";
+
+
+/** element 초기화 */
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,
+small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{
+margin:0;padding:0;border:0px;outline:0;/*IE�뿉�꽌 �꺆�궎�씠�슜�떆 �븞蹂댁엫*/vertical-align:baseline;background:transparent;}
+input{margin:0;padding:0;}
+textarea{resize:none;}
+body,h1,h2,h3,h4,input,button,textarea{color:#141414;background:none;}
+h1,h2,h3,h4,h5,h6{font-weight:normal;}
+fieldset,img,abbr,acronym{border:0 none;}
+ol,ul,li{list-style:none;}
+table{border-collapse:collapse;border-spacing:0;border:0 none;}
+caption,th,td{text-align:left;vertical-align:middle;font-weight:normal;}
+address,caption,em,cite{font-weight:normal; font-style:normal;}
+img{vertical-align:top;}
+label,select,input,textarea{vertical-align:middle;}
+i,em,address{font-style:normal;font-weight:normal;}
+legend{left:-5000px;overflow:hidden;position:absolute;top:-5000px;}
+a{text-decoration:none;color:#141414;}
+a:hover{text-decoration:none;}
+a:focus,a:active{text-decoration:none;}
+hr{border:0 none;margin:0;}
+
+
+/** 접근성을 위한 hidden */
+/* legend,hr,.hidden{font-size:0 !important;height:0 !important;left:0 !important;line-height:0 !important;margin:0 !important;overflow:hidden !important;padding:0 !important;position:absolute !important;top:0 !important;width:0 !important;z-index:-1 !important;} */
+.hidden{font-size:0 !important;height:0 !important;left:0 !important;line-height:0 !important;margin:0 !important;overflow:hidden !important;padding:0 !important;position:absolute !important;top:0 !important;width:0 !important;z-index:-1 !important;}
+
+/** 접근성을 위한 마우스 커서 포인터 설정  */
+label,.cursorPointer{cursor:pointer;}
+
+/** 한줄 text 말줄임 */
+.ellipsis_text{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:94%;}
+
+/** 캡션 전용 hidden(크롬,오페라,사파리) */
+.cap_hide{width:0;height:0;visibility:hidden;*display:none;}
+
+/** 투명도100% class */
+/* .unvisible{opacity:0;filter:alpha(opacity:'0');_filter:alpha(opacity=0);} */
+.unvisible{opacity:0;filter:alpha(opacity=0);-ms-filter:"alpha(opacity=0)";-moz-opacity:0;-khtml-opacity:0;zoom:1;}
+
+.smartEditContents ul{padding-left:20px;}
+.smartEditContents ul li{list-style:disc inside;}
+.smartEditContents ol{padding-left:20px;}
+.smartEditContents ol li{list-style:decimal inside;}
+
+.btnReset{font-family:"돋움",Dotum;font-size:12px;}
+
+/*img{width:100%;}*/

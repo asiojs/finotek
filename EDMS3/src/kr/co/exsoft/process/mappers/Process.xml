@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.process.dao.ProcessDao">
+
+	<!-- Insert Start... -->
+	<!-- 업무(협업) 등록 -->
+	<insert id="insertProcess" parameterType="Process">
+		INSERT INTO XR_PROCESS 
+			(PROCESS_ID,DOC_ROOT_ID,CREATOR_ID,CREATOR_NAME,CREATE_DATE,NAME,STATUS,EXPECT_DATE,CONTENT) 
+		VALUES 
+			(#{process_id},#{doc_root_id},#{creator_id},#{creator_name},SYSDATE,#{name},#{status},#{expect_dateDB},#{content})
+	</insert>
+	
+	<!-- 업무(협업) 실행자 등록 -->
+	<insert id="insertProcessExecutor" parameterType="ProcessExecutor">
+		INSERT INTO XR_PROCESS_EXECUTOR 
+			(EXECUTE_ID,PROCESS_ID,DOC_ROOT_ID,TYPE,EXECUTOR_ID,EXECUTOR_NAME,SORT_INDEX,STATUS,START_DATE) 
+		VALUES (#{execute_id},#{process_id},#{doc_root_id},#{type},#{executor_id},#{executor_name},#{sort_index},#{status},#{start_dateDB})
+	</insert>
+	<!-- Insert End... -->
+	
+	<!-- Update Start... -->
+	<!-- 업무(협업) 정보 수정 -->
+	<update id="updateProcess" parameterType="Process">
+		UPDATE XR_PROCESS
+		<set>
+			<if test="name != null and name != ''">
+				NAME = #{name},
+			</if>
+			<if test="status != null and status != ''">
+				STATUS = #{status},
+			</if>
+			<if test="expect_dateDB != null">
+				EXPECT_DATE = #{expect_dateDB},
+			</if>
+			<if test="complete_dateDB != null">
+				COMPLETE_DATE = #{complete_dateDB},
+			</if>
+			<if test="content != null and content != ''">
+				CONTENT = #{content},
+			</if>
+		</set>
+		WHERE PROCESS_ID = #{process_id}
+	</update>
+	
+	<!--  -->
+	<update id="updateProcessExecutor" parameterType="ProcessExecutor">
+		UPDATE XR_PROCESS_EXECUTOR
+		<set>
+			<if test="sort_index != null and sort_index != ''">
+				SORT_INDEX = #{sort_index},
+			</if>
+			<if test="status != null and status != ''">
+				STATUS = #{status},
+			</if>
+			<if test="start_dateDB != null">
+				START_DATE = #{start_dateDB},
+			</if>
+			<if test="end_dateDB != null">
+				END_DATE = #{end_dateDB},
+			</if>
+		</set>
+		<where>
+			<choose>
+				<when test="updateDBType != null and updateDBType == 'APPROVEREQUEST'">
+					TYPE IN ('R', 'C')
+				</when>
+				<when test="updateDBType != null and updateDBType == 'APPROVE'">
+					TYPE = 'A' AND STATUS = 'S'
+				</when>
+				<when test="updateDBType != null and updateDBType == 'APPROVEREJECT'">
+					TYPE = 'A'
+				</when>
+				<otherwise>
+					EXECUTE_ID = #{execute_id}
+				</otherwise>
+			</choose>
+		</where>
+	</update>
+	<!-- Update End... -->
+	
+	<!-- Delete Start... -->
+	<!-- Delete End... -->
+	
+	<!-- Select Start... -->
+	<!-- 메인화면 건수 가져오기 -->
+	<select id="processCount" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(EXECUTE_ID)
+		FROM 
+			XR_PROCESS_EXECUTOR
+		<where>
+			STATUS = 'S'
+			AND EXECUTOR_ID = #{user_id}
+			<choose>
+				<when test='type == "W"'> <!-- 작성중문서 -->
+					AND TYPE IN ('R','C') 
+				</when>
+				<when test='type == "A"'> <!-- 승인대기문서 -->
+					AND TYPE = 'A' 
+				</when>
+			</choose>
+		</where>
+	</select>
+	
+	<!-- 협업 문서 카운트 -->
+	<select id="processListCount" parameterType="HashMap" resultType="Int">
+		SELECT
+		  			COUNT(P.PROCESS_ID)	
+		  FROM XR_PROCESS P
+				 INNER JOIN XR_PROCESS_EXECUTOR PE 
+				 ON PE.EXECUTOR_ID = #{user_id}
+		     	 AND PE.PROCESS_ID = P.PROCESS_ID     
+		     	 <choose>
+					<when test="type == 'WRITE_ING'">AND (PE.TYPE = 'R' OR PE.TYPE = 'C') AND PE.STATUS = 'S'</when>
+					<when test="type == 'APPROVAL_ING'">AND PE.TYPE = 'A' AND PE.STATUS = 'S'</when>
+					<when test="type == 'REQUEST'">AND PE.TYPE = 'Q'</when>
+					<when test="type == 'WRITE_END'">AND (PE.TYPE = 'R' OR PE.TYPE = 'C') AND PE.STATUS = 'E'</when>
+					<when test="type == 'APPROVAL_END'">AND PE.TYPE = 'A' AND PE.STATUS = 'E'</when>
+					<when test="type == 'RECEIVE'">AND PE.TYPE = 'I' AND PE.STATUS = 'E'</when>
+				</choose>
+			<where>
+				<choose>
+					<when test="type == 'WRITE_ING'">P.STATUS IN ('W', 'M')</when>
+					<when test="type == 'APPROVAL_ING'">P.STATUS = 'A'</when>
+					<when test="type == 'WRITE_END'">P.STATUS = 'E'</when>
+					<when test="type == 'APPROVAL_END'">P.STATUS = 'E'</when>
+					<when test="type == 'RECEIVE'">P.STATUS = 'E'</when>
+				</choose>
+				<if test="strKeyword1 != null and strKeyword1 != ''">	AND ${strIndexColumn} LIKE '%${strKeyword1}%' </if>
+				<if test="sdate != null and sdate != ''"><![CDATA[ AND P.CREATE_DATE >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]></if>	
+				<if test="edate != null and edate != ''"><![CDATA[ AND P.CREATE_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999  ]]></if>
+			</where>
+	</select>
+	<!-- 협업 문서 목록 -->
+	<select id="processList" parameterType="HashMap" resultType="Process">
+		SELECT
+		 		PROCESS_ID, DOC_ROOT_ID, NAME, STATUS, CREATOR_ID, CREATOR_NAME, EXPECT_DATE, COMPLETE_DATE
+		FROM 
+		(
+		  SELECT
+		  			P.PROCESS_ID, P.DOC_ROOT_ID, P.NAME, P.STATUS, P.CREATOR_ID, 
+					P.CREATOR_NAME, P.EXPECT_DATE, P.COMPLETE_DATE,
+		        CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM	
+		  FROM XR_PROCESS P
+				 INNER JOIN XR_PROCESS_EXECUTOR PE 
+				 ON PE.EXECUTOR_ID = #{user_id}
+		     	 AND PE.PROCESS_ID = P.PROCESS_ID     
+		     	 <choose>
+					<when test="type == 'WRITE_ING'">AND (PE.TYPE = 'R' OR PE.TYPE = 'C') AND PE.STATUS = 'S'</when>
+					<when test="type == 'APPROVAL_ING'">AND PE.TYPE = 'A' AND PE.STATUS = 'S'</when>
+					<when test="type == 'REQUEST'">AND PE.TYPE = 'Q'</when>
+					<when test="type == 'WRITE_END'">AND (PE.TYPE = 'R' OR PE.TYPE = 'C') AND PE.STATUS = 'E'</when>
+					<when test="type == 'APPROVAL_END'">AND PE.TYPE = 'A' AND PE.STATUS = 'E'</when>
+					<when test="type == 'RECEIVE'">AND PE.TYPE = 'I' AND PE.STATUS = 'E'</when>
+				</choose>
+			<where>
+				<choose>
+					<when test="type == 'WRITE_ING'">P.STATUS IN ('W', 'M')</when>
+					<when test="type == 'APPROVAL_ING'">P.STATUS = 'A'</when>
+					<when test="type == 'WRITE_END'">P.STATUS = 'E'</when>
+					<when test="type == 'APPROVAL_END'">P.STATUS = 'E'</when>
+					<when test="type == 'RECEIVE'">P.STATUS = 'E'</when>
+				</choose>
+				<if test="strKeyword1 != null and strKeyword1 != ''">	AND ${strIndexColumn} LIKE '%${strKeyword1}%' </if>
+				<if test="sdate != null and sdate != ''"><![CDATA[ AND P.CREATE_DATE >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]></if>	
+				<if test="edate != null and edate != ''"><![CDATA[ AND P.CREATE_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999  ]]></if>
+			</where>	
+		) LIST WHERE LIST.PAGENUM = #{nPage}	
+	</select>
+	
+	<!-- 실행자 목록 -->
+	<select id="processExcutorList" parameterType="HashMap" resultType="ProcessExecutor">
+		SELECT PROCESS_ID, TYPE, EXECUTOR_ID, EXECUTOR_ID, EXECUTOR_NAME, STATUS 
+		  FROM XR_PROCESS_EXECUTOR
+		 WHERE
+		<choose>
+			<when test="processIdList != null and processIdList !='' ">
+				PROCESS_ID IN
+				<foreach item="item" index="index" collection="processIdList" separator="," open=" ( " close=")" >
+						#{item}
+				</foreach>
+			</when>
+			<when test="process_id != null and process_id !='' ">
+				PROCESS_ID  = #{process_id}
+			</when>
+		</choose> 
+		AND TYPE IN('R','C','A','I')
+		ORDER BY SORT_INDEX
+	</select>
+	
+	<!-- 최근 등록한 업무 목록 -->
+	<select id="processRecentlyRegistList" parameterType="HashMap" resultType="Process">
+		SELECT P.PROCESS_ID, P.NAME, R.IDX AS RECENTLY_ID
+		  FROM XR_PROCESS P
+		 INNER JOIN XR_RECENTLY_OBJECT R ON R.USER_ID = #{user_id} AND R.TARGET_TYPE = 'P'
+		 WHERE P.PROCESS_ID = R.TARGET_ID 
+		 ORDER BY R.LAST_USED_DATE DESC
+	</select>
+	
+	<!-- 업무명 가져오기 -->
+	<select id="processInfo" parameterType="HashMap" resultType="Process">
+		SELECT PROCESS_ID, DOC_ROOT_ID, CREATOR_ID, CREATOR_NAME, CREATE_DATE,
+			   NAME, STATUS, EXPECT_DATE, COMPLETE_DATE, CONTENT
+		 FROM XR_PROCESS
+		WHERE PROCESS_ID = #{process_id}
+	</select>
+	
+	<!-- 폴더ID 가져오기 -->
+	<select id="processFolderIdByDocId" parameterType="HashMap" resultType="String">
+		SELECT FOLDER_ID
+		 FROM XR_LINKED
+		WHERE DOC_ID = #{doc_id}
+	</select>
+	
+	<!-- 현재 승인 할 승인자 정보 가져오기 -->
+	<select id="currentApproverInfo" parameterType="HashMap" resultType="ProcessExecutor">
+		SELECT EXECUTE_ID, PROCESS_ID, DOC_ROOT_ID, TYPE, EXECUTOR_ID,
+		       EXECUTOR_NAME, SORT_INDEX, STATUS, START_DATE, END_DATE
+		 FROM XR_PROCESS_EXECUTOR
+		WHERE PROCESS_ID = #{process_id}
+		  AND TYPE = 'A'
+		  AND STATUS != 'E'
+		  AND SORT_INDEX = (
+		  					SELECT MIN(sort_index) 
+		                    FROM XR_PROCESS_EXECUTOR 
+		                    WHERE PROCESS_ID = #{process_id}
+		                    AND TYPE = 'A'
+		                    AND STATUS != 'E'
+		  					)
+	</select>
+	<!-- Select End... -->
+</mapper>	

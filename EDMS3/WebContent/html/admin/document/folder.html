@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <title>index</title>
+  <script src="/js/jquery-2.1.3.min.js"></script>
+  <script src="/lib/jstree/jstree.js"></script>
+  <script src="/js/tree.js"></script>
+  <script src="/js/jquery-ui.js"></script>
+  <script src="/lib/jqgrid/js/jquery.jqGrid.min.js"></script>
+  <script src="/js/jquery.ddslick.custom.js"></script>
+  <script src="/js/jquery.cookie.js"></script>
+  <script src="/js/jquery.alerts.js"></script>
+  <script src="/js/admin/ecm.js"></script>
+
+  <link rel="stylesheet" href="/css/admin/ecm.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/jqtree-custom.css">
+  <link rel="stylesheet" href="/css/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery.alerts.css">
+  <link rel="stylesheet" href="/css/jquery.ddslick.custom.css">
+  <link rel="stylesheet" href="/lib/jqgrid/css/ui.jqgrid.css">
+</head>
+
+<body>
+	<div class="wrap">
+	    <header class="header">
+	    	<div class="header_subWrapper">
+	    		<div class="logo">
+					<h1><a href="#"><img src="/img/logo.png"></a></h1>
+				</div>
+				<div class="header_menu_wrapper">
+					<div class="header_icon">
+						<ul class="header_icon_menu">
+							<li class="main_menu">
+								<a href="#" class="system selected">시스템 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#" class="selected">그룹관리</a></li>
+										<li><a href="#">사용자관리</a></li>
+										<li><a href="#">메뉴접근제한관리</a></li>
+										<li><a href="#">환경설정 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="document">문서 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">문서유형 관리</a></li>
+										<li><a href="#">폴더 관리</a></li>
+										<li><a href="#">권한 관리(ACL)</a></li>
+										<li><a href="#">만기 문서 관리</a></li>
+										<li><a href="#">소유권 변경</a></li>
+										<li><a href="#">휴지통 관리</a></li>
+										<li><a href="#">중복 파일 관리</a></li>
+										<li><a href="#">대량문서 열람 검사 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="rGate">rGate 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">저장금지 확장자 관리</a></li>
+										<li><a href="#">저장 허용 프로그램 관리</a></li>
+										<li><a href="#">로컬 저장 허용 관리</a></li>
+										<li><a href="#">USB 저장 허용 관리</a></li>
+									</ul>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="header_user">
+						<ul class="header_user_menu">
+							<li class="user_info">
+								<a href="#">
+									<img src="/img/icon/user_info.png" alt="">
+									<strong>관리자</strong>님 환영합니다.
+								</a>
+							</li>
+							<li class="user_account">
+								<a href="#"><img src="/img/icon/admin/pwd.png" alt=""></a>
+							</li>
+							<li class="user_logout">
+								<a href="#"><img src="/img/icon/user_logout.png" alt=""></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+	    	</div>
+		</header>
+		<div class="cnt_wrapper">
+			<div class="depth_navigation">
+				문서관리 &gt; 폴더 관리
+			</div>
+			
+			<div class="folder_sub_wrapper">
+				<div class="sub_left">
+					<div class="srch_result_wrapper">
+						<div class="folder_btnGrp left">
+							<button type="button" id="" name="" class="register_folder_btn">등록</button>
+							<button type="button" id="" name="" class="move_folder_btn">이동</button>
+							<button type="button" id="" name="" class="delete_folder_btn">삭제</button>
+						</div>
+						<div class="folder_type">
+							<span>구분</span>
+							<select id="" name="" class="">
+								<option value="">부서</option>
+								<option value="">프로젝트</option>
+							</select>
+						</div>
+						<div class="folder_tree">
+							트리영역
+						</div>
+					</div>
+										
+				</div>
+				
+				<div class="sub_right">
+					<div class="doc_config_info">
+						<table>
+							<tr>
+								<th class="bold">엑스소프트</th>
+								<td colspan="3">
+									<button type="button" id="" name="" class="register_folder_btn">등록</button>
+									<button type="button" id="" name="" class="delete_folder_btn">삭제</button>
+								</td>
+							</tr>
+							<tr>
+								<th>폴더명</th>
+								<td colspan="3"><input type="text" id="" name="" class="" value=""></td>
+							</tr>
+							<tr>
+								<th>폴더명(영문)</th>
+								<td colspan="3"><input type="text" id="" name="" class="" value=""></td>
+							</tr>
+							<tr>
+								<th>폴더경로</th>
+								<td colspan="3">엑스소프트</td>
+							</tr>
+							<tr>
+								<th>문서저장여부</th>
+								<td>
+									<select id="" name="" class="">
+										<option value="">가능</option>
+										<option value="">불가능</option>
+									</select>
+								</td>
+								<th>사용여부</th>
+								<td>
+									<select id="" name="" class="">
+										<option value="">사용</option>
+										<option value="">미사용</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<th>저장문서유형</th>
+								<td>
+									<select id="" name="" class="">
+										<option value="">모든문서</option>
+									</select>
+								</td>
+								<th>정렬순서</th>
+								<td><input type="text" id="" name="" class=""></td>
+							</tr>
+							<tr>
+								<th>스토리지 할당량</th>
+								<td>
+									<label><input type="checkbox" class="" name="" class="">체크시 용량제한 없음</label>
+    								<input type="text" class="folder_storage_limit readonly" readonly="readonly" value="무제한">GB
+								</td>
+								<th>스토리지 사용량</th>
+								<td>0 B</td>
+							</tr>
+							<tr>
+								<th>권한변경 여부</th>
+								<td colspan="3">
+									<label><input type="checkbox" id="" name="" class="">상위 폴더 권한 변경 시 현재 권한 유지</label>
+								</td>
+							</tr>
+							<tr>
+								<th>공유폴더 여부</th>
+								<td colspan="3">
+									<label><input type="checkbox" id="" name="" class="">권한을 부여받은 사용자에게 '공유받은 폴더' 제공</label>
+								</td>
+							</tr>
+							<tr>
+								<th>등록일자</th>
+								<td>2015-01-29	</td>
+								<th>등록자</th>
+								<td><input type="text" id="" name="" class=""></td>
+							</tr>
+						</table>
+					</div>
+					
+					<div class="dropDown_wrapper">
+						<a class="dropDown_txt">
+							<label>
+								<strong>[엑스소프트 부서 기본 권한] 권한</strong>
+							</label>
+						</a>
+						<span class="dropDown_arrow down"></span>
+						<div class="dropDown_subWrapper hide">
+							<div>
+								<button type="button" id="" name="" class="">권한변경</button>
+								<label><input type="checkbox" id="" name="" class=""> 하위 폴더/문서 권한 일괄변경</label>
+							</div>
+							<div class="auth_tbl_wrapper">
+								<table>
+		         				<tr>
+			         				<th rowspan="2">접근자</th>
+			         				<th colspan="3">폴더권한</th>
+			         				<th colspan="4">문서권한</th>
+		         				</tr>
+		         				<tr>
+			         				<th>기본권한</th>
+			         				<th>폴더등록</th>
+			         				<th>권한변경</th>
+			         				<th>기본권한</th>
+			         				<th>문서등록</th>
+			         				<th>반출취소</th>
+			         				<th>권한변경</th>
+		         				</tr>
+		         				<tr>
+			         				<td>소유자</td>
+			         				<td><img src="/img/icon/prev_d.png" class="auth_grade" alt="" title="">삭제</td>
+			         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/prev_d.png" class="auth_grade" alt="" title="">삭제</td>
+			         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+		         				</tr>
+		         				<tr>
+			         				<td>전체</td>
+			         				<td><img src="/img/icon/prev_r.png" class="auth_grade" alt="" title="">조회</td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/prev_r.png" class="auth_grade" alt="" title="">조회</td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+		         				</tr>
+		         				<tr>
+			         				<td>엑스소프트</td>
+			         				<td><img src="/img/icon/prev_u.png" class="auth_grade" alt="" title="">수정</td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/prev_u.png" class="auth_grade" alt="" title="">수정</td>
+			         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+		         				</tr>
+		         				</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btnGrp">
+				<button type="button" class="btn1 bold">저장</button>
+				<button type="button" class="btn1">취소</button>
+			</div>
+		</div>
+		<footer class="footer">
+			<p class="copyright">Copyright eXsoft All Rights Reserved.</p>
+		</footer>
+		
+		<!-- 폴더 등록 시작 -->
+	   	<div class="register_folder_wrapper hide"></div>
+	   	<div class="register_folder hide">
+	   		<div class="window_title">
+	   			엑스소프트
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="register_folder_cnts">
+	        	<table>
+		        	<tr>
+		        		<th>폴더명</th>
+		        		<td colspan="3"><input type="text" id="" name="" class="folder_name"></td>
+		        	</tr>
+		        	<tr>
+		        		<th>폴더명(영문)</th>
+		        		<td colspan="3"><input type="text" id="" name="" class="folder_name"></td>
+		        	</tr>
+		        	<tr>
+		        		<th>폴더 경로</th>
+		        		<td colspan="3">
+		        			<input type="text" id="" name="" class="folder_path">
+		        			<button type="button" id="" class="">선택</button>
+		        		</td>
+		        	</tr>
+		        	<tr>
+		        		<th>문서저장 여부</th>
+		        		<td>
+		        			<select id="" name="" class="">
+		        				<option value="">가능</option>
+		        			</select>
+		        		</td>
+		        		<th>사용 여부</th>
+		        		<td>
+		        			<select id="" name="" class="">
+		        				<option value="">사용</option>
+		        			</select>
+		        		</td>
+		        	</tr>
+		        	<tr>
+		        		<th>저장 문서유형</th>
+		        		<td>
+		        			<select id="" name="" class="">
+		        				<option value="">모든문서</option>
+		        			</select>
+		        		</td>
+		        		<th>정렬순서</th>
+		        		<td>
+		        			<select id="" name="" class="">
+		        				<option value="">1</option>
+		        			</select>
+		        		</td>
+		        	</tr>
+		        	<tr>
+		        		<th>스토리지 할당량</th>
+		        		<td colspan="3">
+		        			<input type="text" id="" name="" class="storage_allocation">GB
+		        		</td>
+		        	</tr>
+		        	<tr>
+		        		<th>권한변경 여부</th>
+		        		<td colspan="3">
+		        			<label><input type="checkbox" id="" name="" class="" value="">상위폴더 권한변경시에도 현재 권한 유지</label>
+		        		</td>
+		        	</tr>
+		        	<tr>
+		        		<th>설명</th>
+		        		<td colspan="3"><textarea id="" name="" class="folder_description"></textarea></td>
+		        	</tr>
+	        	</table>
+	        	<div class="dropDown_wrapper">
+					<a class="dropDown_txt">
+						<label>
+							<strong>권한 : 엑스소프트 부서 기본 권한</strong>
+						</label>
+						
+					</a>
+					<button type="button" id="" name="" class="dropDown_authChange_btn">권한변경</button>
+					
+					<span class="dropDown_arrow down"></span>
+					<div class="dropDown_subWrapper hide">
+						<div>
+							<label><input type="checkbox" id="" name="" class="">권한부여받은 사용자에게 '공유받은 폴더' 제공</label>
+						</div>
+						<div class="auth_tbl_wrapper">
+							<table>
+	         				<tr>
+		         				<th rowspan="2">접근자</th>
+		         				<th colspan="3">폴더권한</th>
+		         				<th colspan="4">문서권한</th>
+	         				</tr>
+	         				<tr>
+		         				<th>기본권한</th>
+		         				<th>폴더등록</th>
+		         				<th>권한변경</th>
+		         				<th>기본권한</th>
+		         				<th>문서등록</th>
+		         				<th>반출취소</th>
+		         				<th>권한변경</th>
+	         				</tr>
+	         				<tr>
+		         				<td>소유자</td>
+		         				<td><img src="/img/icon/prev_d.png" class="auth_grade" alt="" title="">삭제</td>
+		         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/prev_d.png" class="auth_grade" alt="" title="">삭제</td>
+		         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+	         				</tr>
+	         				<tr>
+		         				<td>전체</td>
+		         				<td><img src="/img/icon/prev_r.png" class="auth_grade" alt="" title="">조회</td>
+		         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/prev_r.png" class="auth_grade" alt="" title="">조회</td>
+		         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+	         				</tr>
+	         				<tr>
+		         				<td>엑스소프트</td>
+		         				<td><img src="/img/icon/prev_u.png" class="auth_grade" alt="" title="">수정</td>
+		         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/prev_u.png" class="auth_grade" alt="" title="">수정</td>
+		         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+		         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+	         				</tr>
+	         				</table>
+						</div>
+					</div>
+				</div>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="register_folder_btn bold">등록</button>
+        		<button type="button" id="" class="cancel_folder_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 폴더 등록 끝 -->
+	   	
+	   	<!-- 항목 설정 시작 -->
+	   	<div class="register_docuCateType_wrapper hide"></div>
+	   	<div class="register_docuCateType hide">
+	   		<div class="window_subtitle">
+	   			항목 설정
+	            <a href="#" class="window_close"><img src="/img/icon/window_close1.png" alt="" title=""></a>
+	        </div>
+	        <div class="register_docuCateType_cnts">
+	        	<div class="register_docuCateType_btnGrp">
+	        		<button type="button" id="" class="">추가</button>
+	        		<button type="button" id="" class="">삭제</button>
+	        	</div>
+        		<table>
+	        		<tr>
+	        			<th><input type="checkbox" id="" name="" class="" value=""></th>
+	        			<th>항목명</th>
+	        			<th>정렬순서</th>
+	        			<th>기본여부</th>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td><input type="text" id="" name="" class="" value=""></td>
+	        			<td><input type="text" id="" name="" class="" value=""></td>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td><input type="text" id="" name="" class="" value=""></td>
+	        			<td><input type="text" id="" name="" class="" value=""></td>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td><input type="text" id="" name="" class="" value=""></td>
+	        			<td><input type="text" id="" name="" class="" value=""></td>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        		</tr>
+	        		<tr>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td><input type="text" id="" name="" class="" value=""></td>
+	        			<td><input type="text" id="" name="" class="" value=""></td>
+	        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+	        		</tr>
+	        	</table>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="register_docuType_btn bold">등록</button>
+        		<button type="button" id="" class="cancel_docuType_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 항목 설정 끝 -->
+	   	
+	   	<!-- 권한 변경 시작 -->
+   		<div class="authChange_wrapper hide"></div>
+	   	<div class="authChange hide">
+	   		<div class="window_subtitle">
+	   			항목 설정
+	            <a href="#" class="window_close"><img src="/img/icon/window_close1.png" alt="" title=""></a>
+	        </div>
+	        <div class="authChange_cnts">
+	        	<div class="authChange_btnGrp">
+	        		<button type="button" id="" class="">권한등록</button>
+	        		<button type="button" id="" class="">권한수정</button>
+	        		<button type="button" id="" class="">권한삭제</button>
+	        		<button type="button" id="" class="">권한복사</button>
+	        	</div>
+        		<div>
+        			<table>
+        				<colgroup>
+        					<col width="30"/>
+        					<col width="120"/>
+        					<col width="400"/>
+        				</colgroup>
+        				<tr>
+        					<th><input type="radio" name="" class="" value="" checked="checked"></th>
+        					<th>현재 적용 권한</th>
+        					<td><span class="bold">솔루션 사업부(기본권한)</span></td>
+        				</tr>
+        				<tr>
+        					<th><input type="radio" name="" class="" value=""></th>
+        					<th>상속 권한</th>
+        					<td><span>솔루션 사업부(기본권한)</span></td>
+        				</tr>
+        			</table>
+        		</div>
+        		<div>
+        			<div class="tab_menu">
+		                 <div class="tab_elem_wrapper">
+		                     <span class="tab_element selected">공유권한</span>
+		                     <span class="tab_element">개인권한</span>
+		                     
+		                     <div class="authName_srch_wrapper">
+		                     	<form id="">
+			                     	권한명
+			                     	<input type="text" id="" name="" class="">
+			                     	<button type="button" id="" name="" class="">검색</button>
+		                     	</form>
+		                     </div>
+		                 </div>
+					</div>
+					
+					<!-- 공유권한 -->
+		            <div class="tab_form">
+		            	jqGrid 부분1
+		            	<table id=""></table>
+		            </div>
+		            
+		            <!-- 개인권한 -->
+		            <div class="tab_form hide">
+		            	jqGrid 부분2
+		            	<table id=""></table>
+		            </div>
+        		</div>
+        		
+        		<div class="auth_tbl_wrapper">
+					<table>
+       				<tr>
+         				<th rowspan="2">접근자</th>
+         				<th colspan="3">폴더권한</th>
+         				<th colspan="4">문서권한</th>
+       				</tr>
+       				<tr>
+         				<th>기본권한</th>
+         				<th>폴더등록</th>
+         				<th>권한변경</th>
+         				<th>기본권한</th>
+         				<th>문서등록</th>
+         				<th>반출취소</th>
+         				<th>권한변경</th>
+       				</tr>
+       				<tr>
+         				<td>소유자</td>
+         				<td><img src="/img/icon/prev_d.png" class="auth_grade" alt="" title="">삭제</td>
+         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/prev_d.png" class="auth_grade" alt="" title="">삭제</td>
+         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+       				</tr>
+       				<tr>
+         				<td>전체</td>
+         				<td><img src="/img/icon/prev_r.png" class="auth_grade" alt="" title="">조회</td>
+         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/prev_r.png" class="auth_grade" alt="" title="">조회</td>
+         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+       				</tr>
+       				<tr>
+         				<td>엑스소프트</td>
+         				<td><img src="/img/icon/prev_u.png" class="auth_grade" alt="" title="">수정</td>
+         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/prev_u.png" class="auth_grade" alt="" title="">수정</td>
+         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+       				</tr>
+       				</table>
+				</div>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="authChange_btn bold">확인</button>
+        		<button type="button" id="" class="authChange_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 권한 변경 끝 -->
+	   	
+	   	<!-- 폴더 선택 시작 -->
+   		<div class="folder_choose_wrapper hide"></div>
+	   	<div class="folder_choose hide">
+	   		<div class="window_title">
+	   			폴더 선택
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="folder_choose_cnts">
+	        	<div class="">
+	        		구분
+	        		<select id="" name="" class="">
+	        			<option value="">부서</option>
+	        		</select>
+	        	</div>
+	        	<div class="folder_tree">
+	        		트리 부분
+	        	</div>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="folder_choose_btn bold">확인</button>
+        		<button type="button" id="" class="folder_choose_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 폴더 선택 끝 -->
+	</div>
+</body>
+</html>

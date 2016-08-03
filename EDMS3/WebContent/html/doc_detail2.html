@@ -1,0 +1,1346 @@
+<!docType html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width; initial-scale=1.0">
+<title>index</title>
+<script src="/js/jquery-2.1.3.min.js"></script>
+<script src="/js/jquery-ui.js"></script>
+<script src="/lib/jstree/jstree.js"></script>
+<script src="/lib/jqgrid/js/jquery.jqGrid.min.js"></script>
+<script src="/js/jquery.ddslick.custom.js"></script>
+<script src="/js/jquery.cookie.js"></script>
+<script src="/js/jquery.alerts.js"></script>
+<script src="/js/ecm.js"></script>
+<link rel="stylesheet" href="/css/ecm.css">
+<link rel="stylesheet" href="/css/reset.css">
+<link rel="stylesheet" href="/css/jqtree-custom.css">
+<link rel="stylesheet" href="/css/jquery-ui.css">
+<link rel="stylesheet" href="/css/jquery.alerts.css">
+<link rel="stylesheet" href="/css/jquery.ddslick.custom.css">
+<link rel="stylesheet" href="/lib/jqgrid/css/ui.jqgrid.css">
+</head>
+
+<body>
+<div class="wrap">
+	<div class="top_menu">
+		<div class="top_menu_custom">
+			<ul class="custom_menu_list">
+				<li class="full_screen"> <a href="#" class="full_screen"><img src="/img/icon/fullscreen.png" alt="" title=""></a> </li>
+				<li class="quick_menu"><a href="#" class="quick_menu"> <img src="/img/icon/quickmenu.png" alt="" title="">퀵메뉴 <span class="quick_menu"></span> </a>
+					<div class="quick_sub_wrapper">
+						<ul class="quick_sub_menu">
+							<li><a href="#">내 소유 문서</a></li>
+							<li><a href="#">내 수정 중인 문서</a></li>
+							<li><a href="#">내 만기 문서</a></li>
+							<li><a href="#">휴지통</a></li>
+							<li><a href="#">즐겨찾기</a></li>
+							<li><a href="#">공유받은 문서</a></li>
+							<li><a href="#">공유받은 폴더</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="top_menu_shape"></div>
+		<div class="top_menu_search"><span class="lbl_integrated_search">통합검색</span>
+			<div class="search_input_form">
+				<form class="" name="" method="post">
+					<input type="text" class="search_text" placeholder="검색어를 입력하세요">
+					<button type="submit" class="search_submit"></button>
+				</form>
+			</div>
+			<div class="search_detail">
+				<a href="#" class="dropDown_img"><img src="/img/icon/search_detail_btn.png" alt=""></a>
+				<div class="integrated_dropDown_menu hide">
+					<form>
+						<table class="srch_integrated_tbl">
+							<tr>
+							<th>기본검색</th>
+							<td>
+								<input type="text" class="srch_integrated_txt" placeholder="검색어를 입력하세요">
+								<label><input type="checkbox" id="" name="" class="" value="">결과내 재 검색</label>
+							</td>
+							</tr>
+							<tr>
+							<th>등록기간</th>
+							<td>
+								<a href="#" id="0" class="srch_integrated_regDate">전체</a>
+								<a href="#" id="1" class="srch_integrated_regDate">1개월</a>
+								<a href="#" id="2" class="srch_integrated_regDate">3개월</a>
+								<a href="#" id="3" class="srch_integrated_regDate">6개월</a>
+								<a href="#" id="4" class="srch_integrated_regDate">1년</a>			
+								<input type="text" id="datepicker3" name="" class="srch_integrated_startDate input-text calend" name="start_date" readonly="readonly">
+								<span class="dateto">-</span>
+								<input type="text" id="datepicker4" name="" class="srch_integrated_endDate input-text calend" name="end_date" readonly="readonly">
+							</td>
+							</tr>
+							<tr>
+							<th></th>
+							<td>
+								<label><input type="radio" name="" class="" value="">전체</label>
+								<label><input type="radio" name="" class="" value="">제목</label>
+								<label><input type="radio" name="" class="" value="">본문</label>
+								<label><input type="radio" name="" class="" value="">등록자</label>
+								<label><input type="radio" name="" class="" value="">첨부파일명</label>
+								<label><input type="radio" name="" class="" value="">첨부내용</label>
+							</td>
+							</tr>
+							<tr>
+							<th>문서유형</th>
+							<td>
+								<select id="srch_type5" name="">
+									<option value="" selected="selected">전체</option>
+									<option value="">일반문서</option>
+									<option value="">파일문서</option>
+								</select>							
+							</td>
+							</tr>
+							<tr>
+							<th>폴더위치</th>
+							<td>
+								<input type="text" id="" name="" class="srch_integrated_folder">
+								<button type="button" id="" name="" class="srch_integrated_folderChoose">선택</button>
+								<label><input type="checkbox" id="" name="" class="" value="">하위폴더 포함</label>
+							</td>
+							</tr>
+							<tr>
+							<td colspan="2" class="srch_integrated_btnGrp">
+								<button type="submit" id="srch_integrated_submit" class="srch_integrated_btn">검색</button>
+								<button type="reset" id="" class="srch_integrated_btn">초기화</button>
+							</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<header class="header">
+		<div class="logo">
+			<h1> <a href="#"><img src="/img/logo.png"></a> </h1>
+		</div>
+		<div class="header_menu_wrapper">
+			<div class="header_icon">
+				<ul class="header_icon_menu">
+					<li class="selected">
+						<a href="#" class="page selected"></a>
+						<div class="hide">나의 문서</div>
+					</li>
+					<li>
+						<a href="#" class="user"></a>
+						<div class="hide">사용자 정보</div>
+					</li>
+					<li>
+						<a href="#" class="inbox"></a>
+						<div class="hide">문서함</div>
+					</li>
+					<li>
+						<a href="#" class="usergroup"></a>
+						<div class="hide">사용자 그룹</div>
+					</li>
+					<li>
+						<a href="#" class="piechart"></a>
+						<div class="hide">통계</div>
+					</li>
+				</ul>
+			</div>
+			<div class="header_user">
+				<ul class="header_user_menu">
+					<li class="user_info"> <a href="#"> <img src="/img/icon/user_info.png" alt=""> 홍길동님(일반) <img src="/img/icon/head_dropdown.png" class="head_dropDown"> </a>
+						<div class="info_dropDown_menu hide">
+							<div class="tooltip_arrow"></div>
+							<div>
+								<ul>
+									<li><a href="#">내정보</a></li>
+									<li><a href="#">보안 설정</a></li>
+								</ul>
+							</div>
+						</div>
+					</li>
+					<li class="user_note"> <a href="#"> <img src="/img/icon/user_note.png" alt=""> <span class="num_cnt">99</span> </a>
+						<div class="note_dropDown_menu hide">
+							<div class="tooltip_arrow"></div>
+							<ul>
+								<li><a href="#"> <span class="sender_name">[홍길동]</span> <span class="note_title">문서검토바랍니다.</span> </a></li>
+								<li><a href="#"> <span class="sender_name">[홍길동]</span> <span class="note_title">문서검토바랍니다.</span> </a></li>
+								<li><a href="#"> <span class="sender_name">[홍길동]</span> <span class="note_title">문서검토바랍니다.</span> </a></li>
+								<li><a href="#"> <span class="sender_name">[홍길동]</span> <span class="note_title">문서검토바랍니다.</span> </a></li>
+								<li><a href="#"> <span class="sender_name">[홍길동]</span> <span class="note_title">문서검토바랍니다.</span> </a></li>
+							</ul>
+						</div>
+					</li>
+					<li class="user_inbox">
+						<a href="#">
+							<img src="/img/icon/user_inbox.png" alt="">
+							<span class="num_cnt">999</span> 
+						</a>
+					</li>
+					<li class="user_setting"> 
+						<a href="#"><img src="/img/icon/user_setting.png" alt=""></a>
+					</li>
+					<li class="user_logout"> <a href="#"> <img src="/img/icon/user_logout.png" alt=""> </a> </li>
+				</ul>
+			</div>
+		</div>
+	</header>
+	<div class="cnt_wrapper">
+		<nav class="lnb_menu">
+			<section class="lnb_menu_info">
+				<div class="lnb_menu_reg">
+					<ul>
+						<li class="reg_doc"><a href="#">문서등록</a></li>
+						<li class="reg_work"><a href="#">업무등록</a></li>
+					</ul>
+				</div>
+				<div class="lnb_menu_summary">
+					<table class="summary_table">
+						<caption>
+						문서등록 요약
+						</caption>
+						<colgroup>
+						<col width="144"/>
+						<col width="25"/>
+						</colgroup>
+						<tr>
+							<td class="summary_info">새 쪽지</td>
+							<td class="summary_cnts"><span>5</span></td>
+						</tr>
+						<tr>
+							<td class="summary_info">승인요청문서</td>
+							<td class="summary_cnts"><span>12</span></td>
+						</tr>
+						<tr>
+							<td class="summary_info">신규문서</td>
+							<td class="summary_cnts"><span>123</span></td>
+						</tr>
+						<tr>
+							<td class="summary_info">협업진행</td>
+							<td class="summary_cnts"><span>1</span></td>
+						</tr>
+					</table>
+				</div>
+			</section>
+			<section class="lnb_tree">
+				<div class="tree_menu">
+					<ul class="tree_menu_list">
+						<li><a href="#">부서</a></li>
+						<li><a href="#">전사</a></li>
+						<li><a href="#" class="focus">프로젝트</a></li>
+					</ul>
+					<div class="tree_menu_more">
+						<ul class="menu_more_list">
+							<li><a href="#"><img src="/img/icon/tree_more.png" alt="" title=""></a></li>
+							<li><a href="#"><img src="/img/icon/tree_refresh.png" alt="" title=""></a></li>
+						</ul>
+					</div>
+				</div>
+				<div id="lnb_tree_list"></div>
+			</section>
+		</nav>
+		<div class="contents">
+			<div class="cnts_srch_wrapper">
+				<div class="toggle_tree_menu"></div>
+				<div class="cnts_srch_detail">
+					<div class="cnts_srch">
+						<form class="cnts_srch_form" method="post">
+							<select id="srch_type1">
+								<option value="0" selected="selected">전체</option>
+								<option value="1">제목</option>
+								<option value="2">등록자</option>
+							</select>
+							<input type="text" class="srch_keyword" name="srch_keyword" placeholder="검색어를 입력하세요">
+							<button type="submit" class="srch_btn"></button>
+						</form>
+					</div>
+					<div class="srch_detail_dropDown"> 
+						<a class="dropDown_txt">
+							<label>상세</label>
+							<span class="dropDown_arrow down"></span>
+						</a>
+						<div class="detail_dropDown_menu hide">
+							<form>
+								<table class="srch_detail_tbl">
+									<tr>
+										<th>기본검색</th>
+										<td>
+											<select id="srch_type2">
+												<option value="0" selected="selected">전체</option>
+												<option value="1">제목</option>
+												<option value="2">등록자</option>
+												<option value="3">첨부파일명</option>
+											</select>
+											<input type="text" class="srch_detail_txt" placeholder="검색어를 입력하세요">
+										</td>
+									</tr>
+									<tr>
+										<th>&nbsp;</th>
+										<td>
+											<label class="srch_detail_lbl">
+												<input type="checkbox" class="srch_detail_checkbox">
+												<span>하위폴더 포함</span>
+											</label>
+										</td>
+									</tr>
+									<tr>
+										<th>등록기간</th>
+										<td>
+											<a href="#" class="srch_detail_regDate">전체</a> 
+											<a href="#" class="srch_detail_regDate">1개월</a> 
+											<a href="#" class="srch_detail_regDate">3개월</a> 
+											<a href="#" class="srch_detail_regDate">6개월</a> 
+											<a href="#" class="srch_detail_regDate">1년</a>
+											<input type="text" id="datepicker1" name="" class="srch_detail_startDate input-text calend" name="start_date" readonly="readonly">
+											<span class="dateto">-</span>
+											<input type="text" id="datepicker2" name="" class="srch_detail_endDate input-text calend" name="end_date" readonly="readonly">
+										</td>
+									</tr>
+									<tr>
+										<th>첨부파일명</th>
+										<td><input type="text" id="" name="" class="srch_detail_keyword"></td>
+									</tr>
+									<tr>
+										<th>키워드</th>
+										<td><input type="text" class="srch_detail_keyword"></td>
+									</tr>
+									<tr>
+										<th>문서유형</th>
+										<td>
+											<select id="srch_type3">
+												<option selected="selected">전체</option>
+												<option>내용</option>
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="2" class="srch_detail_btnGrp">
+											<button type="submit" id="srch_detail_submit" class="srch_detail_btn">검색</button>
+											<button type="reset" id="" class="srch_detail_btn">초기화</button>
+										</td>
+									</tr>
+								</table>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="depth_navi">
+					<span>
+						<strong>20. 안전관리규정</strong>
+						<span class="depth_navi_path hide">
+							<a href="#">부서</a> &gt; 
+							<a href="#">경영지원팀</a> &gt; 
+							<a href="#">20. 안전관리규정</a> 
+						</span>
+					</span> 
+				</div>
+			</div>
+			<div class="cnts_tbl_menu">
+				<div class="tbl_menu_left">
+					<button type="button" class="tbl_reg">등록</button>
+					<button type="button" class="tbl_del">삭제</button>
+					<div class="tbl_extFunction"> <a class="dropDown_txt">
+						<label>추가기능</label>
+						<span class="dropDown_arrow down"></span> </a>
+						<div class="extFunction_dropDown_wrapper hide">
+							<ul class="extFunction_dropDown_menu">
+								<li><a href="#" class="move">이동</a></li>
+								<li><a href="#" class="copy">복사</a></li>
+								<li><a href="#" class="favorite">즐겨찾기 추가</a></li>
+								<li><a href="#" class="tempbox">작업카트 추가</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="tbl_menu_right">
+					<ul class="tbl_thumbMenu">
+						<li class="excel_download"><a href="#" class="menu"></a></li>
+						<li class="layout_view"><a href="#" class="menu"></a>
+							<div class="layout_view_dropDown hide">
+								<ul>
+									<li id="list_only"><a href="#">메일 목록만 보기</a></li>
+									<li id="horizontal_divide"><a href="#">좌우 분할로 보기</a></li>
+									<li id="vertical_divide"><a href="#">상하 분할로 보기</a></li>
+								</ul>
+							</div>
+						</li>
+						<li class="menu_refresh"><a href="#" class="menu"></a></li>
+					</ul>
+					<select id="tbl_rowCount" name="">
+						<option value="10">10개</option>
+						<option value="15">15개</option>
+						<option value="20">20개</option>
+						<option value="25">25개</option>
+					</select>
+				</div>
+			</div>
+			<div class="cnts_tbl_wrapper">
+				<div class="cnts_list">
+					<div class="thead">
+						<ul class="tbl_head_list">
+							<li class="subject">제목
+								<ul class="tbl_head">
+									<li class="check_all">
+										<input type="checkbox" class="checkall">
+									</li>
+									<li class="icon"><img src="/img/icon/attach.png" alt=""></li>
+									<li class="icon"><img src="/img/icon/link.png" alt=""></li>
+									<li class="icon"><img src="/img/icon/lock.png" alt=""></li>
+									<li class="docType">문서유형</li>
+									<li class="regid">등록자</li>
+									<li class="regDate"> <a href="#" class="sort_regDate down">등록일</a> </li>
+									<li class="previlege">권한 <img class="previlege_listImg" src="/img/icon/previlege_help.png" alt="" title=""> 
+										<!-- 권한 도움말 시작 -->
+										<div class="previlege_list hide">
+											<ul>
+												<li><img src="/img/icon/prev_d.png" alt="" title="">Delete</li>
+												<li><img src="/img/icon/prev_u.png" alt="" title="">Update</li>
+												<li><img src="/img/icon/prev_r.png" alt="" title="">Read</li>
+												<li><img src="/img/icon/prev_b.png" alt="" title="">Browse</li>
+												<li><img src="/img/icon/prev_n.png" alt="" title="">None</li>
+											</ul>
+										</div>
+										<!-- 권한 도움말 끝 --> 
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+					<div class="tbody">
+						<ul class="tbl_data_list">
+							<li class="data_list">
+								<ul class="tbl_data_body">
+									<li class="check">
+										<input type="checkbox">
+									</li>
+									<li class="icon"><img src="/img/icon/attach.png" alt="" class="attach_file"></li>
+									<li class="icon"><img src="/img/icon/link.png" alt="" class="relative_docs"></li>
+									<li class="icon"><img src="/img/icon/lock.png" alt="" class="doc_lock"></li>
+									<li class="docType">일반</li>
+									<li class="regid">홍길동</li>
+									<li class="regDate">2015-01-23</li>
+									<li class="previlege"><img src="/img/icon/prev_d.png" class="previlege_grade" alt="" title=""></li>
+								</ul>
+								<div class="subject"> <img src="/img/icon/hwp.png" class="extension" alt="" title=""> <a href="#">자재업무 매뉴얼...
+									<div class="hide">자재업무 매뉴얼 입니다1111.</div>
+									</a> <img src="/img/icon/new.png" class="new_doc" alt="" title=""> 
+								</div>
+							</li>
+						</ul>
+						<ul class="tbl_data_list">
+							<li class="data_list">
+								<ul class="tbl_data_body">
+									<li class="check">
+										<input type="checkbox">
+									</li>
+									<li class="icon"><img src="/img/icon/attach.png" alt=""></li>
+									<li class="icon"><img src="/img/icon/link.png" alt=""></li>
+									<li class="icon"><img src="/img/icon/lock.png" alt=""></li>
+									<li class="docType">일반</li>
+									<li class="regid">홍길동</li>
+									<li class="regDate">2015-01-23</li>
+									<li class="previlege"><img src="/img/icon/prev_d.png" class="previlege_grade" alt="" title=""></li>
+								</ul>
+								<div class="subject"> 
+									<img src="/img/icon/hwp.png" class="extension" alt="" title=""> 
+									<a href="#">자재업무 매뉴얼...
+										<div class="hide">자재업무 매뉴얼 입니다1111.</div>
+									</a> 
+									<img src="/img/icon/new.png" class="new_doc" alt="" title="">
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="cnts_aside hide">
+                	<div class="horizontal_draggable"></div>
+                    <div class="aside_cnts_wrapper">
+                    	<div class="cnts_sub_wrapper">
+                    		<div class="aside_title">
+                    			다음 설정을 통하여 편리하게 문서를 관리해보세요.
+	                    		<span class="regDate">2010-05-31</span>
+	                    	</div>
+	                    	<div class="aside_cnts">
+	                    		<p>
+	                    			- 분할모드 첫화면 첫번째 문서 자동 보기 설정을 할 수 있습니다.
+	                    			<a href="#" class="config_view">환경설정 보기</a>
+	                    		</p>
+	                    		<p>
+	                    			- 문서 삭제/이동 후 자동으로 다음/이전 문서로 이동할 수 있습니다.
+	                    			<a href="#" class="config_view">환경설정 보기</a>
+	                    		</p> 
+	                    		<table>
+	                    		<tr>
+	                    			<th>샘플</th>
+	                    			<td>샘플</td>
+	                    		</tr>
+	                    		</table>
+	                    	</div>
+                    	</div>
+                    </div>
+                </div>
+                <div class="cnts_bottom hide">
+                	<div class="vertical_draggable"></div>
+                    <div class="bottom_cnts_wrapper">
+                   		<div class="bottom_title">
+                   			다음 설정을 통하여 편리하게 문서를 관리해보세요.
+                   			<span class="regDate">2010-05-31</span>
+                   		</div>
+                    	<div class="bottom_cnts">
+                    		<p>
+                    			- 분할모드 첫화면 첫번째 문서 자동 보기 설정을 할 수 있습니다.
+                    			<a href="#" class="config_view">환경설정 보기</a>
+                    		</p>
+                    		<p>
+                    			- 문서 삭제/이동 후 자동으로 다음/이전 문서로 이동할 수 있습니다.
+                    			<a href="#" class="config_view">환경설정 보기</a>
+                    		</p> 
+                    		<table>
+                    		<tr>
+                    			<th>샘플</th>
+                    			<td>샘플</td>
+                    		</tr>
+                    		</table>
+                    	</div>
+                    </div>
+                </div>
+			</div>
+			<div class="pg_navi_wrapper">
+				<ul class="pg_navi">
+					<li class="first"><a href="#"><img src="/img/icon/pg_first.png" alt="" title=""></a></li>
+					<li class="prev"><a href="#"><img src="/img/icon/pg_prev.png" alt="" title=""></a></li>
+					<li class="curr"><a href="#">1</a></li>
+					<li><a href="#">2</a></li>
+					<li><a href="#">3</a></li>
+					<li><a href="#">4</a></li>
+					<li><a href="#">5</a></li>
+					<li><a href="#">6</a></li>
+					<li><a href="#">7</a></li>
+					<li><a href="#">8</a></li>
+					<li><a href="#">9</a></li>
+					<li><a href="#">10</a></li>
+					<li class="next"><a href="#"><img src="/img/icon/pg_next.png" alt="" title=""></a></li>
+					<li class="last"><a href="#"><img src="/img/icon/pg_last.png" alt="" title=""></a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<footer class="footer">
+		<ul class="footer_menu">
+			<li class="ft_lyr_tooltip"><a href="#">도움말</a>
+				<div class="ft_lyr_wrapper hide">
+					<div class="ft_lyr">
+						<p>도움말에 대한 안내글이 보여집니다.</p>
+						<label>
+							<input type="checkbox" class="ECM_help" class="ft_tooltip_noshow">
+							다시 보지 않기</label>
+					</div>
+					<div class="ft_tt_arrow"></div>
+				</div>
+			</li>
+			<li class="ft_lyr_tooltip"><a href="#">프로그램설치</a>
+				<div class="ft_lyr_wrapper hide">
+					<div class="ft_lyr">
+						<p>프로그램 설치에 대한 안내글이 보여집니다.</p>
+						<label>
+							<input type="checkbox" class="ECM_prog" class="ft_tooltip_noshow">
+							다시 보지 않기</label>
+					</div>
+					<div class="ft_tt_arrow"></div>
+				</div>
+			</li>
+			<li class="ft_lyr_tooltip"><a href="#">시스템관리</a>
+				<div class="ft_lyr_wrapper hide">
+					<div class="ft_lyr">
+						<p>시스템 관리에 대한 안내글이 보여집니다.</p>
+						<label>
+							<input type="checkbox" class="ECM_system" class="ft_tooltip_noshow">
+							다시 보지 않기</label>
+					</div>
+					<div class="ft_tt_arrow"></div>
+				</div>
+			</li>
+			<li class="ft_lyr_tooltip"><a href="#">퀵메뉴추가</a>
+				<div class="ft_lyr_wrapper hide">
+					<div class="ft_lyr">
+						<p>퀵메뉴 추가에 대한 안내글이 보여집니다.</p>
+						<label>
+							<input type="checkbox" class="ECM_quickmn" class="ft_tooltip_noshow">
+							다시 보지 않기</label>
+					</div>
+					<div class="ft_tt_arrow"></div>
+				</div>
+			</li>
+		</ul>
+		<p class="copyright"> Copyright eXsoft All Rights Reserved. </p>
+	</footer>
+	
+	<!-- 테이블 첨부파일 시작 -->
+	<div class="attach_window hide">
+		<div class="attach_title"> 첨부파일 <a href="#" class="close"><img src="/img/icon/window_close.png" alt="" title=""></a> </div>
+		<div class="attach_cnts">
+			<div class="attach_summary"> <span class="file_cnt">파일 : 2</span> <a href="#" class="attach_save_all">모두저장</a> </div>
+			<ul class="attach_file_list">
+				<li> <span class="attach_name"> <a href="#">워드문서.docx</a> </span> <span class="attach_detail"> 111.111k <a href="#"><img src="/img/icon/attach_download.png"></a> </span> </li>
+				<li> <span class="attach_name"> <a href="#">워드문서.docx</a> </span> <span class="attach_detail"> 111.111k <a href="#"><img src="/img/icon/attach_download.png"></a> </span> </li>
+			</ul>
+		</div>
+	</div>
+	<!-- 테이블 첨부파일 끝 --> 
+	
+	<!-- 테이블 관련문서 시작 -->
+	<div class="relative_docs_window hide">
+		<div class="relative_docs_title"> 관련문서 <a href="#" class="close"><img src="/img/icon/window_close.png" alt="" title=""></a> </div>
+		<div class="relative_docs_cnts">
+			<table>
+				<colgroup>
+				<col width="32">
+				<col width="210">
+				<col width="52">
+				<col width="86">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>No.</th>
+						<th>제목</th>
+						<th>등록자</th>
+						<th>등록일</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td>프로세스흐름도_퇴직금_v1.013068</td>
+						<td>김주혁</td>
+						<td>2014-12-23</td>
+					</tr>
+					<tr>
+						<td>1</td>
+						<td>프로세스흐름도_퇴직금_v1.013068</td>
+						<td>김주혁</td>
+						<td>2014-12-23</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<!-- 테이블 관련문서 끝 --> 
+	
+	<!-- 반출정보 시작 -->
+	<div class="doc_lock_info hide">
+		<p>반출자 : <span class="lock_usr">홍길동</span></p>
+		<p>반출일시 : <span class="lock_date">2014.08.28</span></p>
+	</div>
+	<!-- 반출정보 끝 --> 
+	
+	<!-- 권한조회 시작 -->
+	<div class="previlege_inquiry hide">
+		<p>소유자 : <span class="previlege_owner">홍길동</span></p>
+		<p>기본권한 : <span class="previlege_default">조회</span></p>
+		<p>반출취소 : <span class="lock_cancel">없음</span></p>
+		<p>권한변경 : <span class="previlege_modify">없음</span></p>
+	</div>
+	<!-- 권한조회 끝 --> 
+	
+	<!-- 공통 우클릭 컨텍스트 메뉴 시작 -->
+	<div class="tbl_context_menu hide">
+		<ul>
+			<li><a href="#" class="modify"><span class="left"></span><span class="right">수정</span></a></li>
+			<li><a href="#" class="delete"><span class="left"></span><span class="right">삭제</span></a></li>
+			<li><a href="#" class="move"><span class="left"></span><span class="right">이동</span></a></li>
+			<li><a href="#" class="copy"><span class="left"></span><span class="right">복사</span></a></li>
+			<li><a href="#" class="favorite"><span class="left"></span><span class="right">즐겨찾기 추가</span></a></li>
+			<li><a href="#" class="tempbox"><span class="left"></span><span class="right">작업카트 추가</span></a></li>
+		</ul>
+	</div>
+	<!-- 공통 우클릭 컨텍스트 메뉴 끝 --> 
+	
+	<!-- 폴더 선택 -->
+	<div class="doc_folder_choose2 hide">
+		<input type="hidden" class="context_choose">
+		<div class="doc_folder_title"> 폴더 선택 <a href="#" class="doc_folder_close"><img src="/img/icon/window_close.png" alt="" title=""></a> </div>
+		<div class="doc_folder_cnts">
+			<div class="doc_folder_box"> <span class="box_lbl">문서함</span>
+				<select id="doc_folder_list">
+					<option value="">부서</option>
+					<option value="">경영지원팀</option>
+				</select>
+			</div>
+			<div class="doc_folder_tree2"> </div>
+			<div class="doc_folder_btnGrp2">
+				<button type="button" class="confirm">확인</button>
+				<button type="button" class="cancel">취소</button>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 즐겨찾기 선택 -->
+	<div class="doc_favorite_choose hide">
+		<div class="doc_favorite_title"> 즐겨찾기 선택 <a href="#" class="doc_favorite_close"><img src="/img/icon/window_close.png" alt="" title=""></a> </div>
+		<div class="doc_favorite_cnts">
+			<div class="doc_favorite_tree"> </div>
+			<div class="doc_favorite_btnGrp">
+				<button type="button" class="confirm">확인</button>
+				<button type="button" class="cancel">취소</button>
+			</div>
+		</div>
+	</div>
+	<!-- 즐겨찾기 끝 --> 
+	
+	<!-- 트리 컨텍스트 시작 -->
+	<div class="doc_tree_context hide">
+		<ul>
+			<li><a href="#" class="register"><span class="left"></span><span class="right">폴더 등록</span></a></li>
+			<li><a href="#" class="modify"><span class="left"></span><span class="right">폴더 수정</span></a></li>
+			<li><a href="#" class="move"><span class="left"></span><span class="right">폴더 이동</span></a></li>
+			<li><a href="#" class="delete"><span class="left"></span><span class="right">폴더 삭제</span></a></li>
+			<li><a href="#" class="favorite"><span class="left"></span><span class="right">즐겨찾기 추가</span></a></li>
+		</ul>
+	</div>
+	<!-- 트리 컨텍스트 끝 --> 
+	
+	<!-- 문서 상세조회 -->
+	<div class="doc_detail_wrapper"></div>
+	<div class="doc_detail">
+		<div class="doc_detail_title">
+			문서 상세조회
+			<a href="#" class="doc_detail_close">
+				<img src="/img/icon/window_close2.png" alt="" title="">
+			</a>
+		</div>
+		<div class="doc_detail_cnts">
+			<div class="cnts_title"> <span class="title">문서관리 지침</span>
+				<div class="cnts_abbr_info"> <span class="cnts_version">ver 1.1</span> <span class="cnts_locked"> <img src="/img/icon/lock1.png" alt="" title="">
+					<div class="locked_info hide">
+						<p>반출자 : 홍길동</p>
+						<p>반출일시 : 2014.08.28</p>
+					</div>
+					</span>
+				</div>
+			</div>
+			<div class="tab_menu">
+				<div class="tab_elem_wrapper">
+					<span class="tab_element">기본</span>
+					<span class="tab_element selected">협업</span>
+					<span class="tab_element">버전</span> 
+					<span class="tab_element">이력</span> 
+					<span class="tab_element">의견(<span class="opinion_cnt">3</span>)</span> 
+				</div>
+				<div class="tab_btn_wrapper">
+					<button type="button">수정</button>
+					<button type="button" class="delete">삭제</button>
+					<button type="button" class="cancel_checkout">체크아웃취소</button>
+					<div class="tbl_extFunction"> <a class="dropDown_txt">
+						<label>추가기능</label>
+						<span class="dropDown_arrow down"></span> </a>
+						<div class="extFunction_dropDown_wrapper hide">
+							<ul class="extFunction_dropDown_menu">
+								<li><a href="#" class="move">이동</a></li>
+								<li><a href="#" class="copy">복사</a></li>
+								<li><a href="#" class="favorite">즐겨찾기 추가</a></li>
+								<li><a href="#" class="tempbox">작업카트 추가</a></li>
+								<li><a href="#" class="archive_excel">엑셀 이력관리</a></li>
+								<li><a href="#" class="email_send">URL메일 전송</a></li>
+							</ul>
+						</div>
+					</div>
+					<button type="button" class="btn_urlCopy">URL복사</button>
+				</div>
+			</div>
+			<div class="tab_form hide">
+				<div class="doc_detail_attach">
+					<a class="dropDown_txt">
+						<label>
+							<strong>첨부파일</strong>
+							<span class="attach_cnt">2개</span>
+							<span class="attach_size">(2MB)</span>
+						</label>
+					</a>
+					<button class="download_all">모두 저장</button>
+					<span class="dropDown_arrow down"></span>
+					<div class="attach_docs_wrapper">
+						<ul>
+							<li class="attach_docs_list">
+								<a href="#">
+									<img src="/img/icon/ppt.png" alt="" title="">회의록.docx
+								</a>
+								<div class="download_detail">
+									<span class="download_filesize">1.3MB</span>
+									<a href="#" class="download">
+										<img src="/img/icon/attach_download1.png" alt="" title="">
+									</a>
+								</div>
+							</li>
+							<li class="attach_docs_list">
+								<a href="#">
+									<img src="/img/icon/ppt.png" alt="" title="">회의록.docx
+								</a>
+								<div class="download_detail">
+									<span class="download_filesize">1.3MB</span>
+									<a href="#" class="download">
+										<img src="/img/icon/attach_download1.png" alt="" title="">
+									</a>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="doc_detail_info">
+					<a class="dropDown_txt">
+						<label><strong>문서 정보</strong></label>
+					</a>
+					<span class="dropDown_arrow down"></span>
+					<div class="detail_info_wrapper">
+						<table>
+							<tr>
+								<th>기본폴더</th>
+								<td colspan="3">부서함/경영지원팀/경영일반/규정관리</td>
+							</tr>
+							<tr>
+								<th>문서유형</th>
+								<td>일반문서</td>
+								<th>보존연한</th>
+								<td>5년</td>
+							</tr>
+							<tr>
+								<th>보안등급</th>
+								<td>일반</td>
+								<th>조회등급</th>
+								<td>사원이상</td>
+							</tr>
+							<tr>
+								<th>등록자(소유자)</th>
+								<td>홍길동(최영호)</td>
+								<th>등록일</th>
+								<td>2014.09.15 15:12:23</td>
+							</tr>
+							<tr>
+								<th>수정자</th>
+								<td>홍길동</td>
+								<th>수정일</th>
+								<td>2014.09.15 15:12:23</td>
+							</tr>
+							<tr>
+								<th>다차원 분류</th>
+								<td colspan="3">프로젝트/EDMS구축/설계/전산기획팀/경영일반/공통관리</td>
+							</tr>
+							<tr>
+								<th>키워드</th>
+								<td colspan="3">규정</td>
+							</tr>
+							<tr>
+								<th>설명</th>
+								<td colspan="3"></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<div class="doc_detail_auth">
+					<a class="dropDown_txt">
+						<label><strong>권한</strong> : 연구소 부서권한</label>
+						<span class="dropDown_arrow down"></span>
+					</a>
+					<div class="hide">
+						연구소 부서권한
+					</div>
+				</div>
+				<div class="doc_detail_relative">
+					<a class="dropDown_txt">
+						<label><strong>관련문서</strong>(3)</label>
+						 
+					</a>
+					<button class="relative_docs_checkAll">전체선택</button>
+					<button class="relative_docs_uncheckAll">전체해제</button>
+					<button class="relative_docs_downloadChecked">선택다운로드</button>
+					<span class="dropDown_arrow down"></span>
+					<!-- 
+						<button class="">전체해제</button>
+						<button class="">선택다운로드</button>
+					-->
+					<div class="relative_docs_wrapper">
+						<ul>
+							<li class="relative_docs_list">
+								<input type="checkbox" name="" class="relative_docs_checkbox" value="">
+								<a href="#">
+									<img src="/img/icon/ppt.png" alt="" title="">
+									회의록.docx
+								</a>
+								<div class="download_detail">
+									<span class="download_filesize">1.3MB</span>
+									<a href="#" class="download">
+										<img src="/img/icon/attach_download1.png" alt="" title="">
+									</a>
+									<a href="#" class="contextMenu">
+										<img src="/img/icon/attach_context.png" alt="" title="">
+									</a>
+								</div>
+							</li>
+							<li class="relative_docs_list">
+								<input type="checkbox" name="" class="relative_docs_checkbox" value="">
+								<a href="#">
+									<img src="/img/icon/ppt.png" alt="" title="">
+									회의록.docx
+								</a>
+								<div class="download_detail">
+									<span class="download_filesize">1.3MB</span>
+									<a href="#" class="download">
+										<img src="/img/icon/attach_download1.png" alt="" title="">
+									</a>
+									<a href="#" class="contextMenu">
+										<img src="/img/icon/attach_context.png" alt="" title="">
+									</a>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="tab_form">
+				<div class="coop_process_procedure1">
+					<ul>
+						<li class="coop_process">작성단계</li>
+						<li class="coop_process">승인단계</li>
+						<li class="coop_process">보완단계</li>
+						<li class="coop_process current">완료</li>
+					</ul>
+				</div>
+				<div class="coop_approvalRequest_form">
+					<table>
+					<colgroup>
+						<col width="117"/>
+						<col width="528"/>
+					</colgroup>
+					<tr>
+					<th>업무요청자</th>
+					<td>김요청</td>
+					</tr>
+					<tr>
+					<th>업무완료 예정일</th>
+					<td>2015-02-13</td>
+					</tr>
+					<tr>
+					<th>업무요청내역</th>
+					<td>업무를 요청 합니다.</td>
+					</tr>
+					<tr>
+					<th>작성자
+						<span class="required">*</span>
+					</th>
+					<td>김작성</td>
+					</tr>
+					<tr>
+					<th>공동작성자</th>
+					<td>박공동, 최공동</td>
+					</tr>
+					<tr>
+					<th>승인자
+						<span class="required">*</span>
+					</th>
+					<td>허승인</td>
+					</tr>
+					<tr>
+					<th>수신자</th>
+					<td>
+						<div class="approvalResult_receiver">
+							[<span class="">0</span>/<span class="">1</span>] 엄보고
+							<div class="approvalResult_tooltip hide">
+								● 엄보고 : 미열람
+							</div>
+						</div>
+					</td>
+					</tr>
+					</table>
+				</div>
+				
+				<div class="coop_approvalResult">
+					<a class="dropDown_txt">
+						<label>
+							<strong>승인현황</strong>
+							(<span class="approvalResult_cnt">2</span>)
+						</label>
+					</a>
+					<span class="dropDown_arrow down"></span>
+					<div class="approvalResult_wrapper">
+						<ul>
+							<li class="approvalResult_list">
+								<p>
+									<span class="bold">김요청</span>
+									<span>2015-02-01 18:00</span>
+								</p>
+								<p>
+									보고서 작성이 완료되었습니다. 팀장님 승인 부탁드립니다.
+								</p>
+							</li>
+							<li class="approvalResult_list">
+								<p>
+									<span class="bold">김팀장</span>
+									<span>2015-02-01 18:00</span>
+								</p>
+								<p>
+									승인완료 합니다.
+								</p>
+							</li>
+						</ul>
+					</div>
+				</div>
+				
+			</div>
+			<div class="tab_form hide">
+				<div class="doc_version">
+					<table>
+						<colgroup>
+						<col width="65"/>
+						<col width="292"/>
+						<col width="95"/>
+						<col width="144"/>
+						</colgroup>
+						<thead>
+							<tr>
+								<th>버전</th>
+								<th>문서명</th>
+								<th>변경자</th>
+								<th>변경일자</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>ver 2.0</td>
+								<td>문서관리 지침</td>
+								<td>홍길동</td>
+								<td>2014.09.15 15:12:23</td>
+							</tr>
+							<tr>
+								<td>ver 2.0</td>
+								<td>문서관리 지침</td>
+								<td>홍길동</td>
+								<td>2014.09.15 15:12:23</td>
+							</tr>
+							<tr class="current">
+								<td>ver 2.0</td>
+								<td>문서관리 지침</td>
+								<td>홍길동</td>
+								<td>2014.09.15 15:12:23</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="doc_ver_attach">
+					<div class="doc_ver_detail">
+						<p><strong>버전상세</strong></p>
+						<textarea id="" name="" class="ver_detail_txt" readonly="readonly">버전상세</textarea>
+					</div>
+					<div class="doc_ver_title">
+						<span>
+							<strong>버전파일</strong> : <span class="ver_file_cnt">1</span>
+						</span>
+						<div class="ver_btn_wrapper">
+							<button class="">버전삭제</button>
+							<button class="">상세조회</button>
+						</div>
+					</div>
+					<div class="doc_ver_wrapper">
+						<ul>
+							<li class="doc_ver_list">
+								<a href="#">
+									<img src="/img/icon/ppt.png" alt="" title="">
+									회의록.docx
+								</a>
+								<div class="download_detail">
+									<span class="download_filesize">1.3MB</span>
+									<a href="#" class="download">
+										<img src="/img/icon/attach_download1.png" alt="" title="">
+									</a>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="tab_form hide">
+				<div class="archive_wrapper">
+					<table>
+						<thead>
+							<tr>
+								<th>no.</th>
+								<th>일시
+									<a href="#"><img src="/img/icon/head_dropdown.png" alt="" title=""></a>
+								</th>
+								<th>수행작업</th>
+								<th>작업자</th>
+								<th>버전</th>
+								<th>비고</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>1</td>
+								<td>2015.02.25 17:12:23</td>
+								<td>등록</td>
+								<td>홍길동</td>
+								<td>1.1</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td>2015.02.25 17:12:23</td>
+								<td>등록</td>
+								<td>홍길동</td>
+								<td>1.1</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>3</td>
+								<td>2015.02.25 17:12:23</td>
+								<td>등록</td>
+								<td>홍길동</td>
+								<td>1.1</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>4</td>
+								<td>2015.02.25 17:12:23</td>
+								<td>등록</td>
+								<td>홍길동</td>
+								<td>1.1</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>5</td>
+								<td>2015.02.25 17:12:23</td>
+								<td>등록</td>
+								<td>홍길동</td>
+								<td>1.1</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>6</td>
+								<td>2015.02.25 17:12:23</td>
+								<td>등록</td>
+								<td>홍길동</td>
+								<td>1.1</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>7</td>
+								<td>2015.02.25 17:12:23</td>
+								<td>등록</td>
+								<td>홍길동</td>
+								<td>1.1</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>8</td>
+								<td>2015.02.25 17:12:23</td>
+								<td>등록</td>
+								<td>홍길동</td>
+								<td>1.1</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>9</td>
+								<td>2015.02.25 17:12:23</td>
+								<td>등록</td>
+								<td>홍길동</td>
+								<td>1.1</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>10</td>
+								<td>2015.02.25 17:12:23</td>
+								<td>등록</td>
+								<td>홍길동</td>
+								<td>1.1</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>2015.02.25 17:12:23</td>
+								<td>등록</td>
+								<td>홍길동</td>
+								<td>1.1</td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="tab_form hide">
+				<div class="opinion_wrapper">
+					<table>
+						<colgroup>
+						<col width="85"/>
+						<col width="84"/>
+						<col width="316"/>
+						<col width="134"/>
+						</colgroup>
+						<thead>
+							<tr>
+								<th>의견 등록자</th>
+								<th>답글 대상자</th>
+								<th>내용</th>
+								<th>등록일시
+									<a href="#"><img src="/img/icon/head_dropdown.png" alt="" title=""></a>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>홍길동</td>
+								<td></td>
+								<td>의견 내용입니다.</td>
+								<td>2015.02.25 17:12:23</td>
+							</tr>
+							<tr>
+								<td>홍길동</td>
+								<td></td>
+								<td>의견 내용입니다.</td>
+								<td>2015.02.25 17:12:23</td>
+							</tr>
+							<tr class="current">
+								<td>홍길동</td>
+								<td></td>
+								<td>의견 내용입니다.</td>
+								<td>2015.02.25 17:12:23</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="opinion_contextMenu hide">
+						<ul>
+							<li><a href="#" class="opinion_reply"><span class="left"></span><span class="right">답글</span></a></li>
+							<li><a href="#" class="opinion_modify"><span class="left"></span><span class="right">수정</span></a></li>
+							<li><a href="#" class="opinion_delete"><span class="left"></span><span class="right">삭제</span></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="opinion_writeform">
+					<form>
+						<div class="opinion_account">
+							<img src="/img/icon/user_info.png" alt="">
+							<span class="account_nm">홍길동</span>
+							<div class="opinion_btnGrp">
+								<button type="button" class="refresh">새로고침</button>
+								<button type="button" class="register">등록</button>
+								<button type="button" class="delete">삭제</button>
+							</div>
+						</div>
+						<div class="opinion_cnt_wrapper">
+							<textarea class="" name="">의견을 입력해주세요.</textarea>
+						</div>
+					</form>
+				</div>
+			</div>
+			<!-- URL 복사  -->
+			<div class="url_copy hide">
+				<div class="url_copy_title">
+					URL 조회기간 설정
+					<a href="#" class="url_copy_close"> <img src="/img/icon/window_close.png" alt="" title=""></a>
+				</div>
+				<div class="url_copy_cnts">
+					<form>
+						<div class="url_copy_duration">
+							<label>
+								<input type="radio" name="" class="" value="">
+								제한없음
+							</label>
+							<label>
+								<input type="radio" name="" class="" value="">
+								<input type="text" name="" class="" value="">
+								일로 제한
+							</label>
+						</div>
+						<div class="url_copy_confirm"> 문서의 URL을 복사하시겠습니까? </div>
+						<div class="url_copy_btnGrp">
+							<button type="submit">확인</button>
+							<button type="button">취소</button>
+						</div>
+					</form>
+				</div>
+			</div>
+			<!-- URL 붙여넣기, 메일 내용 -->
+			<div class="url_paste hide">
+				<div class="url_paste_title">
+					URL 붙여넣기 &amp; 메일 내용
+					<a href="#" class="url_paste_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+				</div>
+				<div class="url_paste_cnts">
+					<table>
+						<colgroup>
+						<col width="101"/>
+						<col width="126"/>
+						<col width="97"/>
+						<col width="115"/>
+						</colgroup>
+						<tr>
+							<th>문서제목</th>
+							<td colspan="3">Anydocu_gluesys11103번째 문서 1.1</td>
+						</tr>
+						<tr>
+							<th>폴더</th>
+							<td colspan="3">/엑스소프트/영업팀/영업팀/하위_11</td>
+						</tr>
+						<tr>
+							<th>등록자[소유자]</th>
+							<td>김종민 [김주혁]</td>
+							<th>등록일</th>
+							<td>2015-02-10</td>
+						</tr>
+						<tr>
+							<th>파일</th>
+							<td colspan="3">
+								<a href="#" class="doc_download">워드문서.docx</a>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<!-- URL 메일 전송  -->
+			<div class="url_email hide">
+				<div class="url_email_title">
+					URL 메일 전송
+					<a href="#" class="url_email_close">
+						<img src="/img/icon/window_close.png" alt="" title="">
+					</a>
+				</div>
+				<div class="url_email_cnts">
+					<form>
+						<table>
+							<colgroup>
+							<col width="70"/>
+							<col width="310"/>
+							</colgroup>
+							<tr>
+								<th>조회기간</th>
+								<td>
+									<label>
+										<input type="radio" name="" class="" value="">
+										제한없음
+									</label>
+									<label>
+										<input type="radio" name="" class="" value="">
+										<input type="text" name="" class="duration_limit" value="">
+										일로 제한
+									</label>
+								</td>
+							</tr>
+							<tr>
+								<th>메일수신자</th>
+								<td>
+									<input type="text" name="" class="email_receiver" placeholder="메일수신자를 입력해주세요.">
+									<button type="button" id="" class="email_find">찾기</button>
+								</td>
+							</tr>
+						</table>
+						<div class="url_email_confirm">문서의 URL을 메일로 발송하시겠습니까?</div>
+						<div class="url_email_btnGrp">
+							<button type="submit">확인</button>
+							<button type="button">취소</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 문서상세조회 끝 --> 
+</div>
+</body>
+</html>

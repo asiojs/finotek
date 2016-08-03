@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <title>index</title>
+  <script src="/js/jquery-2.1.3.min.js"></script>
+  <script src="/js/jquery-ui.js"></script>
+  <script src="/lib/jstree/jstree.js"></script>
+  <script src="/lib/jqgrid/js/jquery.jqGrid.min.js"></script>
+  <script src="/js/jquery.ddslick.custom.js"></script>
+  <script src="/js/jquery.cookie.js"></script>
+  <script src="/js/jquery.alerts.js"></script>
+  <script src="/js/ecm.js"></script>
+
+  <link rel="stylesheet" href="/css/ecm.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/jqtree-custom.css">
+  <link rel="stylesheet" href="/css/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery.alerts.css">
+  <link rel="stylesheet" href="/css/jquery.ddslick.custom.css">
+  <link rel="stylesheet" href="/lib/jqgrid/css/ui.jqgrid.css">
+</head>
+
+<body>
+  <div class="wrap">
+	<div class="top_menu">
+		<div class="top_menu_custom">
+			<ul class="custom_menu_list">
+            	<li class="full_screen">
+                	<a href="#" class="full_screen"><img src="/img/icon/fullscreen.png" alt="" title=""></a>
+                </li>
+                <li class="quick_menu"><a href="#" class="quick_menu">
+                	<img src="/img/icon/quickMenu.png" alt="" title="">퀵메뉴
+                    <span class="quick_menu"></span>
+                   </a>
+                   <div class="quick_sub_wrapper">
+                   <ul class="quick_sub_menu">
+                   		<li><a href="#">내 소유 문서</a></li>
+                        <li><a href="#">내 수정 중인 문서</a></li>
+                        <li><a href="#">내 만기 문서</a></li>
+                        <li><a href="#">휴지통</a></li>
+                        <li><a href="#">즐겨찾기</a></li>
+                        <li><a href="#">공유받은 문서</a></li>
+                        <li><a href="#">공유받은 폴더</a></li>
+                   </ul>
+                   </div>
+                </li>
+            </ul>
+		</div>
+        <div class="top_menu_shape"></div>
+		<div class="top_menu_search"><span class="lbl_integrated_search">통합검색</span>
+			<div class="search_input_form">
+				<form class="" name="" method="post">
+					<input type="text" class="search_text" placeholder="검색어를 입력하세요">
+					<button type="submit" class="search_submit"></button>
+				</form>
+			</div>
+			<div class="search_detail">
+				<a href="#" class="dropDown_img"><img src="/img/icon/search_detail_btn.png" alt=""></a>
+				<div class="integrated_dropDown_menu hide">
+					<form>
+						<table class="srch_integrated_tbl">
+							<tr>
+							<th>기본검색</th>
+							<td>
+								<input type="text" class="srch_integrated_txt" placeholder="검색어를 입력하세요">
+								<label><input type="checkbox" id="" name="" class="" value="">결과내 재 검색</label>
+							</td>
+							</tr>
+							<tr>
+							<th>등록기간</th>
+							<td>
+								<a href="#" id="0" class="srch_integrated_regDate">전체</a>
+								<a href="#" id="1" class="srch_integrated_regDate">1개월</a>
+								<a href="#" id="2" class="srch_integrated_regDate">3개월</a>
+								<a href="#" id="3" class="srch_integrated_regDate">6개월</a>
+								<a href="#" id="4" class="srch_integrated_regDate">1년</a>			
+								<input type="text" id="datepicker3" name="" class="srch_integrated_startDate input-text calend" name="start_date" readonly="readonly">
+								<span class="dateto">-</span>
+								<input type="text" id="datepicker4" name="" class="srch_integrated_endDate input-text calend" name="end_date" readonly="readonly">
+							</td>
+							</tr>
+							<tr>
+							<th></th>
+							<td>
+								<label><input type="radio" name="" class="" value="">전체</label>
+								<label><input type="radio" name="" class="" value="">제목</label>
+								<label><input type="radio" name="" class="" value="">본문</label>
+								<label><input type="radio" name="" class="" value="">등록자</label>
+								<label><input type="radio" name="" class="" value="">첨부파일명</label>
+								<label><input type="radio" name="" class="" value="">첨부내용</label>
+							</td>
+							</tr>
+							<tr>
+							<th>문서유형</th>
+							<td>
+								<select id="srch_type5" name="">
+									<option value="" selected="selected">전체</option>
+									<option value="">일반문서</option>
+									<option value="">파일문서</option>
+								</select>							
+							</td>
+							</tr>
+							<tr>
+							<th>폴더위치</th>
+							<td>
+								<input type="text" id="" name="" class="srch_integrated_folder">
+								<button type="button" id="" name="" class="srch_integrated_folderChoose">선택</button>
+								<label><input type="checkbox" id="" name="" class="" value="">하위폴더 포함</label>
+							</td>
+							</tr>
+							<tr>
+							<td colspan="2" class="srch_integrated_btnGrp">
+								<button type="submit" id="srch_integrated_submit" class="srch_integrated_btn">검색</button>
+								<button type="reset" id="" class="srch_integrated_btn">초기화</button>
+							</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+    <header class="header">
+		<div class="logo">
+			<h1>
+				<a href="#"><img src="/img/logo.png"></a>
+			</h1>
+		</div>
+		<div class="header_menu_wrapper">
+			<div class="header_icon">
+				<ul class="header_icon_menu">
+					<li class="selected"><a href="#" class="page selected"></a>
+                    	<div class="hide">나의 문서</div>
+                    </li>
+					<li><a href="#" class="user"></a>
+                    	<div class="hide">사용자 정보</div>
+                    </li>
+					<li><a href="#" class="inbox"></a>
+                    	<div class="hide">문서함</div>
+                    </li>
+					<li><a href="#" class="usergroup"></a>
+                    	<div class="hide">사용자 그룹</div>
+                    </li>
+					<li><a href="#" class="piechart"></a>
+                    	<div class="hide">통계</div>
+                    </li>
+				</ul>
+			</div>
+			<div class="header_user">
+				<ul class="header_user_menu">
+					<li class="user_info">
+						<a href="#">
+							<img src="/img/icon/user_info.png" alt="">
+							홍길동님(일반)
+							<img src="/img/icon/head_dropdown.png" class="head_dropDown">
+						</a>
+                        <div class="info_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                            <div>
+                                <ul>
+                                    <li><a href="#">내정보</a></li>
+                                    <li><a href="#">보안 설정</a></li>
+                                </ul>
+                            </div>
+                        </div>
+					</li>
+					<li class="user_note">
+						<a href="#">
+							<img src="/img/icon/user_note.png" alt="">
+							<span class="num_cnt">99</span>
+						</a>
+                        <div class="note_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                           	<ul>
+                            	<li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                            	<li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                            </ul>
+                        </div>
+					</li>
+					<li class="user_inbox">
+						<a href="#">
+							<img src="/img/icon/user_inbox.png" alt="">
+							<span class="num_cnt">999</span>
+						</a>
+					</li>
+					<li class="user_setting">
+						<a href="#">
+							<img src="/img/icon/user_setting.png" alt="">
+						</a>
+					</li>
+					<li class="user_logout">
+						<a href="#">
+							<img src="/img/icon/user_logout.png" alt="">
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</header>
+	<div class="cnt_wrapper">
+		<div class="error_page">
+			<div class="error_page_left">
+				<img src="/img/icon/stricted.png" alt="" title="">
+			</div>
+			<div class="error_page_right">
+				<p class="error_title">페이지를 찾을 수 없습니다.</p>
+				<p class="error_subtitle">죄송합니다. 요청하신 페이지를 찾을 수 없습니다.</p>
+				<p class="error_cnts">
+					찾으시는 페이지의 주소가 잘못 입력되었거나,<br>
+					페이지의 주소가 변경 혹은 서버에서 삭제되었을 수 있습니다.
+				</p>
+			</div>
+		</div>
+	</div>
+	<footer class="footer">
+		<ul class="footer_menu">
+			<li class="ft_lyr_tooltip"><a href="#">도움말</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>도움말에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_help" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">프로그램설치</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>프로그램 설치에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_prog" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">시스템관리</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>시스템 관리에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_system" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">퀵메뉴추가</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>퀵메뉴 추가에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_quickmn" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+		</ul>
+		<p class="copyright">
+			Copyright eXsoft All Rights Reserved.
+		</p>
+    </footer>
+  </div>
+</body>
+</html>

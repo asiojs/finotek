@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+ 
+<form-validation>
+ 
+    <formset>
+ 
+        <form name="folderVO">
+         	<field property="folder_name_ko" depends="required">
+				<arg0 key="folderVO.folder_name_ko" />
+			</field>
+			<field property="parent_id" depends="required">
+				<arg0 key="folderVO.parent_id" />
+			</field>
+             <field property="storage_quota" depends="required,long,mask">
+             	<msg name="mask" key="errors.long"/>
+				<arg0 key="folderVO.storage_quota" /> 
+    			<var>
+        			<var-name>mask</var-name>
+        			<var-value>^(-?)[0-9]+$</var-value>        			 
+    			</var>
+			</field>
+        </form>
+ 
+    </formset>
+ 
+</form-validation>

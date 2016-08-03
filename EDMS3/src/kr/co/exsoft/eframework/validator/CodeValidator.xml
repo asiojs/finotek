@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+ 
+<form-validation>
+ 
+    <formset>
+ 
+        <form name="codeVO">
+         	<field property="code_id" depends="required">
+				<arg0 key="codeVO.code_id" />
+			</field>          
+			<field property="code_nm" depends="required">
+				<arg0 key="codeVO.code_nm" />
+			</field>          
+			<field property="gcode_id" depends="required">
+				<arg0 key="codeVO.gcode_id" />
+			</field>          
+        </form>
+ 
+    </formset>
+ 
+</form-validation>

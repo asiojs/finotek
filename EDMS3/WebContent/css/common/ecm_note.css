@@ -1,0 +1,183 @@
+@charset "UTF-8";
+
+/* 레이아웃 */
+html, body{width:730px;max-width:730px;height:690px;max-height:690px;margin:0;padding:0;font-family:dotum;font-size:12px}
+.wrap{position:relative;display:block;height:100%;padding:20px}
+
+/* 탭메뉴 */
+.tab_menu{position:relative;height:31px;margin-top:22px;padding-left:1px}
+.tab_btn_wrapper{position:absolute;display:inline-block;min-width:367px;right:0;text-align:right}
+.tab_btn_wrapper label{float:left} 
+.tab_btn_wrapper button{float:left;margin-left:6px;padding:5px 10px 5px 10px;border:1px solid #b7b7b7;border-radius:3px;color:#404040;cursor:pointer;font-size:12px}
+.tab_btn_wrapper > div.tbl_extFunction{width:78px;margin-left:6px;border:1px solid #b7b7b7}
+.tab_btn_wrapper1{position:absolute;display:inline-block;right:0;text-align:right}
+.tab_btn_wrapper1 label{float:left} 
+.tab_btn_wrapper1 button{float:left;margin-left:6px;padding:5px 10px 5px 10px;border:1px solid #b7b7b7;border-radius:3px;color:#404040;cursor:pointer;font-size:12px}
+.tab_element{display:inline-block;float:left;margin-left:-1px;padding:8px 18px 8px 18px;border:1px solid #e7e7e7;border-bottom:0;background-color:#f5f5f5;cursor:pointer}
+.tab_element.selected{padding:8px 18px 9px 18px;border:1px solid #c9c9c9;border-bottom:0;background-color:#fff;font-weight:bold}
+.tab_form{border-top:1px solid #c9c9c9;padding-top:26px;}
+.tab_form > div.tbl_wrapper{position:relative}
+.tab_form table{width:100%}
+.tab_form table tr{height:29px}
+.tab_form table tr.current{background-color:#ecf5ff}
+.tab_form table th{padding-left:12px;border:1px solid #e5e5e5;background-color:#f9f9f9}
+.tab_form table td{padding-left:12px;border:1px solid #e5e5e5}
+
+/* 쪽지 관리 */
+.myNote{position:absolute;overflow:hidden;width:688px;top:20px;left:20px;border:1px solid #525252;border-radius:5px;background-color:#fff;z-index:50}
+.myNote_title{position:relative;padding:12px 14px 12px 20px;border-bottom:1px solid #525252;background-color:#ebebeb;color:#333;font-weight:bold}
+.myNote_close{position:absolute;left:663px}
+.myNote_cnts{padding:20px}
+.myNote_sub_cnts{position:relative;width:100%;height:413px}
+.myNote_sub_cnts table{height:373px}
+.myNote_sub_cnts table thead{position:absolute;}
+.myNote_sub_cnts table tbody{overflow-y:scroll;position:absolute;height:342px;top:31px}
+.myNote_sub_cnts table tr.chat_view td{background-color:#f9f9f9; border-bottom:1px solid #bbcce1}
+.myNote_sub_cnts table tr.chat_view td.subject{position:relative}
+.myNote_sub_cnts table tr.chat_view td div.me{margin-top:10px;text-align:right}
+.myNote_sub_cnts table tr.chat_view td div.me div.chat_box{background-color:#ecf5ff}
+.myNote_sub_cnts table tr.chat_view td div.me div.tooltip_tail{position:absolute;width:10px;height:16px;top:5px;right:-8px;background:url('../../img/icon/note_tooltip_right1.png') center center no-repeat}
+.myNote_sub_cnts table tr.chat_view td div.opposite{margin-top:10px;text-align:left}
+.myNote_sub_cnts table tr.chat_view td div .chat_user{font-weight:bold}
+.myNote_sub_cnts table tr.chat_view td div .chat_box{position:relative;display:inline-block;width:360px;margin-top:10px;padding:10px;border-bottom:1px solid #bbc4cd;border-radius:5px;background-color:#fff;color:#666;line-height:17px;text-align:left}
+.myNote_sub_cnts table tr.chat_view td div.opposite .tooltip_tail{position:absolute;width:10px;height:16px;top:5px;left:-8px;background:url('../../img/icon/note_tooltip_left.png') center center no-repeat}
+.myNote_sub_cnts table tr.preview td{background-color:#ecf5ff;border-bottom:1px solid #bbcce1}
+.myNote_sub_cnts table th:first-child{border-left:0}
+.myNote_sub_cnts table th:last-child{border-right:0}
+.myNote_sub_cnts table th.tooltip{width:16px;padding:8px 10px}
+.myNote_sub_cnts table th.subject{width:358px;padding:8px 12px}
+.myNote_sub_cnts table th.noteDate{width:115px;padding:8px 12px;}
+.myNote_sub_cnts table th.listMenu{width:92px}
+.myNote_sub_cnts table td{border-left:0;border-right:0}
+.myNote_sub_cnts table td.tooltip{width:16px;padding:8px 10px}
+.myNote_sub_cnts table td.subject{width:358px;padding:8px 12px}
+.myNote_sub_cnts table td.subject span{display:inline-block;line-height:17px}
+.myNote_sub_cnts table td.subject .abbr_contents{display:inline-block;color:#666;line-height:17px}
+.myNote_sub_cnts table td.noteDate{width:115px;padding:8px 12px;vertical-align:top}
+.myNote_sub_cnts table td.listMenu{width:70px;text-align:center}
+.myNote_sub_cnts table td.listMenu a{margin-right:5px}
+.myNote_cnts_srch{height:25px;}
+#myNote_srch_type{height:25px;border:1px solid #b7b7b7;border-right:0;border-top-left-radius:3px;border-bottom-left-radius:3px;border-top-right-radius:0;border-bottom-right-radius:0;}
+.myNote_srch_keyword{float:left;width:213px;height:11px;padding:7px 12px 7px 12px;border:1px solid #b7b7b7;border-right:0;color:#c7c7c7;font-size:11px}
+.myNote_srch_btn{width:28px;height:27px;border:0;border-top-right-radius:2px;border-bottom-right-radius:2px;background:url('../../img/icon/detail_search_btn.png') center center no-repeat #464854;cursor:pointer}
+.myNote_btnGrp{position:relative;margin-top:5px;padding-top:15px;border-top:1px solid #b4b4b4;text-align:center}
+.myNote_btnGrp button{padding:6px 15px;border:1px solid #b7b7b7;border-radius:3px;cursor:pointer}
+.myNote_btnGrp .myNote_ok{border:1px solid #333;border-radius:3px;font-weight:bold}
+.myNote_btnGrp .myNote_cancel{color:#666}
+
+/* 쪽지 쓰기 */
+.myNoteWrite{position:absolute;overflow:hidden;width:608px;top:50%;left:50%;margin:-277px 0 0 -305px;border:1px solid #525252;border-radius:5px;background-color:#fff;z-index:70}
+.myNoteWrite_title{position:relative;padding:12px 14px 12px 20px;border-bottom:1px solid #525252;background-color:#ebebeb;color:#333;font-weight:bold}
+.myNoteWrite_close{position:absolute;left:583px}
+.myNoteWrite_cnts{padding:20px}
+.myNoteWrite_cnts table{width:100%}
+.myNoteWrite_cnts table td{padding:5px 10px}
+.myNoteWrite_cnts table input[type=text]{float:left;width:427px;height:25px;border:1px solid #cacaca;color:#333}
+.myNoteWrite_cnts table button{float:left;margin-left:5px;padding:5px 10px;border:1px solid #b7b7b7;border-radius:3px;color:#333;cursor:pointer}
+.myNoteWrite_cnts table textarea{width:477px;height:248px}
+.myNoteWrite_cnts table td p.note_count{text-align:right;margin-top:10px}
+
+.myNoteWrite_btnGrp{position:relative;margin-top:5px;padding-top:15px;text-align:center}
+.myNoteWrite_btnGrp button{padding:6px 15px;border:1px solid #b7b7b7;border-radius:3px;cursor:pointer}
+.myNoteWrite_btnGrp .myNoteWrite_confirm{border:1px solid #333;border-radius:3px;font-weight:bold}
+.myNoteWrite_btnGrp .myNoteWrite_cancel{color:#666}
+
+/* 쪽지 전달 */
+.myNoteForward{position:absolute;overflow:hidden;width:608px;top:50%;left:50%;margin:-277px 0 0 -305px;border:1px solid #525252;border-radius:5px;background-color:#fff;z-index:70}
+.myNoteForward_title{position:relative;padding:12px 14px 12px 20px;border-bottom:1px solid #525252;background-color:#ebebeb;color:#333;font-weight:bold}
+.myNoteForward_close{position:absolute;left:583px}
+.myNoteForward_cnts{padding:20px}
+.myNoteForward_cnts table{width:100%}
+.myNoteForward_cnts table td{padding:5px 10px}
+.myNoteForward_cnts table input[type=text]{float:left;width:427px;height:25px;border:1px solid #cacaca;color:#333}
+.myNoteForward_cnts table button{float:left;margin-left:5px;padding:5px 10px;border:1px solid #b7b7b7;border-radius:3px;color:#333;cursor:pointer}
+.myNoteForward_cnts table textarea{width:477px;height:248px}
+.myNoteForward_cnts table td p.note_count{text-align:right;margin-top:10px}
+
+.myNoteForward_btnGrp{position:relative;margin-top:5px;padding-top:15px;text-align:center}
+.myNoteForward_btnGrp button{padding:6px 15px;border:1px solid #b7b7b7;border-radius:3px;cursor:pointer}
+.myNoteForward_btnGrp .myNoteForward_confirm{border:1px solid #333;border-radius:3px;font-weight:bold}
+.myNoteForward_btnGrp .myNoteForward_cancel{color:#666}
+
+/* 쪽지 답장 */
+.myNoteReply{position:absolute;overflow:hidden;width:608px;top:50%;left:50%;margin:-277px 0 0 -305px;border:1px solid #525252;border-radius:5px;background-color:#fff;z-index:70}
+.myNoteReply_title{position:relative;padding:12px 14px 12px 20px;border-bottom:1px solid #525252;background-color:#ebebeb;color:#333;font-weight:bold}
+.myNoteReply_close{position:absolute;left:583px}
+.myNoteReply_cnts{padding:20px}
+.myNoteReply_cnts table{width:100%}
+.myNoteReply_cnts table td{padding:5px 10px}
+.myNoteReply_cnts table input[type=text]{float:left;width:481px;height:25px;border:1px solid #cacaca;color:#333}
+.myNoteReply_cnts table button{float:left;margin-left:5px;padding:5px 10px;border:1px solid #b7b7b7;border-radius:3px;color:#333;cursor:pointer}
+.myNoteReply_cnts table textarea{width:477px;height:248px}
+.myNoteReply_cnts table td p.note_count{text-align:right;margin-top:10px}
+
+.myNoteReply_btnGrp{position:relative;margin-top:5px;padding-top:15px;text-align:center}
+.myNoteReply_btnGrp button{padding:6px 15px;border:1px solid #b7b7b7;border-radius:3px;cursor:pointer}
+.myNoteReply_btnGrp .myNoteReply_confirm{border:1px solid #333;border-radius:3px;font-weight:bold}
+.myNoteReply_btnGrp .myNoteReply_cancel{color:#666}
+
+/* URL 메일 수신자 선택 */
+.note_reciverlist{float:left;width:500px;height:471px;border-right:1px solid #e5e5e5}
+.note_reciverchoose{position:absolute;width:750px;top:20px;left:20px;border:1px solid #525252;border-radius:5px;background-color:#fff;z-index:70}
+.note_reciverchoose_close{position:absolute;left:660px}
+
+/* 쪽지 수신자 선택 */
+.note_choose{position:absolute;width:878px;top:20px;left:20px;border:1px solid #525252;border-radius:5px;background-color:#fff;z-index:70}
+.note_choose_title{position:relative;padding:12px 14px 12px 20px;border-bottom:1px solid #525252;background-color:#ebebeb;color:#333;font-weight:bold}
+.note_choose_close{position:absolute;left:853px}
+.note_choose_cnts{height:471px;padding:20px 20px 0 20px;border-bottom:1px solid #b4b4b4}
+.noteChoose_sub_wrapper{width:100%;height:100%;border-top:1px solid #757575}
+.note_group{float:left;width:178px;height:100%;border-left:1px solid #e5e5e5;border-right:1px solid #e5e5e5}
+.note_group_title{padding:12px 20px;background-color:#f3f3f3;font-weight:bold}
+.note_tree{margin-top:20px}
+
+
+.note_list{float:left;width:344px;height:471px;border-right:1px solid #e5e5e5}
+.note_srch_form input[type=text]{margin-left:5px;padding:5px 10px;border:1px solid #cacaca;border-radius:3px}
+.note_srch_form label{float:left;margin-left:10px}
+.note_srch_form label:first-child{margin-left:0}
+.note_srch_form .filter_note_name{width:55px}
+.note_srch_form .filter_depart_name{width:103px}
+.note_srch_form .note_filter_btn{float:left;margin-left:6px;padding:5px 10px;border:1px solid #b7b7b7;border-radius:3px;color:#404040;cursor:pointer}
+.note_srch_form{height:27px;padding:10px 10px 0 10px}
+.note_list_result{overflow-y:scroll;height:413px;margin-top:20px;padding:0 10px}
+.note_list_result table{width:100%}
+.note_list_result th{background-color:#f9f9f9}
+.note_list_result th,
+.note_list_result td{padding:9px;border:1px solid #e5e5e5;text-align:center}
+.selected_note_list{float:left;width:313px;height:100%}
+.selected_receiver{float:left}
+.selected_cc{float:left}
+.selected_hiddencc{float:left}
+.selected_note_list .selected_btnGrp{float:left;width:47px;height:81px;margin-top:200px;text-align:center}
+.selected_note_list .selected_btnGrp a{display:inline-block;width:24px;height:24px;border:1px solid #b7b7b7;border-radius:3px;text-align:center}
+.selected_note_list .selected_btnGrp a:last-child{margin-top:5px}
+.selected_note_list .selected_btnGrp a img{margin-top:6px}
+.selected_note_list .selected_cnts{float:left;width:265px;height:137px;padding-top:10px}
+.selected_note_list .selected_sub_wrapper{overflow-y:scroll;height:436px;margin-top:10px;padding-right:5px}
+.selected_note_list .selected_sub_wrapper table{width:100%}
+.selected_note_list .selected_sub_wrapper table th{background-color:#f9f9f9;color:#666}
+.selected_note_list .selected_sub_wrapper table th,
+.selected_note_list .selected_sub_wrapper table td{padding:6px;border:1px solid #e5e5e5;text-align:center}
+
+.note_choose_btnGrp{margin:15px;text-align:center}
+.note_choose_btnGrp button{padding:5px 9px;border-radius:3px;color:#333;cursor:pointer}
+.note_chooseConfirm_btn{border:1px solid #333;font-weight:bold}
+.note_chooseCancel_btn{margin-left:10px;border:1px solid #b7b7b7}
+
+/* 페이지 네비게이션 */
+.pg_navi_wrapper{width:100%;height:44px;text-align:center;}
+.pg_navi{display:inline-block;height:24px;margin-top:10px}
+.pg_navi li{float:left;font-weight:bold}
+.pg_navi li a{display:block;width:24px;height:18px;padding-top:6px}
+.pg_navi li a:hover{color:#3c88e9}
+.pg_navi li.first{border:1px solid #cacaca;border-right:0;border-top-left-radius:3px;border-bottom-left-radius:3px}
+.pg_navi li.prev{margin-right:7px;border:1px solid #cacaca;border-top-right-radius:3px;border-bottom-right-radius:3px}
+.pg_navi li.next{margin-left:7px;border:1px solid #cacaca;border-right:0;border-top-left-radius:3px;border-bottom-left-radius:3px}
+.pg_navi li.last{border:1px solid #cacaca;border-top-right-radius:3px;border-bottom-right-radius:3px}
+.pg_navi li.curr{border:1px solid #e9e9e9}
+.pg_navi li.curr a{height:19px;padding-top:5px;color:#3c88e9}
+
+.hide{display:none}
+.readonly{background-color:#e5e9f2}
+.textAreaClsss {border:solid 1px #e5e5e5}

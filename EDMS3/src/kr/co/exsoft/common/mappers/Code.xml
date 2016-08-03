@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.common.dao.CodeDao">
+	
+	<sql id="whereCodeCommon">
+		<where>	
+			<if test="gcode_id != null and gcode_id != ''">
+				AND GCODE_ID = #{gcode_id}
+			</if>		
+			<if test="is_use != null and is_use != ''">			
+				AND IS_USE = #{is_use}
+			</if>		
+			<if test="gcode_id == 'ROLE' ">
+				<choose>
+					<when test="nPage != null and nPage != ''">
+						AND CODE_ID NOT IN ('SYSTEM_OPERATOR','CREATOR')
+					</when>
+					<otherwise>
+						AND CODE_ID NOT IN ('SYSTEM_OPERATOR')
+					</otherwise>
+				</choose>				
+			</if>
+			<if test="strKeyword != null and strKeyword != ''">
+				AND CODE_NM LIKE '%${strKeyword}%'
+			</if>
+		</where>
+	</sql>
+	
+	<!-- 코드 페이지 목록 가져오기 -->
+	<select id="codePagingList" parameterType="HashMap" resultType="Code">
+		SELECT 
+			CODE_ID,CODE_NM,GCODE_ID,SORT_INDEX,IS_USE,IS_SYS
+		FROM
+		(
+			SELECT 
+				CODE_ID,CODE_NM,GCODE_ID,SORT_INDEX,IS_USE,IS_SYS,
+				CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM		
+			FROM XR_CODE
+			<include refid="whereCodeCommon" />				
+		) LIST
+		WHERE LIST.PAGENUM = #{nPage}							
+	</select>
+	
+	<!-- 코드 페이지 목록 카운트 -->
+	<select id="codePagingCount" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(CODE_ID) AS CNT
+		FROM
+		(
+			SELECT 
+				CODE_ID,CODE_NM,GCODE_ID,SORT_INDEX,IS_USE,IS_SYS				
+			FROM XR_CODE
+			<include refid="whereCodeCommon" />				
+		) LIST
+	</select>
+	
+	<!-- 코드 목록 가져오기 SELECT BOX  -->
+	<select id="codeSelectList" parameterType="HashMap" resultType="Code">
+		SELECT 
+			CODE_ID,CODE_NM,GCODE_ID,SORT_INDEX,IS_USE,IS_SYS
+		FROM XR_CODE
+		<include refid="whereCodeCommon" />				
+		ORDER BY SORT_INDEX ASC 				
+	</select>
+
+	
+	<!-- 코드 정보 가져오기 -->
+	<select id="codeDetail" parameterType="HashMap" resultType="Code">
+		SELECT 
+			CODE_ID,CODE_NM,GCODE_ID,SORT_INDEX,IS_USE,IS_SYS
+		FROM XR_CODE
+		<where>			
+			<choose>
+			<when test="type == 'insert' ">
+			<if test="code_id != null and code_id != ''">
+				AND CODE_ID = #{code_id}
+			</if>			
+			<if test="code_nm != null and code_nm != ''">
+				AND CODE_NM = #{code_nm}
+			</if>			
+			<if test="gcode_id != null and gcode_id != ''">
+				AND GCODE_ID = #{gcode_id}
+			</if>		
+			</when>
+			<when test="type == 'update' ">
+			<if test="code_id != null and code_id != ''">
+				AND CODE_ID != #{code_id}
+			</if>			
+			<if test="code_nm != null and code_nm != ''">
+				AND CODE_NM = #{code_nm}
+			</if>			
+			<if test="gcode_id != null and gcode_id != ''">
+				AND GCODE_ID = #{gcode_id}
+			</if>		
+			</when>
+			</choose>
+		</where> 							
+	</select>
+	
+	 <!-- 코드 등록처리 :: XR_CODE ROLE -->
+	<insert id="codeWrite" parameterType="Code">
+		INSERT INTO XR_CODE (
+				CODE_ID,CODE_NM,GCODE_ID,SORT_INDEX
+		) VALUES (
+				#{code_id},#{code_nm},#{gcode_id},#{sort_index}
+		)
+	</insert>
+	
+	<!-- 코드 삭제처리 :: XR_CODE ROLE -->
+	<delete id="codeDelete" parameterType="HashMap">
+		DELETE FROM XR_CODE 
+		<where>			
+			<if test="code_id != null and code_id != ''">
+				AND CODE_ID = #{code_id}
+			</if>			
+			<if test="gcode_id != null and gcode_id != ''">
+				AND GCODE_ID = #{gcode_id}
+			</if>
+			<if test="is_sys != null and is_sys != ''">
+				AND IS_SYS = #{is_sys}
+			</if>		
+		</where> 				
+	</delete>
+	
+		
+	<!-- 코드 수정처리 :: XR_CODE ROLE  -->
+	<update id="codeUpdate" parameterType="Code">
+		UPDATE XR_CODE			
+		<set>
+			<if test="code_nm != null and code_nm != ''">
+				CODE_NM = #{code_nm},
+			</if>			
+			<if test="is_use != null and is_use != ''">
+				IS_USE = #{is_use},
+			</if>			
+			<if test="sort_index != null and sort_index != ''">
+				SORT_INDEX = #{sort_index},
+			</if>			
+		</set>
+		<where>			
+			<if test="code_id != null and code_id != ''">
+				AND CODE_ID = #{code_id}
+			</if>			
+			<if test="gcode_id != null and gcode_id != ''">
+				AND GCODE_ID = #{gcode_id}
+			</if>		
+		</where> 				
+	</update>		
+	
+	<!-- 코드 정보 가져오기 MAX SORT_INDEX-->
+	<select id="codeMaxSortIndex" parameterType="HashMap" resultType="Int">
+		SELECT LIST.SORT_INDEX
+		FROM 
+		(
+			SELECT 
+				CODE_ID,CODE_NM,GCODE_ID,SORT_INDEX,IS_USE,IS_SYS
+			FROM XR_CODE 
+			<where>					
+			<if test="gcode_id != null and gcode_id != ''">
+				AND GCODE_ID = #{gcode_id}
+			</if>		
+			</where> 				
+			ORDER BY SORT_INDEX DESC
+ 		)LIST  				
+		WHERE ROWNUM = 1			
+	</select>
+	
+	<!-- 코드(ROLE) 이 사용중인지 체크한다. -->
+	<select id="isRoleUsing" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(ROLE_ID) 
+		FROM XR_USER
+		<where>					
+			<if test="role_id != null and role_id != ''">
+				AND ROLE_ID = #{role_id}
+			</if>		
+		</where> 
+	</select>	
+	
+</mapper>

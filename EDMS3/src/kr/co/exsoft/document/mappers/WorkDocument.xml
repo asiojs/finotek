@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.document.dao.WorkDocumentDao">
+
+<!-- 확장문서 유형 검색 / 첨부파일명 -->
+<sql id="workExtendDoc">
+	<if test="tbl_name != null and tbl_name != ''">
+		WITH EXTEND_DOC AS 
+		( 
+			SELECT DOC_ID 
+		  	FROM ${tbl_name}
+		  	<where>
+		  		<foreach item="item" index="index" collection="attrList">
+				<choose>
+					<when test="(item.display_type == 'CHECK' or item.display_type == 'INPUT') and (item.search_word != null and item.search_word != '')">
+						AND ${item.attr_id} LIKE '%${item.search_word}%'
+					</when>
+					<when test="item.search_word != null and item.search_word != ''">
+						AND ${item.attr_id} = #{item.search_word}
+					</when>
+				</choose>
+				</foreach>
+		  	</where>
+		)
+	 </if>	
+	 <if test="page_name != null and page_name != ''">
+		WITH PAGE_DOC AS
+		(
+			SELECT DISTINCT F.DOC_ID 
+			FROM XR_FILED F
+			INNER JOIN XR_PAGE P ON P.PAGE_NAME LIKE '%${page_name}%' AND F.PAGE_ID = P.PAGE_ID
+		)
+	</if>	
+</sql>	
+
+<!-- ACL 권한 체크 -->
+<sql id="workPageAclCommon">
+	<if test="acl_check != null and acl_check == 'true'">
+	AND (EXISTS( 
+			   SELECT A.ACL_ID FROM XR_ACLITEM A 
+			   WHERE D.ACL_ID = A.ACL_ID 
+				 AND ACT_BROWSE = 'T'
+				 AND A.IS_TYPE = 'D' 
+				 AND (   (A.ACCESSOR_ISALIAS = 'T' AND A.ACCESSOR_ID = 'OWNER' AND D.OWNER_ID = #{user_id} ) 
+					  OR (A.ACCESSOR_ISALIAS = 'T' AND A.ACCESSOR_ID = 'WORLD') 
+					  OR (A.ACCESSOR_ISALIAS = 'F' AND A.ACCESSOR_ISGROUP = 'F' AND A.ACCESSOR_ID = #{user_id}) 
+					  OR (A.ACCESSOR_ISALIAS = 'F' AND A.ACCESSOR_ISGROUP = 'T' AND A.ACCESSOR_ID IN
+					  		<foreach item="item" index="index" collection="group_id_list" separator="," open=" ( " close=")" >
+								#{item}
+							</foreach>
+					     ) 
+					 )  
+			  )
+		OR
+		EXISTS( 
+			   SELECT E.DOC_ID FROM XR_EXACLITEM E 
+			   WHERE D.DOC_ID = E.DOC_ID 
+				 AND ACT_BROWSE = 'T'
+				 AND (   (E.ACCESSOR_ISALIAS = 'T' AND E.ACCESSOR_ID = 'OWNER' AND D.OWNER_ID = #{user_id} ) 
+					  OR (E.ACCESSOR_ISALIAS = 'T' AND E.ACCESSOR_ID = 'WORLD') 
+					  OR (E.ACCESSOR_ISALIAS = 'F' AND E.ACCESSOR_ISGROUP = 'F' AND E.ACCESSOR_ID = #{user_id}) 
+					  OR (E.ACCESSOR_ISALIAS = 'F' AND E.ACCESSOR_ISGROUP = 'T' AND E.ACCESSOR_ID IN
+					  		<foreach item="item" index="index" collection="group_id_list" separator="," open=" ( " close=")" >
+								#{item}
+							</foreach>
+					     ) 
+					 )  
+			  )
+		)
+	</if>			  
+</sql>
+
+<!-- 업무문서/개인문서 공통 SQL -->
+<sql id="workPageCommon">
+	SELECT 
+		D.DOC_ID, D.DOC_NAME, D.PAGE_CNT, D.VERSION_NO, T.TYPE_NAME, D.ROOT_ID, D.DOC_TYPE, D.IS_INHERIT_ACL,		
+		D.CREATOR_NAME, D.CREATE_DATE, D.IS_LOCKED, D.LOCK_DATE,D.EXPIRED_DATE,D.DELETER_ID, D.DELETER_NAME, D.DELETE_DATE, D.OWNER_ID,
+		( SELECT COUNT(R.ROOT_DOC_ID) FROM XR_REF_DOC R WHERE R.ROOT_DOC_ID = D.ROOT_ID OR R.ROOT_DOC_ID = D.DOC_ID ) AS RELATION_DOC,  
+		( SELECT USER_NAME_KO FROM XR_USER U WHERE U.USER_ID =  D.LOCK_OWNER ) AS LOCK_OWNER,		
+		( SELECT USER_NAME_KO FROM XR_USER U WHERE U.USER_ID = D.OWNER_ID ) AS OWNER_NAME,
+		( 	
+			SELECT PAGE_EXTENSION FROM XR_PAGE WHERE PAGE_ID = COALESCE((SELECT PAGE_ID FROM XR_FILED WHERE DOC_ID = D.DOC_ID AND PAGE_NO = 1),'NOPAGE') 
+		) AS  PAGE_EXTENSION
+	FROM XR_DOCUMENT D 
+		INNER JOIN XR_TYPE T ON T.TYPE_ID = D.DOC_TYPE
+		<if test="tbl_name != null and tbl_name != ''">
+			INNER JOIN EXTEND_DOC E ON E.DOC_ID = D.DOC_ID
+		</if>		
+		<if test="page_name != null and page_name != ''">
+			INNER JOIN PAGE_DOC P ON P.DOC_ID = D.DOC_ID	
+		</if>	
+<!-- 		<choose>		 -->
+<!-- 		<when test="select_action == null or select_action == ''"> -->
+			INNER JOIN XR_LINKED L ON L.FOLDER_ID IN 
+			<foreach item="item" index="index" collection="folder_id_list" separator="," open=" ( " close=")" >	#{item} </foreach> AND D.DOC_ID = L.DOC_ID
+<!-- 		</when> -->
+<!-- 		</choose>	 -->
+	WHERE
+		D.IS_CURRENT = 'T'
+		<if test="doc_status != null and doc_status != ''"> AND D.DOC_STATUS = #{doc_status} </if>										<!-- 휴지통인 경우에만 D -->
+		<if test="is_expired != null and is_expired != ''"> AND D.IS_EXPIRED = #{is_expired}  </if>										<!-- 내만기문서인 경우에만 T -->
+		<if test="strKeyword1 != null and strKeyword1 != ''">	AND ${strIndexColumn} LIKE '%${strKeyword1}%' </if>						<!-- 문서명/문서설명/등록자/작성자리스트 -->
+		<if test="keyword != null and keyword != ''">	AND D.KEYWORD LIKE '%${keyword}%' </if>											<!-- 키워드 -->
+		<if test="sdate != null and sdate != ''">	<![CDATA[ AND ${dateColumn} >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]>	</if>			<!-- 등록일 -->	
+		<if test="edate != null and edate != ''">	<![CDATA[ AND ${dateColumn} < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999  ]]>	</if>	<!-- 등록일 -->
+		<if test="map_id != null"> <!-- 개인휴지통/내소유문서에 해당됨 --> 
+			AND F.MAP_ID IN <foreach item="item" index="index" collection="map_id" separator="," open=" ( " close=")" >	#{item} </foreach>		
+		</if>	 		
+		<include refid="workPageAclCommon"/>	<!-- ACL 권한 체크(공유문서) -->						
+</sql>
+
+
+<!-- 업무문서/개인문서 목록 수 -->		
+<select id="workDocumentListCnt" parameterType="HashMap" resultType="Int">
+	<include refid="workExtendDoc"/>
+	SELECT 
+			COUNT(DOC_ID) AS CNT
+	FROM
+	(		
+		<include refid="workPageCommon"/>
+	) INDATA	
+</select>
+
+<!-- 업무문서/개인문서 목록 -->	
+<select id="workDocumentList" parameterType="HashMap" resultType="Document">
+	<include refid="workExtendDoc"/>
+	SELECT 
+		DOC_ID, DOC_NAME, PAGE_CNT, VERSION_NO, TYPE_NAME, IS_INHERIT_ACL, PAGE_EXTENSION,
+		ROOT_ID, DOC_TYPE, RELATION_DOC, CREATOR_NAME, CREATE_DATE, IS_LOCKED, LOCK_DATE, LOCK_OWNER,
+		DELETER_ID, DELETER_NAME, DELETE_DATE, OWNER_ID, OWNER_NAME, EXPIRED_DATE
+	FROM
+	(		
+		SELECT 
+			DOC_ID, DOC_NAME, PAGE_CNT, VERSION_NO, TYPE_NAME, ROOT_ID, DOC_TYPE, IS_INHERIT_ACL, PAGE_EXTENSION,
+			RELATION_DOC, CREATOR_NAME, CREATE_DATE, IS_LOCKED, LOCK_DATE, LOCK_OWNER, 
+			CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM,
+			DELETER_ID, DELETER_NAME, DELETE_DATE, OWNER_ID, OWNER_NAME, EXPIRED_DATE
+		FROM
+		(		
+			<include refid="workPageCommon"/>
+		) INDATA	
+	) LIST 
+	WHERE LIST.PAGENUM = #{nPage}									
+</select>	
+	
+<!-- 메인Layout :: 
+	권한적용Y - 새로운문서/최다조회문서/최근조회문서/
+ 	권한적용N - 내수정중인문서/최다조회내문서
+-->	
+<select id="mainDocumentList" parameterType="HashMap" resultType="Document">
+	SELECT
+		DOC_ID,DOC_NAME,PAGE_CNT,VERSION_NO,CREATOR_NAME,CREATE_DATE,IS_LOCKED,
+		TO_CHAR(LOCK_DATE, 'YYYY-MM-DD') LOCK_DATE,LOCK_OWNER,OWNER_ID,READ_CNT,PAGE_EXTENSION
+		<if test="isRecently != null and isRecently == 'true'">,TO_CHAR(ACTION_DATE, 'YYYY-MM-DD') READ_DATE	</if>			<!-- 최근조회문서 -->
+	FROM
+	(	
+		SELECT 
+		<if test="isRecently != null and isRecently == 'true'">	
+			DISTINCT 
+		</if>		
+			D.DOC_ID, D.DOC_NAME, D.PAGE_CNT, D.VERSION_NO,D.CREATOR_NAME, D.CREATOR_ID,D.CREATE_DATE, D.IS_LOCKED, 
+			D.LOCK_DATE,D.LOCK_OWNER,D.OWNER_ID,D.READ_CNT,
+			( 	
+				SELECT PAGE_EXTENSION FROM XR_PAGE WHERE PAGE_ID = COALESCE((SELECT PAGE_ID FROM XR_FILED WHERE DOC_ID = D.DOC_ID AND PAGE_NO = 1),'NOPAGE') 
+			) AS  PAGE_EXTENSION
+			<if test="isRecently != null and isRecently == 'true'">,H.ACTION_DATE	</if>		<!-- 최근조회문서 -->
+		FROM XR_DOCUMENT D
+		<if test="isRecently != null and isRecently == 'true'">	
+			INNER JOIN XR_DOCUMENT_HT H ON H.TARGET_ID = D.DOC_ID
+		</if>	
+		INNER JOIN XR_LINKED L ON L.DOC_ID = D.DOC_ID
+		INNER JOIN XR_FOLDER F ON F.FOLDER_ID = L.FOLDER_ID AND F.FOLDER_ID = D.FOLDER_ID 
+		WHERE
+			D.IS_CURRENT = 'T' AND D.DOC_STATUS = 'C'
+			<if test="sdate != null and sdate != ''">	
+					<![CDATA[ AND D.CREATE_DATE >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]>	
+			</if>		
+			<if test="edate != null and edate != ''">	
+					<![CDATA[ AND D.CREATE_DATE< TO_DATE(#{edate},'YYYY-MM-DD')+0.99999  ]]>	
+			</if>
+			<if test="is_locked != null and is_locked != ''"> 
+					AND D.IS_LOCKED = #{is_locked}  
+			</if>	
+			<if test="user_id != null and user_id != ''"><!-- 내수정중인문서/최다조회내문서 그외는 권한으로 가져온다. -->
+				<choose>
+					<when test="actionType == 'MOSTMYDOC' or actionType == 'CHECKOUTDOC' ">
+						AND ${userColumn} = #{user_id} 
+					</when>					
+				</choose>				
+			</if>		
+			<if test="isRead != null and isRead == 'true'">	
+				<![CDATA[  AND D.READ_CNT > 0  ]]>				
+			</if>	
+			<include refid="workPageAclCommon"/>
+	) LIST
+	<![CDATA[ WHERE ROWNUM <= 10 ]]>			
+	<if test="isRecently != null and isRecently == 'true'">	ORDER BY ACTION_DATE DESC	</if>	<!-- 최근조회문서 -->
+	<if test="isRead != null and isRead == 'true'">	ORDER BY READ_CNT DESC	</if>	<!-- 최다조회 문서/최다조회 내문서 -->
+</select>	
+	
+	
+	
+</mapper>

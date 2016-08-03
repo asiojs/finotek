@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.permission.dao.AclDao">
+	
+	<sql id="whereListCommon">
+		<where>
+			(	
+				<choose>
+					<when test="type == 'public'">
+						ACL_TYPE = 'ALL'
+						OR (ACL_TYPE = 'DEPT' AND OPEN_ID IN 
+		 				<foreach item="item" index="index" collection="dept_id_list" separator="," open=" ( " close=")" >
+							#{item}
+						</foreach>
+						)
+						OR (ACL_TYPE = 'TEAM' AND OPEN_ID IN
+						<foreach item="item" index="index" collection="team_id_list" separator="," open=" ( " close=")" >
+							#{item}
+						</foreach>
+						)
+						AND ACL_TYPE != 'PRIVATE'
+					</when>
+					<when test="type == 'private'">
+						ACL_TYPE = 'PRIVATE'  AND OPEN_ID = #{user_id}
+					</when>
+					<when test="type == 'SYSTEM_OPERATOR'">
+						ACL_TYPE != 'PRIVATE' OR ACL_TYPE = 'PRIVATE'
+					</when>
+					<otherwise>
+						ACL_TYPE = 'ALL'
+						OR (ACL_TYPE = 'DEPT' AND OPEN_ID IN 
+		 				<foreach item="item" index="index" collection="dept_id_list" separator="," open=" ( " close=")" >
+							#{item}
+						</foreach>
+						)
+						OR (ACL_TYPE = 'TEAM' AND OPEN_ID IN
+						<foreach item="item" index="index" collection="team_id_list" separator="," open=" ( " close=")" >
+							#{item}
+						</foreach>
+						)
+						OR (ACL_TYPE = 'PRIVATE'  AND OPEN_ID = #{user_id})
+					</otherwise>
+				</choose>
+			)
+			<if test="strIndex != null and strIndex != ''">
+				AND ACL_TYPE LIKE '%${strIndex}%'
+			</if>
+			<if test="strKeyword1 != null and strKeyword1 != ''">
+				AND OPEN_NAME LIKE '%${strKeyword1}%'
+			</if>
+			<if test="strKeyword2 != null and strKeyword2 != ''">
+				AND ACL_NAME LIKE '%${strKeyword2}%'
+			</if>
+			<if test="acl_name != null and acl_name != ''">
+				AND ACL_NAME = #{acl_name}
+			</if>
+		</where>
+	</sql>
+	
+	<!-- Insert Start... -->
+	<!-- 권한 추가 :: XR_ALC -->
+	<insert id="aclWrite" parameterType="Acl">
+		INSERT INTO XR_ACL (
+				ACL_ID, ACL_NAME, ACL_TYPE, OPEN_ID, OPEN_NAME,
+				OPEN_ISGROUP, CREATOR_ID, SORT_INDEX
+		) VALUES (
+				#{acl_id}, #{acl_name}, #{acl_type}, #{open_id}, #{open_name},
+				#{open_isgroup}, #{creator_id}, #{sort_index}
+		)
+	</insert>
+	
+	<!-- 접근자 추가 :: XR_ALCITEM -->
+	<insert id="aclItemWrite" parameterType="AclItem">
+		INSERT INTO XR_ACLITEM (
+				ACL_ID, IS_TYPE, ACCESSOR_ID, ACCESSOR_ISGROUP, ACCESSOR_ISALIAS, ACT_BROWSE,
+				ACT_READ, ACT_CREATE, ACT_UPDATE, ACT_DELETE, ACT_CANCEL_CHECKOUT,
+				ACT_CHANGE_PERMISSION
+		) VALUES (
+				#{acl_id}, #{is_type}, #{accessor_id}, #{accessor_isgroup}, #{accessor_isalias}, #{act_browse},
+				#{act_read}, #{act_create}, #{act_update}, #{act_delete}, #{act_cancel_checkout},
+				#{act_change_permission}
+		)
+	</insert>
+	<!-- Insert End... -->
+	
+	<!-- Update Start... -->
+	<!-- 권한정보 수정 :: XR_ACL -->
+	<update id="aclUpdate" parameterType="Acl">
+		UPDATE XR_ACL
+			<set>
+			  <if test="acl_name != null and acl_name != ''">
+		   	  	  ACL_NAME = #{acl_name},
+		   	  </if>
+		   	  <if test="acl_type != null and acl_type != ''">
+		   	  	  ACL_TYPE = #{acl_type},
+		   	  </if>
+		   	  <if test="open_id != null and open_id != ''">
+		   	  	  OPEN_ID = #{open_id},
+		   	  </if>
+		   	  <if test="open_name != null and open_name != ''">
+		   	  	  OPEN_NAME = #{open_name},
+		   	  </if>
+		   	  <if test="open_isgroup != null and open_isgroup != ''">
+		   	  	  OPEN_ISGROUP = #{open_isgroup},
+		   	  </if>
+		   	  <if test="sort_index != null and sort_index != ''">
+		   	  	  SORT_INDEX = #{sort_index},
+		   	  </if>
+			</set>
+			WHERE ACL_ID = #{acl_id}
+	</update>
+	<!-- Update End... -->
+	
+	<!-- Delete Start... -->
+	<!-- 권한 삭제 :: XR_ACL -->
+	<delete id="aclDelete" parameterType="HashMap">
+		DELETE FROM XR_ACL
+		WHERE ACL_ID = #{acl_id}
+	</delete>
+	
+	<!-- 접근자 삭제 :: XR_ACLITEM -->
+	<delete id="aclItemDelete" parameterType="HashMap">
+		DELETE FROM XR_ACLITEM
+		WHERE ACL_ID = #{acl_id}
+		<if test="isOwnerDelete != null and isOwnerDelete != ''">
+			<choose>
+				<when test="isOwnerDelete == 'false'">
+					AND ACCESSOR_ID != 'OWNER'
+				</when>
+			</choose>
+		</if>
+	</delete>
+	<!-- Delete End... -->
+	
+	<!-- Select Start... -->
+	<!-- 권한 목록 수 :: XR_ACL -->
+	<select id="aclPagingCount" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(ACL_ID)
+		FROM 
+			XR_ACL		
+		<include refid="whereListCommon" />    
+	</select>
+	
+	<!-- 권한 목록 :: XR_ACL -->
+	<select id="aclList" parameterType="HashMap" resultType="Acl">
+		SELECT
+			ACL_ID, ACL_NAME, ACL_TYPE, OPEN_ID, OPEN_ISGROUP, 
+			OPEN_NAME, SORT_INDEX, PAGENUM, CREATOR_ID
+		FROM
+		(
+			SELECT 
+				ACL_ID, ACL_NAME, ACL_TYPE, OPEN_ID, OPEN_ISGROUP, 
+				OPEN_NAME, SORT_INDEX, CREATOR_ID,
+	        	CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType}, ACL_NAME ASC )) / ${page_size} ) PAGENUM
+			FROM XR_ACL
+			<include refid="whereListCommon" />    
+		)LIST				
+		WHERE LIST.PAGENUM = #{nPage}				
+	</select>
+	
+	<!-- FOLDER_ID로 ACL을 얻는다. -->
+	<select id="aclInheritDetail" parameterType="HashMap" resultType="Acl">
+		SELECT 
+			A.ACL_ID, A.ACL_NAME, A.ACL_TYPE, A.OPEN_ID, A.OPEN_ISGROUP, 
+			A.OPEN_NAME, A.CREATOR_ID, A.CREATE_DATE,
+			(SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID = A.CREATOR_ID) AS CREATOR_NAME
+      	FROM XR_ACL A
+     	INNER JOIN XR_FOLDER F ON F.FOLDER_ID = #{folder_id}   
+		WHERE A.ACL_ID = F.ACL_ID
+	</select>
+	
+	<!-- ACL_ID로 ACL을 얻는다. -->
+	<select id="aclDetail" parameterType="HashMap" resultType="Acl">
+		SELECT 
+			ACL_ID, ACL_NAME, ACL_TYPE, OPEN_ID, OPEN_ISGROUP, 
+			OPEN_NAME, CREATOR_ID, TO_CHAR(CREATE_DATE,'YYYY-MM-DD') AS CREATE_DATE,
+			(SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID = CREATOR_ID) AS CREATOR_NAME,
+			SORT_INDEX
+		 FROM XR_ACL
+		WHERE ACL_ID = #{acl_id}
+	</select>
+	
+	<!-- 접근자 상세정보 -->
+	<select id="aclDetailItems" parameterType="HashMap" resultType="AclItem">
+		SELECT 
+		    ACL_ID, IS_TYPE, ACCESSOR_ID, ACCESSOR_ISGROUP, ACCESSOR_ISALIAS,
+		    ACT_BROWSE, ACT_READ, ACT_UPDATE, ACT_DELETE, ACT_CREATE,
+		    ACT_CANCEL_CHECKOUT, ACT_CHANGE_PERMISSION,
+		    CASE
+				WHEN (ACCESSOR_ISGROUP = 'T' AND ACCESSOR_ISALIAS = 'F') THEN (SELECT GROUP_NAME_KO FROM XR_GROUP WHERE GROUP_ID = ACCESSOR_ID)
+				WHEN (ACCESSOR_ISGROUP = 'F' AND ACCESSOR_ISALIAS = 'F') THEN (SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID = ACCESSOR_ID)
+				ELSE (SELECT CODE_NM FROM XR_CODE WHERE CODE_ID = ACCESSOR_ID)
+			END AS ACCESSOR_NAME
+  		FROM XR_ACLITEM
+		<where>
+			<if test="acl_id != null and acl_id != ''">
+				AND ACL_ID =#{acl_id}
+			</if>
+			<if test="is_type != null and is_type != ''">
+				AND IS_TYPE =#{is_type}
+			</if>
+		</where>
+ 		ORDER BY ACCESSOR_ISALIAS DESC, ACCESSOR_ISGROUP DESC, ACCESSOR_ID ASC
+	</select>
+	
+	<!-- 문서확장 접근자 상세정보 -->
+	<select id="aclExDetailItems" parameterType="HashMap" resultType="AclExItem">
+		SELECT 
+		    DOC_ID, ACCESSOR_ID, ACCESSOR_ISGROUP, ACCESSOR_ISALIAS,
+		    ACT_BROWSE, ACT_READ, ACT_UPDATE, ACT_DELETE, ACT_CREATE,
+		    ACT_CANCEL_CHECKOUT, ACT_CHANGE_PERMISSION,
+		    CASE
+				WHEN (ACCESSOR_ISGROUP = 'T' AND ACCESSOR_ISALIAS = 'F') THEN (SELECT GROUP_NAME_KO FROM XR_GROUP WHERE GROUP_ID = ACCESSOR_ID)
+				WHEN (ACCESSOR_ISGROUP = 'F' AND ACCESSOR_ISALIAS = 'F') THEN (SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID = ACCESSOR_ID)
+				ELSE (SELECT CODE_NM FROM XR_CODE WHERE CODE_ID = ACCESSOR_ID)
+			END AS ACCESSOR_NAME,
+			CASE 
+				WHEN ( ACT_DELETE = 'T') THEN 'DELETE'
+				WHEN ( ACT_UPDATE = 'T') THEN 'UPDATE'
+				WHEN ( ACT_READ = 'T') THEN 'READ'
+				WHEN ( ACT_BROWSE = 'T') THEN 'BROWSE'
+				ELSE 'NONE'	
+			END AS DOC_DEFAULT_ACL
+  		FROM XR_EXACLITEM
+		<where>
+			<if test="doc_id != null and doc_id != ''">
+				AND DOC_ID =#{doc_id}
+			</if>
+		</where>
+ 		ORDER BY ACCESSOR_ISALIAS DESC, ACCESSOR_ISGROUP DESC
+	</select>
+	
+	<!--  FOLDER 문서권한 ACL 체크 :: 문서등록 공통  -->
+	<select id="isAuthCheck" parameterType="HashMap" resultType="AclItem">
+		SELECT 
+ 			MAX(ACT_BROWSE) AS ACT_BROWSE,MAX(ACT_READ) AS ACT_READ,MAX(ACT_CREATE) AS ACT_CREATE,
+ 			MAX(ACT_UPDATE) AS ACT_UPDATE,MAX(ACT_DELETE) AS ACT_DELETE,MAX(ACT_CANCEL_CHECKOUT) AS ACT_CANCEL_CHECKOUT,
+ 			MAX(ACT_CHANGE_PERMISSION) AS ACT_CHANGE_PERMISSION
+		FROM
+		( 
+    		SELECT 
+        		F.FOLDER_ID,F.ACL_ID,F.CREATOR_ID,A.ACCESSOR_ID, A.ACCESSOR_ISGROUP, A.ACCESSOR_ISALIAS,A.ACT_BROWSE, 
+				A.ACT_READ, A.ACT_CREATE, A.ACT_UPDATE, A.ACT_DELETE, A.ACT_CANCEL_CHECKOUT, A.ACT_CHANGE_PERMISSION
+    		FROM XR_FOLDER F
+        		INNER JOIN XR_ACLITEM A ON F.ACL_ID = A.ACL_ID
+			<where>
+				<if test="folder_id != null and folder_id != ''">
+					AND F.FOLDER_ID =#{folder_id}
+				</if>
+				<if test="is_type != null and is_type != ''">
+					AND A.IS_TYPE =#{is_type}
+				</if>
+				AND (	
+  					(ACCESSOR_ISALIAS = 'T' AND ACCESSOR_ID = 'OWNER' AND CREATOR_ID = #{user_id}) OR
+           			(ACCESSOR_ISALIAS = 'T' AND ACCESSOR_ID = 'WORLD') OR
+            		(ACCESSOR_ISALIAS = 'F' AND ACCESSOR_ISGROUP = 'T' AND ACCESSOR_ID IN  
+            			<foreach item="item" index="index" collection="group_id_list" separator="," open=" ( " close=")" >
+							#{item}
+						</foreach>
+            		) OR
+          			(ACCESSOR_ISALIAS = 'F' AND ACCESSOR_ISGROUP = 'F' AND ACCESSOR_ID = #{user_id} )
+  				)
+			</where>  
+		)
+	</select>
+	
+	<!-- folder_id 기준으로 로그인한 사용자 권한 상태 가져오기 -->
+	<select id="alcListByFolderIDs" parameterType="HashMap" resultType="CaseMap">
+		SELECT F.FOLDER_ID, A.IS_TYPE, 
+			   MAX(ACT_BROWSE) AS ACT_BROWSE, MAX(ACT_READ) AS ACT_READ, MAX(ACT_CREATE) AS ACT_CREATE,
+			   MAX(ACT_UPDATE) AS ACT_UPDATE, MAX(ACT_DELETE) AS ACT_DELETE, MAX(ACT_CHANGE_PERMISSION) AS ACT_CHANGE_PERMISSION
+		FROM XR_FOLDER F
+		INNER JOIN XR_ACLITEM A ON A.ACL_ID = F.ACL_ID   
+		WHERE 
+		<if test="fol_idList != null and fol_idList !='' ">
+		F.FOLDER_ID IN
+		<foreach item="item" index="index" collection="fol_idList" separator="," open=" ( " close=")" >
+				#{item}
+		</foreach>
+		</if>
+		AND (     (A.ACCESSOR_ISALIAS = 'T' AND A.ACCESSOR_ID = 'OWNER' AND F.CREATOR_ID = #{user_id} )
+	           OR (A.ACCESSOR_ISALIAS = 'T' AND A.ACCESSOR_ID = 'WORLD')
+	           OR (A.ACCESSOR_ISALIAS = 'F' AND A.ACCESSOR_ISGROUP = 'F' AND A.ACCESSOR_ID = #{user_id})
+	           OR (A.ACCESSOR_ISALIAS = 'F' AND A.ACCESSOR_ISGROUP = 'T' AND A.ACCESSOR_ID IN 
+	           	  	<foreach item="item" index="index" collection="group_id_list" separator="," open=" ( " close=")" >
+						#{item}
+					</foreach>
+	           	  )
+	   		)
+		GROUP BY F.FOLDER_ID, A.IS_TYPE
+	</select>
+	
+	<!-- doc_id 기준으로 로그인한 사용자 권한 상태 가져오기 -->
+	<select id="alcListByDocumentIDs" parameterType="HashMap" resultType="CaseMap">
+		SELECT DOC_ID,  
+			   MAX(ACT_BROWSE) AS ACT_BROWSE, MAX(ACT_READ) AS ACT_READ, MAX(ACT_UPDATE) AS ACT_UPDATE, MAX(ACT_DELETE) AS ACT_DELETE,
+			   MAX(ACT_CREATE) AS ACT_CREATE, MAX(ACT_CANCEL_CHECKOUT) AS ACT_CANCEL_CHECKOUT, MAX(ACT_CHANGE_PERMISSION) AS ACT_CHANGE_PERMISSION
+		FROM
+		(             
+			SELECT D.DOC_ID AS DOC_ID, ACT_BROWSE, ACT_READ, ACT_UPDATE, ACT_DELETE, 
+						 ACT_CREATE, ACT_CANCEL_CHECKOUT, ACT_CHANGE_PERMISSION
+						FROM XR_DOCUMENT D
+						INNER JOIN XR_ACLITEM A ON A.ACL_ID = D.ACL_ID 
+			      WHERE 
+				  <if test="doc_idList != null and doc_idList !='' ">
+					D.DOC_ID IN
+					<foreach item="item" index="index" collection="doc_idList" separator="," open=" ( " close=")" >
+							#{item}
+					</foreach>
+				  </if>
+			      AND   A.IS_TYPE = 'D'			
+					AND (     (A.ACCESSOR_ISALIAS = 'T' AND A.ACCESSOR_ID = 'OWNER' AND D.OWNER_ID = #{user_id} )
+				           OR (A.ACCESSOR_ISALIAS = 'T' AND A.ACCESSOR_ID = 'WORLD')
+				           OR (A.ACCESSOR_ISALIAS = 'F' AND A.ACCESSOR_ISGROUP = 'F' AND A.ACCESSOR_ID = #{user_id})
+				           OR (A.ACCESSOR_ISALIAS = 'F' AND A.ACCESSOR_ISGROUP = 'T' AND A.ACCESSOR_ID IN
+						   <foreach item="item" index="index" collection="group_id_list" separator="," open=" ( " close=")" >
+									#{item}
+								</foreach>
+				              )
+			    		)
+			UNION ALL      
+			 SELECT D.DOC_ID AS DOC_ID, ACT_BROWSE, ACT_READ, ACT_UPDATE, ACT_DELETE, 
+						 ACT_CREATE, ACT_CANCEL_CHECKOUT, ACT_CHANGE_PERMISSION
+						FROM XR_DOCUMENT D
+			      INNER JOIN XR_EXACLITEM E ON E.DOC_ID = D.DOC_ID
+						WHERE 
+						<if test="doc_idList != null and doc_idList !='' ">
+							D.DOC_ID IN
+							<foreach item="item" index="index" collection="doc_idList" separator="," open=" ( " close=")" >
+									#{item}
+							</foreach>
+						</if>
+						AND (     (E.ACCESSOR_ISALIAS = 'T' AND E.ACCESSOR_ID = 'OWNER' AND D.OWNER_ID = #{user_id} )
+					           OR (E.ACCESSOR_ISALIAS = 'T' AND E.ACCESSOR_ID = 'WORLD')
+					           OR (E.ACCESSOR_ISALIAS = 'F' AND E.ACCESSOR_ISGROUP = 'F' AND E.ACCESSOR_ID = #{user_id})
+					           OR (E.ACCESSOR_ISALIAS = 'F' AND E.ACCESSOR_ISGROUP = 'T' AND E.ACCESSOR_ID IN 
+							   		<foreach item="item" index="index" collection="group_id_list" separator="," open=" ( " close=")" >
+										#{item}
+									</foreach>
+					              )
+				    		)
+		) GROUP BY DOC_ID
+	</select>
+	
+	
+	
+	<!-- Select End... -->
+	<!-- ########## [where common 쿼리] Start... ########## -->
+	<!-- ########## [where common 쿼리] End... ########## -->
+	<!-- ########## [update common  쿼리] Start... ########## -->
+	<!-- ########## [update common  쿼리] End... ########## -->
+	<!-- ########## [사용자 및 관리자 공통 쿼리] Start... ########## -->
+	<!-- ########## [사용자 및 관리자 공통 쿼리] End... ########## -->
+	<!-- ########## [관리자 권한 관련 쿼리] Start... ########## -->
+	
+	<!-- 접근자 ID로 ACL Item을 조회한다 -->
+	<select id="aclItemCountByAccessorId" parameterType="HashMap" resultType="Int">
+		SELECT COUNT(*)
+		FROM 
+			XR_ACLITEM
+		WHERE
+			ACCESSOR_ID = #{accessor_id} 
+		<if test="acl_id != null and acl_id != ''">
+			AND ACL_ID != #{acl_id}
+		</if>
+	</select>
+	
+	<!-- 생성자 ID로 ACL를 카운트 -->
+	<select id="aclCountByCreatorId" parameterType="HashMap" resultType="Int">
+		SELECT COUNT(*)
+		FROM 
+			XR_ACL
+		WHERE
+			CREATOR_ID = #{creator_id} 
+	</select>
+	
+	<select id="aclCountByAclName" parameterType="HashMap" resultType="Int">
+		SELECT COUNT(*)
+		FROM
+			XR_ACL
+		WHERE
+			ACL_NAME = #{acl_name}
+	</select>
+	<!-- ########## [관리자 권한 관련 쿼리] End... ########## -->
+	<!-- ########## [사용자 권한 관련 쿼리] Start... ########## -->
+	<!-- 문서 추가접근자 삭제 -->
+	<delete id="aclExItemDelete" parameterType="HashMap">
+		DELETE FROM XR_EXACLITEM
+		WHERE DOC_ID = #{doc_id}
+	</delete>
+	
+	<!-- 문서 추가 접근자 등록 -->
+	<insert id="aclExItemWrite" parameterType="AclExItem">
+		INSERT INTO XR_EXACLITEM (
+				DOC_ID, ACCESSOR_ID, ACCESSOR_ISGROUP, ACCESSOR_ISALIAS, ACT_BROWSE,
+				ACT_READ, ACT_UPDATE, ACT_DELETE, ACT_CREATE, ACT_CANCEL_CHECKOUT,
+				ACT_CHANGE_PERMISSION
+		) VALUES (
+				#{doc_id}, #{accessor_id}, #{accessor_isgroup}, #{accessor_isalias}, #{act_browse},
+				#{act_read}, #{act_update}, #{act_delete}, #{act_create}, #{act_cancel_checkout},
+				#{act_change_permission}
+		)
+	</insert>
+	<!-- ########## [사용자 권한 관련 쿼리] End... ########## -->
+</mapper>

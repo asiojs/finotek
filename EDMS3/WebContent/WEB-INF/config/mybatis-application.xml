@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>	
+	<properties resource="../config/db.properties" />
+	
+	<settings>
+		<setting name="cacheEnabled" value="true" />
+		<setting name="defaultExecutorType" value="REUSE" />
+		<setting name="multipleResultSetsEnabled" value="true"/>		
+		<setting name="defaultStatementTimeout" value="25000" />
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="org.apache.commons.collections.map.CaseInsensitiveMap" alias="CaseMap" />
+		<typeAlias type="java.lang.String" alias="String" />
+		<typeAlias type="java.util.Map" alias="Map" />
+		<typeAlias type="java.util.HashMap" alias="HashMap" />		
+		<typeAlias type="kr.co.exsoft.user.vo.UserVO" alias="User"/>
+		<typeAlias type="kr.co.exsoft.user.vo.LoginLogVO" alias="LoginLog"/>
+		<typeAlias type="kr.co.exsoft.user.vo.GroupVO" alias="Group"/>
+		<typeAlias type="kr.co.exsoft.user.vo.ConnectLogVO" alias="ConnectLog"/>		
+		<typeAlias type="kr.co.exsoft.user.vo.GroupHtVO" alias="GroupHt"/>
+		<typeAlias type="kr.co.exsoft.user.vo.QuickMenuVO" alias="QuickMenu"/>
+		
+		
+	</typeAliases>
+	
+	<environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC" />
+            <dataSource type="POOLED">
+                <property name="driver" value="${DB_DRIVER}" />
+                <property name="url" value="${DB_URL}" />
+                <property name="username" value="${DB_USERNAME}" />
+                <property name="password" value="${DB_PASSWORD}" />
+            </dataSource>
+        </environment>
+    </environments>
+	
+    <mappers>    	
+    	<mapper resource="kr/co/exsoft/user/mappers/User.xml" />		    	
+    </mappers>
+</configuration>

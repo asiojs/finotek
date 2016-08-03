@@ -1,0 +1,37 @@
+<!DOCTYPE tiles-definitions PUBLIC 
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" 
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">  
+<tiles-definitions>   
+
+	<!-- 관리자 Layout  Template 	-->
+	<definition name="tilesAdminBase" template="/jsp/layout/adminLayout.jsp">   
+		<put-attribute name="title" value="" />        
+		<put-attribute name="adminHeader" value="/jsp/layout/adminHeader.jsp" />   
+		<put-attribute name="contents" value="" />
+		<put-attribute name="adminFooter" value="/jsp/layout/adminFooter.jsp" />
+	</definition>	
+
+	<!-- 관리자 Layout	 -->
+	<definition name="adminLayout" extends="tilesAdminBase">      
+		
+	</definition>  
+
+	<!-- 사용자 Layout Template	-->
+	<definition name="tilesUserBase" template="/jsp/layout/userLayout.jsp">
+		<put-attribute name="title" value="" />     
+		<put-attribute name="userTopMenu" value="/jsp/layout/userTopMenu.jsp" /> 	
+		<put-attribute name="userHeader" value="/jsp/layout/userHeader.jsp" />		
+		<put-attribute name="userFooter" value="/jsp/layout/userFooter.jsp" />  						
+	</definition>
+
+	<!-- 통합검색 Layout -->
+	<definition name="searchLayout" extends="tilesUserBase">
+		<put-attribute name="contents" value="" />
+	</definition>  	
+	
+	<!-- 사용자 Layout -->	
+	<definition name="userLayout" extends="tilesUserBase">  		
+		<put-attribute name="contents" value="" />
+	</definition>  				
+	
+</tiles-definitions>   	

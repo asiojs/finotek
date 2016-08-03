@@ -1,0 +1,1406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.document.dao.DocumentDao">
+	
+	<!-- 문서유형이 사용중인지 체크한다. -->
+	<select id="isUsingType" parameterType="HashMap" resultType="Int">
+		SELECT COUNT(DOC_ID) AS CNT
+        FROM ${table_nm}
+		<where>
+			<if test="type_list != null"> 
+				DOC_TYPE IN 
+				<foreach item="item" index="index" collection="type_list" separator="," open=" ( " close=")" >
+					#{item}
+				</foreach>		
+			 </if>									 	
+		</where>
+	</select>
+	
+	<!-- 권한이 사용중인지 체크한다. -->
+	<select id="isUsingAcl" parameterType="HashMap" resultType="Int">
+		SELECT COUNT(DOC_ID) AS CNT
+        FROM ${table_nm}
+		<where>
+			<if test="acl_list != null"> 
+				ACL_ID IN 
+				<foreach item="item" index="index" collection="acl_list" separator="," open=" ( " close=")" >
+					#{item}
+				</foreach>		
+			 </if>									 	
+		</where>
+	</select>
+	
+	<!-- 중복 파일 포함 문서 카운트 얻기. -->
+	<select id="duplicateDocCount" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(D.DOC_ID) AS CNT
+		FROM XR_DOCUMENT D 
+			INNER JOIN XR_FILED F ON D.DOC_ID = F.DOC_ID
+			INNER JOIN XR_PAGE P ON F.PAGE_ID = P.PAGE_ID 
+			INNER JOIN XR_TYPE T ON D.DOC_TYPE = T.TYPE_ID 
+		<where>
+			<if test="page_name != null and page_name != ''">
+				AND P.PAGE_NAME = #{page_name}
+			</if>		
+			<if test="file_size != null and file_size != ''">
+				AND P.PAGE_SIZE = #{file_size}
+			</if>		
+			<if test="is_current != null and is_current != ''">
+				AND D.IS_CURRENT = #{is_current} AND D.DOC_STATUS = 'C'
+			</if>
+			<if test="sdate != null and sdate != ''">
+				<![CDATA[ AND D.CREATE_DATE >=  TO_DATE(#{sdate},'YYYY-MM-DD')  ]]>
+			</if>		
+			<if test="edate != null and edate != ''">
+				<![CDATA[ AND D.CREATE_DATE <  TO_DATE(#{edate},'YYYY-MM-DD')+0.99999   ]]>
+			</if>
+		</where>		
+	</select>
+	
+	<!-- 중복 파일 포함 문서 목록 얻기. :: PAGE_NAME/PAGE_SIZE 인덱스 설정 체크 -->
+	<select id="duplicateDocList" parameterType="HashMap" resultType="Document">
+		SELECT
+			DOC_ID,ROOT_ID,DOC_NAME, TYPE_NAME, IS_LOCKED, VERSION_NO, CREATOR_ID,DOC_STATUS,DOC_TYPE,
+			CREATOR_NAME, CREATE_DATE
+		FROM
+		(
+			SELECT 
+				D.DOC_ID, D.ROOT_ID,D.DOC_NAME,D.IS_LOCKED, D.VERSION_NO,D.CREATOR_ID,D.DOC_STATUS, 			
+				D.CREATOR_NAME, D.CREATE_DATE,T.TYPE_NAME,T.TYPE_ID AS DOC_TYPE,
+				CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM    	
+			FROM XR_DOCUMENT D 
+				INNER JOIN XR_FILED F ON D.DOC_ID = F.DOC_ID
+				INNER JOIN XR_PAGE P ON F.PAGE_ID = P.PAGE_ID 
+				INNER JOIN XR_TYPE T ON D.DOC_TYPE = T.TYPE_ID 			 	
+			<where>
+				<if test="page_name != null and page_name != ''">
+					AND P.PAGE_NAME = #{page_name}
+				</if>		
+				<if test="file_size != null and file_size != ''">
+					AND P.PAGE_SIZE = #{file_size}
+				</if>		
+				<if test="is_current != null and is_current != ''">
+					AND D.IS_CURRENT = #{is_current} AND D.DOC_STATUS = 'C'
+				</if>		
+				<if test="sdate != null and sdate != ''">
+					<![CDATA[ AND D.CREATE_DATE >=  TO_DATE(#{sdate},'YYYY-MM-DD')  ]]>
+				</if>		
+				<if test="edate != null and edate != ''">
+					<![CDATA[ AND D.CREATE_DATE <  TO_DATE(#{edate},'YYYY-MM-DD')+0.99999   ]]>
+				</if>
+			</where>
+		) LIST
+		WHERE LIST.PAGENUM = #{nPage}		
+	</select>
+	
+	<!-- 폴더에 등록된 문서 수를 얻는다 -->
+	<select id="getDocumentCountByFolderId" parameterType="HashMap" resultType="Int">
+		SELECT COUNT(D.DOC_ID) AS CNT
+		FROM XR_DOCUMENT D
+		INNER JOIN XR_LINKED L ON D.DOC_ID = L.DOC_ID
+		WHERE L.FOLDER_ID = #{folder_id}
+	</select>
+	
+	<!-- 문서 삭제처리 :: XR_DOCUMENT/XR_DOCUMENT_DEL/XR_FAVORITE_DOC/XR_REF_DOC-->
+	<delete id="docCommonDelete" parameterType="HashMap">
+		DELETE FROM ${table_nm}
+		<where>
+			<if test="table_nm == 'XR_REF_DOC'">
+				<if test="doc_id != null and doc_id != ''">
+					AND ROOT_DOC_ID = #{doc_id}
+				</if>		
+				<if test="ref_doc != null and ref_doc != ''">
+					AND ROOT_REF_ID = #{ref_doc}
+				</if>
+			</if>
+			<if test="table_nm != 'XR_REF_DOC'">
+				<if test="doc_id != null and doc_id != ''">
+					AND DOC_ID = #{doc_id}
+				</if>		
+				<if test="ref_doc != null and ref_doc != ''">
+					AND REF_DOC = #{ref_doc}
+				</if>
+			</if>
+			
+		</where>      
+	</delete>
+	
+	<!-- 관리자휴지통 문서이동처리  :: XR_DOCUMENT_DEL -->
+	<insert id="adminTrashMove" parameterType="HashMap">
+		INSERT INTO XR_DOCUMENT_DEL 
+		( 
+			DOC_ID,DOC_NAME,DOC_TYPE,PAGE_CNT,ROOT_ID,IS_CURRENT,IS_LOCKED,LOCK_OWNER,LOCK_DATE,
+			VERSION_NO,VERSION_NOTE,PRESERVATION_YEAR,EXPIRED_DATE,IS_EXPIRED,DOC_DESCRIPTION,DOC_STATUS,
+			ACL_ID,CREATOR_ID,CREATOR_NAME,CREATE_DATE,UPDATER_ID,UPDATER_NAME,UPDATE_DATE,DELETER_ID,
+			DELETER_NAME,DELETE_DATE,OWNER_ID,REF_ID,DOC_NO,IS_TRANS,IS_INHERIT_ACL,LOCATION,ACCESS_GRADE, 
+			FOLDER_ID,PAGE_TOTAL,SECURITY_LEVEL,KEYWORD,IS_SHARE,AUTHOR_LIST,READ_CNT,WASTE_DATE
+		) 
+		SELECT 
+			DOC_ID,DOC_NAME,DOC_TYPE,PAGE_CNT,ROOT_ID,IS_CURRENT,IS_LOCKED,LOCK_OWNER,LOCK_DATE,
+			VERSION_NO,VERSION_NOTE,PRESERVATION_YEAR,EXPIRED_DATE,IS_EXPIRED,DOC_DESCRIPTION,DOC_STATUS,
+			ACL_ID,CREATOR_ID,CREATOR_NAME,CREATE_DATE,UPDATER_ID,UPDATER_NAME,UPDATE_DATE,DELETER_ID,
+			DELETER_NAME,DELETE_DATE,OWNER_ID,REF_ID,DOC_NO,IS_TRANS,IS_INHERIT_ACL,LOCATION,ACCESS_GRADE, 
+			FOLDER_ID,PAGE_TOTAL,SECURITY_LEVEL,KEYWORD,IS_SHARE,AUTHOR_LIST,READ_CNT,SYSDATE 
+		FROM XR_DOCUMENT
+		<where>			
+			<if test="doc_id != null and doc_id != ''">
+				AND DOC_ID = #{doc_id}	
+			</if>				
+		</where> 				
+	</insert>	
+	
+	<!-- 휴지통 문서 count -->
+	<select id="wastePagingCount" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(D.DOC_ID)
+		FROM XR_DOCUMENT_DEL D INNER JOIN XR_USER U ON D.OWNER_ID = U.USER_ID
+		<if test="part != 'ALL'">
+			INNER JOIN XR_GROUPED G ON U.USER_ID =G.USER_ID
+		</if>	
+      	<where>
+			D.IS_CURRENT = 'T'
+			<if test="sdate != null and sdate != ''">
+				<![CDATA[ AND D.WASTE_DATE >=  TO_DATE(#{sdate},'YYYY-MM-DD')  ]]>
+			</if>		
+			<if test="edate != null and edate != ''">
+				<![CDATA[ AND D.WASTE_DATE <  TO_DATE(#{edate},'YYYY-MM-DD')+0.99999   ]]>
+			</if>
+			<if test="strKeyword != null and strKeyword != ''">
+				AND D.DOC_NAME LIKE '%${strKeyword}%'
+			</if>
+			<if test="ownerKeyword != null and ownerKeyword != ''">
+				AND U.USER_NAME_KO LIKE '%${ownerKeyword}%'
+			</if>
+			<if test="authGroupList != null and authGroupList != ''">
+				 AND G.GROUP_ID IN 
+				<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+					#{item}
+				</foreach>		
+			</if>			
+		</where>
+	</select>
+
+	<!-- 휴지통 목록 -->
+	<select id="wasteList" parameterType="HashMap" resultType="Document">
+		SELECT 
+			DOC_ID, DOC_NAME, DOC_TYPE, ROOT_ID, CREATOR_NAME, WASTE_DATE,IS_LOCKED,
+			CREATE_DATE, TYPE_NAME, OWNER_NAME,PAGENUM
+		FROM
+		(
+			SELECT 
+				D.DOC_ID, D.DOC_NAME, D.DOC_TYPE, D.ROOT_ID, D.CREATOR_NAME, D.CREATE_DATE,D.OWNER_ID,D.WASTE_DATE,				
+				COALESCE((SELECT TYPE_NAME FROM XR_TYPE WHERE TYPE_ID = D.DOC_TYPE),'Deleted') AS TYPE_NAME, U.USER_NAME_KO AS OWNER_NAME,
+				D.IS_LOCKED, CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM
+      		FROM XR_DOCUMENT_DEL D INNER JOIN XR_USER U ON D.OWNER_ID = U.USER_ID
+			<if test="part != 'ALL'">
+					INNER JOIN XR_GROUPED G ON U.USER_ID =G.USER_ID
+			</if>	
+			<where>
+				D.IS_CURRENT = 'T'
+				<if test="sdate != null and sdate != ''">
+					<![CDATA[ AND D.WASTE_DATE >=  TO_DATE(#{sdate},'YYYY-MM-DD')  ]]>
+				</if>		
+				<if test="edate != null and edate != ''">
+					<![CDATA[ AND D.WASTE_DATE <  TO_DATE(#{edate},'YYYY-MM-DD')+0.99999   ]]>
+				</if>
+				<if test="strKeyword != null and strKeyword != ''">
+						AND D.DOC_NAME LIKE '%${strKeyword}%'
+				</if>
+				<if test="ownerKeyword != null and ownerKeyword != ''">
+						AND U.USER_NAME_KO LIKE '%${ownerKeyword}%'
+				</if>
+				<if test="authGroupList != null and authGroupList != ''">
+					 AND G.GROUP_ID IN 
+					<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+						#{item}
+					</foreach>		
+			 	</if>			
+			</where>			
+		)LIST
+		WHERE PAGENUM = #{nPage} 
+	</select>
+	
+	<!-- 휴지통 문서 상세 정보 조회 -->
+	<select id="wasteDocDetail" parameterType="HashMap" resultType="Document">
+		SELECT DOC_ID, DOC_NAME, DOC_TYPE, TYPE_NAME, VERSION_NO, VERSION_NOTE, ROOT_ID,
+			CREATOR_ID, CREATOR_NAME, CREATE_DATE, UPDATER_ID, UPDATER_NAME, UPDATE_DATE, EXPIRED_DATE
+		FROM
+		(
+			SELECT D.DOC_ID, D.DOC_NAME, D.DOC_TYPE, T.TYPE_NAME, D.VERSION_NO, D.VERSION_NOTE, D.ROOT_ID,
+				D.CREATOR_ID, D.CREATOR_NAME, D.UPDATER_ID, D.UPDATER_NAME, 
+				D.CREATE_DATE,
+				D.UPDATE_DATE,
+				D.EXPIRED_DATE
+			FROM XR_DOCUMENT_DEL D
+				INNER JOIN XR_TYPE T ON D.DOC_TYPE = T.TYPE_ID
+			<where>
+			<if test="doc_id != null and doc_id != ''">
+				DOC_ID =#{doc_id}
+			</if>
+		</where>
+		) LIST		
+	</select>
+	
+	<!-- 휴지통 비우기 리스트 목록 :: 쿼리수정처리 -->
+	<select id="wasteAllDocList" parameterType="HashMap" resultType="Document">
+		SELECT	
+			D.DOC_ID, D.ROOT_ID,D.IS_LOCKED,D.DOC_TYPE,
+			COALESCE((SELECT TYPE_NAME FROM XR_TYPE WHERE TYPE_ID=D.DOC_TYPE),'Deleted') AS TYPE_NAME
+		FROM XR_DOCUMENT_DEL D 
+		WHERE D.IS_CURRENT = 'T' 
+	</select>
+	
+	<!-- 관련문서의 기본정보를 얻는다 -->
+	<select id="refDocumentList" parameterType="HashMap" resultType="Document">
+		SELECT
+			D.DOC_ID, D.DOC_NAME, D.CREATOR_NAME, D.CREATE_DATE
+		FROM	XR_DOCUMENT D
+		INNER JOIN	XR_REF_DOC RD ON D.DOC_ID = RD.ROOT_REF_ID
+		WHERE RD.ROOT_DOC_ID = #{doc_id}
+	</select>
+
+	<!-- ########## [where common 쿼리] Start... ########## -->
+	<sql id="whereChangeOwnerCommon">
+		<where>
+         	D.IS_CURRENT = 'T'
+         	AND D.DOC_STATUS IN ('C','U')
+	         	
+	        <if test="strKeyword != null and strKeyword != ''">
+				AND D.DOC_NAME LIKE '%${strKeyword}%'
+			</if>
+			<if test="ownerKeyword != null and ownerKeyword != ''">
+				AND D.OWNER_ID = #{ownerKeyword}
+			</if>
+			<if test="sdate != null and sdate != ''">
+				<![CDATA[ AND D.CREATE_DATE >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]>
+			</if>		
+			<if test="edate != null and edate != ''">
+				<![CDATA[ AND D.CREATE_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999  ]]>
+			</if>
+			<if test="search_type != null and search_type != ''">
+				<choose>
+					<when test="search_type == 'MYWORK'">
+						AND F.MAP_ID = 'MYPAGE'
+					</when>
+					<when test="search_type == 'WORKSPACE'">
+						AND F.MAP_ID != 'MYPAGE'
+					</when>
+				</choose>
+			</if>
+		</where>   
+	</sql>
+	
+	<sql id="whereListBasic">
+		<if test="strIndex != null and strIndex != ''">
+			<choose>
+				<when test="strIndex == 'doc_name'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.DOC_NAME LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+				<when test="strIndex == 'doc_description'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.DOC_DESCRIPTION LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+				<when test="strIndex == 'creator_name'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.CREATOR_NAME LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+				<when test="strIndex == 'author_list'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.AUTHOR_LIST LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+			</choose>
+		</if>
+		<choose>
+			<when test="select_action == 'CHECKOUT'">
+				<if test="sdate != null and sdate != ''">
+					<![CDATA[ AND D.LOCK_DATE >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]>
+				</if>		
+				<if test="edate != null and edate != ''">
+					<![CDATA[ AND D.LOCK_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999 ]]>
+				</if>				
+			</when>
+			<otherwise>
+				<if test="sdate != null and sdate != ''">
+					<![CDATA[ AND D.CREATE_DATE >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]>
+				</if>		
+				<if test="edate != null and edate != ''">
+					<![CDATA[ AND D.CREATE_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999 ]]>
+				</if>				
+			</otherwise>
+		</choose>
+		<if test="keyword != null and keyword != ''">
+				AND D.KEYWORD LIKE '%${keyword}%'
+		</if>
+	</sql>
+		
+	<!-- 첨부파일명 검색 -->
+	<sql id="page_search">
+	WITH PAGE_DOC AS
+	(
+		SELECT DISTINCT F.DOC_ID 
+		FROM XR_FILED F
+		INNER JOIN XR_PAGE P 
+		ON P.PAGE_NAME LIKE '%${page_name}%' 
+		AND F.PAGE_ID = P.PAGE_ID
+	)
+	</sql>
+	
+	<!-- ########## [where common  쿼리] End... ########## -->
+	
+	<!-- ########## [update common  쿼리] Start... ########## -->
+	<sql id="updateCommonSet">
+		<set>
+			<if test="doc_name != null and doc_name != ''">
+				DOC_NAME = #{doc_name},
+			</if>
+			<if test="doc_type != null and doc_type != ''">
+				DOC_TYPE = #{doc_type},
+			</if>
+			<if test="page_cnt != null and page_cnt != -1000">
+				PAGE_CNT = #{page_cnt},
+			</if>
+			<if test="is_current != null and is_current != ''">
+				IS_CURRENT = #{is_current},
+			</if>
+			<if test="is_locked != null and is_locked != ''">
+				IS_LOCKED = #{is_locked},
+			</if>
+			<if test="lock_owner != null and lock_owner != ''">
+				LOCK_OWNER = #{lock_owner},
+			</if>
+			<if test="lock_date != null and lock_date != ''">
+				LOCK_DATE = #{lock_date},
+			</if>
+			<if test="version_no != null and version_no != ''">
+				VERSION_NO = #{version_no},
+			</if>
+			<if test="version_note != null and version_note != ''">
+				VERSION_NOTE = #{version_note},
+			</if>
+			<if test="preservation_year != null and preservation_year != -1000">
+				PRESERVATION_YEAR = #{preservation_year},
+			</if>
+			<if test="expired_date != null and expired_date != ''">
+				EXPIRED_DATE = #{expired_date},
+			</if>
+			<if test="is_expired != null and is_expired != ''">
+				IS_EXPIRED = #{is_expired},
+			</if>
+			<if test="doc_description != null and doc_description != ''">
+				DOC_DESCRIPTION = #{doc_description},
+			</if>
+			<if test="doc_status != null and doc_status != ''">
+				DOC_STATUS = #{doc_status},
+			</if>
+			<if test="acl_id != null and acl_id != ''">
+				ACL_ID = #{acl_id},
+			</if>
+			<if test="creator_id != null and creator_id != ''">
+				CREATOR_ID = #{creator_id},
+			</if>
+			<if test="creator_name != null and creator_name != ''">
+				CREATOR_NAME = #{creator_name},
+			</if>
+			<if test="create_date != null and create_date != ''">
+				CREATE_DATE = #{create_date},
+			</if>
+			<if test="updater_id != null and updater_id != ''">
+				UPDATER_ID = #{updater_id},
+			</if>
+			<if test="updater_name != null and updater_name != ''">
+				UPDATER_NAME = #{updater_name},
+			</if>
+			<if test="update_date != null and update_date != ''">
+				UPDATE_DATE = #{update_date},
+			</if>
+			<if test="deleter_id != null and deleter_id != ''">
+				DELETER_ID = #{deleter_id},
+			</if>
+			<if test="deleter_name != null and deleter_name != ''">
+				DELETER_NAME = #{deleter_name},
+			</if>
+			<if test="delete_date != null and delete_date != ''">
+				DELETE_DATE = #{delete_date},
+			</if>
+			<if test="owner_id != null and owner_id != ''">
+				OWNER_ID = #{owner_id},
+			</if>
+			<if test="ref_id != null and ref_id != ''">
+				REF_ID = #{ref_id},
+			</if>
+			<if test="doc_no != null and doc_no != ''">
+				DOC_NO = #{doc_no},
+			</if>
+			<if test="is_trans != null and is_trans != ''">
+				IS_TRANS = #{is_trans},
+			</if>
+			<if test="is_inherit_acl != null and is_inherit_acl != ''">
+				IS_INHERIT_ACL = #{is_inherit_acl},
+			</if>
+			<if test="location != null and location != ''">
+				LOCATION = #{location},
+			</if>
+			<if test="access_grade != null and access_grade != ''">
+				ACCESS_GRADE = #{access_grade},
+			</if>
+			<if test="folder_id != null and folder_id != ''">
+				FOLDER_ID = #{folder_id},
+			</if>
+			<if test="page_total != null and page_total != -1000">
+				PAGE_TOTAL = #{page_total},
+			</if>
+			<if test="security_level != null and security_level != ''">
+				SECURITY_LEVEL = #{security_level},
+			</if>
+			<if test="keyword != null and keyword != ''">
+				KEYWORD = #{keyword},
+			</if>
+		</set>
+	</sql>
+	
+	<sql id="updateCheckInOutSet">
+		<set>
+			IS_LOCKED = #{is_locked},
+			LOCK_OWNER = null,
+			LOCK_DATE = null,
+		</set>
+	</sql>
+	
+	<sql id="updateCheckOutSet">
+		<set>
+			IS_LOCKED = #{is_locked},
+			LOCK_OWNER = #{lock_owner},
+			LOCK_DATE = SYSDATE,
+		</set>
+	</sql>
+	
+	<sql id="updateSameVersion">
+		<set>
+			<if test="doc_name != null and doc_name != ''">
+				DOC_NAME = #{doc_name},
+			</if>
+			<if test="version_note != null and version_note != ''">
+				VERSION_NOTE = #{version_note},
+			</if>
+			<if test="preservation_year != null and preservation_year != ''">
+				PRESERVATION_YEAR = #{preservation_year},
+			</if>
+			<choose>
+				<when test="preservation_year == 0">
+					EXPIRED_DATE = TO_DATE('99991231','yyyy-mm-dd'),
+				</when>
+				<otherwise>
+					EXPIRED_DATE = ADD_MONTHS(SYSDATE, ${preservation_year} * 12),
+				</otherwise>
+			</choose>		
+			<if test="is_expired != null and is_expired != ''">
+				IS_EXPIRED = #{is_expired},
+			</if>
+			<if test="acl_id != null and acl_id != ''">
+				ACL_ID = #{acl_id},
+			</if>
+			<if test="doc_description != null and doc_description != ''">
+				DOC_DESCRIPTION = #{doc_description},
+			</if>
+			<if test="creator_id != null and creator_id != ''">
+				CREATOR_ID = #{creator_id},
+			</if>
+			<if test="creator_name != null and creator_name != ''">
+				CREATOR_NAME = #{creator_name},
+			</if>
+			<if test="create_date != null and create_date != ''">
+				CREATE_DATE = SYSDATE,
+			</if>
+			<if test="is_inherit_acl != null and is_inherit_acl != ''">
+				IS_INHERIT_ACL = #{is_inherit_acl},
+			</if>
+			<if test="access_grade != null and access_grade != ''">
+				ACCESS_GRADE = #{access_grade},
+			</if>
+			<if test="security_level != null and security_level != ''">
+				SECURITY_LEVEL = #{security_level},
+			</if>
+			<if test="keyword != null and keyword != ''">
+				KEYWORD = #{keyword},
+			</if>
+			<if test="is_share != null and is_share != ''">
+				IS_SHARE = #{is_share},
+			</if>			
+			IS_LOCKED = 'F',
+			LOCK_OWNER = '',
+			LOCK_DATE = NULL,
+		</set>
+	</sql>
+	
+	<sql id="updatePageInfo">
+		<set>			
+			PAGE_CNT = #{page_cnt},
+			PAGE_TOTAL = #{page_total},			
+		</set>
+	</sql>	
+	<sql id="updateModifyInfo">
+		<set>
+			IS_LOCKED = #{is_locked},
+			LOCK_OWNER = null,
+			LOCK_DATE = null,
+			IS_CURRENT = #{is_current},
+		</set>
+	</sql>
+	<sql id="updateAclChangeSet">
+		<set>
+			ACL_ID = #{acl_id}
+		</set>
+	</sql>
+	
+	<sql id="updateOwnerChangeSet">
+		<set>
+			OWNER_ID = #{owner_id},
+			FOLDER_ID = #{folder_id},
+		</set>
+	</sql>
+	
+	<sql id="updateWorkOwnerChangeSet">
+		<set>
+			OWNER_ID = #{owner_id},			
+		</set>
+	</sql>
+	
+	<!-- ########## [update common  쿼리] End... ########## -->
+	
+	<!-- ########## [사용자 및 관리자 공통 쿼리] Start... ########## -->
+	
+	<!-- DOC_ID로 모든 버전의 문서 목록을 가져온다 :: XR_DOCUMENT-->
+	<select id="allVersionDocumentList"  parameterType="HashMap" resultType="Document">
+		SELECT 
+			D.DOC_ID, D.DOC_NAME, D.DOC_TYPE, D.IS_CURRENT, D.IS_LOCKED, D.CREATOR_NAME, D.CREATE_DATE, D.VERSION_NO, D.ROOT_ID, T.TYPE_NAME
+		FROM ${table_nm} D
+		INNER JOIN XR_TYPE T ON D.DOC_TYPE = T.TYPE_ID 
+		WHERE
+			D.DOC_ID = #{doc_id} OR  
+			D.DOC_ID IN (SELECT ROOT_ID FROM XR_DOCUMENT WHERE DOC_ID = #{doc_id}) OR
+			D.ROOT_ID IN (SELECT ROOT_ID FROM XR_DOCUMENT WHERE DOC_ID = #{doc_id}) 
+		ORDER BY D.VERSION_NO	
+	</select>
+	
+	<!-- DOC_ID 로 모든 버전의 문서 목록을 가져온다 :: XR_DOCUMENT_DEL -->
+	<select id="allVersionDelDocumentList"  parameterType="HashMap" resultType="Document">
+		SELECT 
+			D.DOC_ID, D.DOC_NAME, D.DOC_TYPE, D.IS_CURRENT, D.IS_LOCKED, 
+			D.CREATOR_NAME, D.VERSION_NO,D.OWNER_ID, 
+			D.ROOT_ID,TO_CHAR(D.CREATE_DATE, 'YYYY-MM-DD HH24:MI:SS') CREATE_DATE
+		FROM XR_DOCUMENT_DEL D		
+		WHERE
+			D.DOC_ID = #{doc_id} OR  
+			D.DOC_ID IN (SELECT ROOT_ID FROM XR_DOCUMENT WHERE DOC_ID = #{doc_id}) OR
+			D.ROOT_ID IN (SELECT ROOT_ID FROM XR_DOCUMENT WHERE DOC_ID = #{doc_id})
+		ORDER BY D.VERSION_NO	
+	</select>
+	
+	<!-- 문서속성정보 수정처리 :: choose문을 이용하세요 -->
+	<update id="docInfoUpdate" parameterType="HashMap">
+		UPDATE XR_DOCUMENT			
+		<set>
+			<choose>
+				<!-- CASE1.문서삭제시 -->
+				<when test="isType == 'delete' ">
+					<if test="doc_status != null and doc_status != ''">
+						DOC_STATUS = #{doc_status} , DELETE_DATE = SYSDATE ,				
+					</if>				
+					<if test="user_id != null and user_id != ''">
+						DELETER_ID = #{user_id} ,		
+					</if>				
+					<if test="user_name != null and user_name != ''">
+						DELETER_NAME = #{user_name} ,		
+					</if>							
+				</when>
+				<when test="isType == 'expired' ">
+					<if test="is_expired != null and is_expired != ''">
+						IS_EXPIRED = #{is_expired} , 				
+					</if>				
+				</when>
+				<!-- CASE2.문서권한 변경시 -->				
+				<otherwise></otherwise>
+			</choose>		
+		</set>
+		<where>			
+			<if test="doc_id != null and doc_id != ''">
+				AND DOC_ID = #{doc_id}	
+			</if>				
+		</where> 				
+	</update>	
+	
+	<!-- 문서 보존기간 변경 :: documentUpdate 통합예정 -->
+	<update id="preservationYearUpdate" parameterType="HashMap">
+		UPDATE XR_DOCUMENT
+		SET
+			PRESERVATION_YEAR = #{preservation_year},
+			IS_EXPIRED = 'F',
+			EXPIRED_DATE = #{expired_date}
+			
+		WHERE
+			DOC_ID = #{doc_id}
+	</update>
+	
+	<!-- 문서조회 :: 공통(다차원분류보기 수정) -->
+	<select id="commonDocDetail" parameterType="HashMap" resultType="Document">
+		SELECT 
+			D.DOC_ID, D.DOC_NAME, D.DOC_TYPE, D.VERSION_NO, D.ROOT_ID,D.REF_ID,D.ACCESS_GRADE,D.SECURITY_LEVEL,
+			D.CREATOR_ID, D.CREATOR_NAME,D.CREATE_DATE,D.PAGE_CNT,D.IS_LOCKED, D.LOCK_DATE,
+			D.LOCK_OWNER, (SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID = D.LOCK_OWNER) AS LOCK_OWNER_NAME,
+			D.UPDATER_ID, D.UPDATER_NAME,D.UPDATE_DATE,D.ACL_ID,D.EXPIRED_DATE,D.IS_INHERIT_ACL,D.IS_SHARE,
+			D.OWNER_ID, (SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID = D.OWNER_ID) AS OWNER_NAME,
+			T.TYPE_NAME,T.IS_SYSTEM,T.TBL_NAME,D.PRESERVATION_YEAR,D.DOC_DESCRIPTION, D.KEYWORD,D.FOLDER_ID,F.MAP_ID,D.PAGE_TOTAL,D.READ_CNT
+			FROM ${table_nm} D
+				INNER JOIN XR_TYPE T ON D.DOC_TYPE = T.TYPE_ID
+				INNER JOIN XR_FOLDER F ON D.FOLDER_ID = F.FOLDER_ID
+		<where>
+			<if test="doc_id != null and doc_id != ''">
+				D.DOC_ID = #{doc_id}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 관리자 휴지통 문서조회  -->
+	<select id="commonDocWasteDetail" parameterType="HashMap" resultType="Document">
+		SELECT 
+			D.DOC_ID, D.DOC_NAME, D.DOC_TYPE, D.VERSION_NO, D.ROOT_ID,D.REF_ID,D.ACCESS_GRADE,D.SECURITY_LEVEL,
+			D.CREATOR_ID, D.CREATOR_NAME,D.CREATE_DATE,D.PAGE_CNT,D.IS_LOCKED, D.LOCK_DATE, D.LOCK_OWNER,
+			D.UPDATER_ID, D.UPDATER_NAME,D.UPDATE_DATE,D.ACL_ID,D.OWNER_ID, 
+			(SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID = D.OWNER_ID) AS OWNER_NAME,
+			D.PRESERVATION_YEAR,D.DOC_DESCRIPTION, D.KEYWORD,			
+			D.FOLDER_ID,D.WASTE_DATE,
+			COALESCE((SELECT TYPE_NAME FROM XR_TYPE WHERE TYPE_ID=D.DOC_TYPE),'Deleted') AS TYPE_NAME					
+		FROM XR_DOCUMENT_DEL D				
+		<where>
+			<if test="doc_id != null and doc_id != ''">
+				D.DOC_ID = #{doc_id}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 문서 이동 :: 삭제예정 -->
+	<update id="documentMove" parameterType="Document">
+		UPDATE XR_LINKED
+		SET FOLDER_ID = #{lnk_folder_id}
+		WHERE
+			DOC_ID = #{doc_id}
+	</update>
+	
+	<!-- 문서 수정 -->
+	<update id="documentUpdate" parameterType="Document">
+		UPDATE
+			XR_DOCUMENT
+		<choose>
+			<!-- CASE1.공통사용 -->
+			<when test="update_action == 'COMMON' ">
+				<include refid="updateCommonSet" />						
+			</when>
+			<!-- CASE2.잠금해제 -->
+			<when test="update_action == 'CHECKIN' ">
+				<include refid="updateCheckInOutSet" />	
+			</when>
+			<!-- CASE2.문서권한 일괄 변경시 -->		
+			<when test="update_action =='CHANGE_ACL_ID'">
+				<include refid="updateAclChangeSet" />	
+			</when>
+			<!-- CASE3.문서 이동 -->
+			<when test="update_action == 'MOVE'">
+				<include refid="updateMoveSet" />
+			</when>		
+			<!-- CASE4.체크아웃취소(잠금해제) -->
+			<when test="update_action == 'CANCEL_CHECKOUT'">
+				<include refid="updateCheckInOutSet" />	
+			</when>
+			<!-- CASE5.문서 복원 -->
+			<when test="update_action == 'RESTORE'">
+				<include refid="updateRestoreSet" />	
+			</when>
+			<!-- CASE6.문서 수정(체크아웃) -->
+			<when test="update_action == 'CHECKOUT'">
+				<include refid="updateCheckOutSet" />	
+			</when>
+			<!-- CASE7.문서 수정(동일버전) -->
+			<when test="update_action =='SAME'">
+				<include refid="updateSameVersion" />	
+			</when>
+			<!-- CASE8.문서 수정(페이지정보) -->
+			<when test="update_action =='PAGE'">
+				<include refid="updatePageInfo" />	
+			</when>
+			<!-- CASE9.문서 수정(체크인/구버전 -->
+			<when test="update_action =='MODIFY'">
+				<include refid="updateModifyInfo" />	
+			</when>
+			<!-- CASE10.문서 소유권변경(개인문서) -->
+			<when test="update_action =='CHANGE_OWNER'">
+				<include refid="updateOwnerChangeSet" />	
+			</when>
+			<!-- CASE11.문서 소유권변경(업무문서) -->
+			<when test="update_action =='CHANGE_OWNER_WORK'">
+				<include refid="updateWorkOwnerChangeSet" />	
+			</when>
+			<otherwise></otherwise>
+		</choose>	
+		WHERE
+		<choose>
+			<when test="update_action =='CHANGE_ACL_ID'">
+				DOC_ID = #{doc_id} OR ROOT_ID = #{doc_id}
+			</when>
+			<otherwise>DOC_ID = #{doc_id}</otherwise>
+		</choose>
+	</update>
+	
+	<select id="documentAclChangeListByFolderId" parameterType="HashMap" resultType="Document">
+		SELECT COALESCE(ROOT_ID, D.DOC_ID) AS DOC_ID
+		FROM XR_DOCUMENT D
+	  	INNER JOIN XR_LINKED L ON L.FOLDER_ID = #{folder_id}
+		WHERE D.IS_INHERIT_ACL = 'F'
+	  	AND D.IS_CURRENT = 'T'
+	  	AND L.DOC_ID = D.DOC_ID
+	</select>
+	<!-- ########## [사용자 및 관리자 공통  쿼리] End... ########## -->
+	
+	
+	<!-- ########## [관리자 문서 관련 쿼리] Start... ########## -->
+	
+	<!-- 만기문서 count -->
+	<select id="expiredPagingCount" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(DOC_ID)
+		FROM XR_DOCUMENT D
+				INNER JOIN XR_USER U ON D.OWNER_ID = U.USER_ID	
+				<if test="part != 'ALL'">
+					INNER JOIN XR_GROUPED G ON U.USER_ID =G.USER_ID
+				</if>	
+      	WHERE
+            D.IS_EXPIRED = 'T' AND D.IS_CURRENT = 'T' AND D.DOC_STATUS='C'
+	        <if test="strKeyword != null and strKeyword != ''">
+				AND D.DOC_NAME LIKE '%${strKeyword}%'
+			</if>
+			<if test="ownerKeyword != null and ownerKeyword != ''">
+				AND U.USER_NAME_KO LIKE '%${ownerKeyword}%'
+			</if>
+			<if test="sdate != null and sdate != ''">
+				<![CDATA[ AND D.EXPIRED_DATE >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]>
+			</if>		
+			<if test="edate != null and edate != ''">
+				<![CDATA[ AND D.EXPIRED_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999 ]]>
+			</if>
+			<if test="authGroupList != null and authGroupList != ''">
+				 AND G.GROUP_ID IN 
+				<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+					#{item}
+				</foreach>		
+			 </if>			
+	</select>
+	
+	<!-- 만기문서 목록 -->
+	<select id="expiredDocumentList"  parameterType="HashMap" resultType="Document">	
+		SELECT
+			DOC_ID, DOC_NAME, DOC_TYPE, CREATOR_NAME, EXPIRED_DATE, ROOT_ID,TYPE_NAME, OWNER_NAME,PAGENUM
+		FROM
+		(
+			SELECT 
+            	D.DOC_ID, D.DOC_NAME, D.DOC_TYPE, D.ROOT_ID, D.CREATOR_NAME, 
+                TO_CHAR(D.EXPIRED_DATE,'YYYY-MM-DD') AS EXPIRED_DATE,T.TYPE_NAME,U.USER_NAME_KO AS OWNER_NAME,
+       			CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM
+      		FROM XR_DOCUMENT D INNER JOIN XR_TYPE T ON D.DOC_TYPE = T.TYPE_ID
+            	INNER JOIN XR_USER U ON D.OWNER_ID = U.USER_ID	
+				<if test="part != 'ALL'">
+					INNER JOIN XR_GROUPED G ON U.USER_ID =G.USER_ID
+				</if>	
+			WHERE
+            	D.IS_EXPIRED = 'T' AND D.IS_CURRENT = 'T' AND D.DOC_STATUS='C'
+	        	<if test="strKeyword != null and strKeyword != ''">
+					AND D.DOC_NAME LIKE '%${strKeyword}%'
+				</if>
+				<if test="ownerKeyword != null and ownerKeyword != ''">
+					AND U.USER_NAME_KO LIKE '%${ownerKeyword}%'
+				</if>
+				<if test="sdate != null and sdate != ''">
+					<![CDATA[ AND D.EXPIRED_DATE >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]>
+				</if>		
+				<if test="edate != null and edate != ''">
+					<![CDATA[ AND D.EXPIRED_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999 ]]>
+				</if>
+				<if test="authGroupList != null and authGroupList != ''">
+					 AND G.GROUP_ID IN 
+					<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+						#{item}
+					</foreach>		
+			 	</if>			
+		) LIST
+		WHERE LIST.PAGENUM = #{nPage} 			
+	</select>
+	
+	<!-- 소유권 이전 문서 count -->
+	<select id="ownerPagingCount" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(D.DOC_ID)
+		FROM XR_DOCUMENT D
+   		INNER JOIN XR_TYPE T ON D.DOC_TYPE = T.TYPE_ID
+		INNER JOIN XR_FOLDER F ON D.FOLDER_ID = F.FOLDER_ID
+   		INNER JOIN XR_LINKED L ON D.DOC_ID = L.DOC_ID
+		INNER JOIN XR_USER U ON D.OWNER_ID = U.USER_ID
+      	<include refid="whereChangeOwnerCommon" />	 				
+	</select>
+	
+	<!-- 소유권 이전 문서 목록 -->
+	<select id="ownerDocumentList"  parameterType="HashMap" resultType="Document">
+		SELECT
+			DOC_ID, DOC_NAME, DOC_TYPE, IS_CURRENT, IS_LOCKED, CREATOR_NAME, CREATE_DATE, ROOT_ID, TYPE_NAME, 
+			PAGENUM,FOLDER_ID,OWNER_ID,OWNER_NAME
+		FROM
+		(
+			SELECT 
+				D.DOC_ID, D.DOC_NAME, D.DOC_TYPE, D.ROOT_ID, D.CREATOR_NAME, D.CREATE_DATE,D.OWNER_ID,U.USER_NAME_KO AS OWNER_NAME,
+             	T.TYPE_NAME, CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM,
+             	D.FOLDER_ID, D.IS_LOCKED, D.IS_CURRENT
+      		FROM XR_DOCUMENT D
+      		INNER JOIN XR_TYPE T ON D.DOC_TYPE = T.TYPE_ID
+			INNER JOIN XR_FOLDER F ON D.FOLDER_ID = F.FOLDER_ID
+      		INNER JOIN XR_LINKED L ON D.DOC_ID = L.DOC_ID
+			INNER JOIN XR_USER U ON D.OWNER_ID = U.USER_ID
+      		<include refid="whereChangeOwnerCommon" />
+		)LIST				
+		WHERE LIST.PAGENUM = #{nPage}
+	</select>
+	
+	<!-- 소유권 이전 목록 리스트 페이징없이 -->
+	<select id="ownerDocumentNoPageList"  parameterType="HashMap" resultType="Document">
+		SELECT 
+				D.DOC_ID, D.DOC_NAME, D.DOC_TYPE, D.ROOT_ID, D.CREATOR_NAME, D.CREATE_DATE,D.OWNER_ID,U.USER_NAME_KO AS OWNER_NAME,
+             	T.TYPE_NAME,D.FOLDER_ID, D.IS_LOCKED, D.IS_CURRENT
+      	FROM XR_DOCUMENT D
+      		INNER JOIN XR_TYPE T ON D.DOC_TYPE = T.TYPE_ID
+			INNER JOIN XR_FOLDER F ON D.FOLDER_ID = F.FOLDER_ID
+      		INNER JOIN XR_LINKED L ON D.DOC_ID = L.DOC_ID      		
+			INNER JOIN XR_USER U ON D.OWNER_ID = U.USER_ID
+      		<include refid="whereChangeOwnerCommon" />
+	</select>
+	
+	<!-- ########## [관리자 문서 관련 쿼리] End... ########## -->
+	
+	
+	<!-- ########## [사용자 문서 관련 쿼리] Start... ########## -->
+	<!-- WorkDocument.xml/ MyDocument.xml 참고 -->
+	<!-- whereAclAdd, extend, documentBasicCount, documentBasicList 삭제  -->
+	<!-- ########## [사용자 문서 관련 쿼리] End... ########## -->
+	
+	<!-- 문서 이동 -->
+	<sql id="updateMoveSet">
+		<set>
+			<if test="folder_id != null and folder_id != ''">
+				FOLDER_ID = #{folder_id},
+			</if>
+			<if test="acl_id != null and acl_id != ''">
+				ACL_ID = #{acl_id},
+			</if>
+			<if test="doc_name != null and doc_name != ''">
+				DOC_NAME = #{doc_name},
+			</if>
+		</set>
+	</sql>
+	
+	<!-- 문서 복원 -->
+	<sql id="updateRestoreSet">
+		<set>
+			DOC_NAME = #{doc_name},
+			DOC_STATUS = #{doc_status},
+			FOLDER_ID = #{folder_id},
+			ACL_ID = #{acl_id},
+			DELETER_ID = #{deleter_id, jdbcType=VARCHAR},
+			DELETER_NAME = #{deleter_name, jdbcType=VARCHAR},
+			DELETE_DATE = #{delete_date, jdbcType=DATE},
+			<if test="is_expired != null and is_expired != ''">
+			IS_EXPIRED = #{is_expired},
+			</if>
+			<choose>
+				<when test="preservation_year == 0 and is_expired != null and is_expired != ''">
+					EXPIRED_DATE = TO_DATE('99991231','yyyy-mm-dd'),
+				</when>
+				<otherwise>
+					<if test="is_expired != null and is_expired != ''">
+					EXPIRED_DATE = ADD_MONTHS(SYSDATE, ${preservation_year} * 12),
+					PRESERVATION_YEAR = #{preservation_year},
+					</if>
+				</otherwise>
+			</choose>		
+		</set>
+	</sql>	
+	
+	<!-- 다중분류 문서인 경우  -->
+	<select id="multiDocument" parameterType="HashMap" resultType="Document">
+		SELECT *
+		FROM XR_LINKED
+		<where>
+			<if test="doc_id != null and doc_id != ''"> 
+				DOC_ID = #{doc_id}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 동일문서명 존재여부 :: 문서상태 -->
+	<select id="isExitsDocName" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(*) AS CNT
+		FROM XR_DOCUMENT D 
+			INNER JOIN XR_LINKED L ON D.DOC_ID = L.DOC_ID
+			INNER JOIN XR_FOLDER F ON L.FOLDER_ID = F.FOLDER_ID
+		<where>
+			<if test="folder_id != null and folder_id != ''">
+				AND F.FOLDER_ID = #{folder_id}
+			</if>		
+			<if test="doc_id != null and doc_id != ''">
+				AND D.DOC_ID != #{doc_id}
+			</if>
+			<if test="doc_name != null and doc_name != ''">
+				AND D.DOC_NAME = #{doc_name}
+			</if>				
+			<if test="is_current != null and is_current != ''">
+				AND D.IS_CURRENT = #{is_current}
+			</if>
+			<if test="doc_status != null and doc_status != ''">
+				AND D.DOC_STATUS = #{doc_status}
+			</if>
+		</where>      
+	</select>
+	
+	<!-- 문서 신규 등록처리 -->
+	<insert id="writeDocument" parameterType="Document">
+		INSERT INTO XR_DOCUMENT 
+		( 
+			DOC_ID,DOC_NAME,DOC_TYPE,PAGE_CNT,ROOT_ID,IS_CURRENT,IS_LOCKED,
+			VERSION_NO,PRESERVATION_YEAR,EXPIRED_DATE,IS_EXPIRED,DOC_DESCRIPTION,DOC_STATUS,
+			ACL_ID,CREATOR_ID,CREATOR_NAME,OWNER_ID,REF_ID,IS_INHERIT_ACL,ACCESS_GRADE, FOLDER_ID,
+			PAGE_TOTAL,SECURITY_LEVEL,KEYWORD,IS_SHARE,AUTHOR_LIST
+		) 
+		VALUES (
+			#{doc_id},#{doc_name},#{doc_type},#{page_cnt},#{root_id, jdbcType=VARCHAR},#{is_current},#{is_locked},
+			#{version_no},#{preservation_year},
+			<choose>
+					<when test="preservation_year == 0">
+						TO_DATE('99991231','yyyy-mm-dd'),
+					</when>
+					<otherwise>
+						ADD_MONTHS(SYSDATE, ${preservation_year} * 12),
+					</otherwise>
+			</choose>			
+			#{is_expired},#{doc_description},#{doc_status},#{acl_id},#{creator_id},#{creator_name},#{owner_id},#{ref_id},
+			#{is_inherit_acl},#{access_grade},#{folder_id},#{page_total},#{security_level},#{keyword},#{is_share},#{author_list}
+		)		 				
+	</insert>	
+	
+	<!-- 관련문서 등록처리 -->
+	<insert id="writeRefDoc" parameterType="HashMap">
+		INSERT INTO XR_REF_DOC(ROOT_DOC_ID,ROOT_REF_ID) VALUES (#{root_doc_id},#{root_ref_id})
+	</insert>
+
+	<!-- 즐거찾기 문서 추가  -->
+	<insert id="favoriteDocWrite" parameterType="HashMap">
+		INSERT INTO XR_FAVORITE_DOC
+		( 
+			DOC_ID, USER_ID, FOLDER_ID, ROOT_ID 
+		)
+		VALUES 
+		( 
+			#{doc_id}, #{user_id}, #{folder_id}, #{root_id}
+		)
+	</insert>
+	
+	<!-- 즐겨찾기 문서 삭제 -->
+	<delete id="deleteFavoriteDoc" parameterType="HashMap">
+		DELETE FROM XR_FAVORITE_DOC
+		WHERE
+			USER_ID = #{user_id}
+			AND ROOT_ID = #{root_id}
+	</delete>
+	
+	<!-- 사용자의 모든 즐겨찾기 문서 삭제 -->
+	<delete id="deleteFavoriteDocOfUser" parameterType="HashMap">
+		DELETE FROM XR_FAVORITE_DOC
+		WHERE
+			USER_ID = #{user_id}
+	</delete>
+	
+	
+	<!-- 즐겨찾기 폴더에 등록된 즐겨찾기 문서 삭제 -->
+	<delete id="deleteFavoriteDocByFolderId" parameterType="HashMap">
+		DELETE FROM XR_FAVORITE_DOC
+		WHERE
+			USER_ID = #{user_id}
+			AND FOLDER_ID = #{folder_id}
+	</delete>
+	
+	<!-- 즐겨찾기 폴더에 문서가 추가되어있는지 검색 -->
+	<select id="favoriteDocSearch" parameterType="HashMap" resultType="Int">
+		SELECT COUNT(DOC_ID)AS CNT
+		FROM XR_FAVORITE_DOC
+		<where>
+			<if test="folder_id != null and folder_id != ''">
+				AND FOLDER_ID = #{folder_id}
+			</if>
+			<if test="doc_id != null and doc_id != ''">
+				AND DOC_ID = #{doc_id}
+			</if>		
+		</where>
+	</select>	
+	
+	<!-- 대상 문서명과 비슷한 문서명을 검색. (같은 폴더 안의 다른 문서들을 대상으로 함) -->
+	<select id="selectSimilarDocumentListByDocNameAndFolderID" parameterType="HashMap" resultType="String">
+		SELECT
+            D.DOC_NAME
+        FROM 
+            XR_FOLDER F, XR_LINKED L, XR_DOCUMENT D 
+        WHERE
+        	F.FOLDER_ID = #{folderId} AND
+        	F.FOLDER_ID = L.FOLDER_ID AND 
+            L.DOC_ID = D.DOC_ID AND
+            D.IS_CURRENT = 'T' AND
+            D.DOC_STATUS NOT IN ('D', 'E') AND
+            UPPER(D.DOC_NAME) LIKE UPPER (#{uniqueFileName}) || '%' || UPPER (#{uniqueExtName})
+	</select>
+	
+	
+	<!-- DOC_ID로 문서 정보 가져오기 -->
+	<!-- getFolderId = > getDocumentInfo 로 변경 LeeNara -->
+	<select id="getDocumentInfo" parameterType="HashMap" resultType="Document">
+		SELECT *
+			FROM XR_DOCUMENT
+		<where>
+			<if test="doc_id != null and doc_id != ''">
+				DOC_ID = #{doc_id}
+			</if>
+		</where>
+	</select>
+		
+	<!-- 다중분류체계 리스트 -->
+	<select id="multiFolderList" parameterType="HashMap" resultType="String">
+		SELECT 
+			L.FOLDER_ID
+		FROM XR_DOCUMENT D  
+			LEFT JOIN XR_LINKED L ON D.DOC_ID = L.DOC_ID
+		<where>
+			<if test="doc_id != null and doc_id != ''">
+				AND D.DOC_ID = #{doc_id} AND D.FOLDER_ID != L.FOLDER_ID
+			</if>
+		</where>      
+	</select>
+		
+		
+	<!-- 사용자 휴지통 비우기 문서 리스트 조회 -->
+	<select id="authWasteAllDocList" parameterType="HashMap" resultType="Document">
+		SELECT *
+		FROM XR_DOCUMENT
+		<where>
+			IS_CURRENT = 'T' AND IS_EXPIRED = 'F'
+			<if test="doc_status != null and doc_status != ''">
+				AND DOC_STATUS = #{doc_status}
+			</if>
+			<if test="deleter_id != null and deleter_id != ''">
+				AND DELETER_ID = #{deleter_id}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 임시작업함 등록 문서 카운트 -->
+	<select id="tempDocumentCount" parameterType="HashMap" resultType="Int">
+		SELECT COUNT(*) AS CNT
+        FROM XR_TEMP_DOC
+		<where>
+			<if test="user_id != null and user_id != ''"> 
+				AND USER_ID = #{user_id}	
+			</if>	
+			<choose>
+				<when test="is_type == 'DOC_CHECK'">		
+					<if test="root_id != null and root_id != ''"> 
+						AND ROOT_ID = #{root_id}	
+					</if>	
+				</when>
+			</choose>											 	
+		</where>
+	</select>
+	<!-- 임시작업함 문서 추가 -->
+	<insert id="tempDocInsert" parameterType="HashMap">
+		INSERT INTO XR_TEMP_DOC 
+		( 
+			USER_ID, ROOT_ID, WORK_DATE
+		) 
+		VALUES 
+		(
+			#{user_id}, #{root_id}, SYSDATE
+		)			
+	</insert>	
+	
+	<!-- 임시작업합 문서 삭제 -->
+	<delete id="tempDocDelete" parameterType="HashMap">
+		DELETE FROM XR_TEMP_DOC
+		<where>
+			<if test="root_id != null and root_id != ''">
+				AND ROOT_ID = #{root_id}
+			</if>		
+			<if test="user_id != null and user_id != ''">
+				AND USER_ID = #{user_id}
+			</if>
+		</where>      
+	</delete>
+	
+	<!-- 나의문서 > 휴지통 (where 조건) IS_EXPIRED='F' 조건 삭제처리(만기문서에서 삭제된 경우)-->
+	<sql id="whereTrashcan">
+		AND D.DOC_STATUS = 'D'	    
+	    <if test="user_id != null and user_id != ''">
+	    	AND D.DELETER_ID = #{user_id}
+	    </if>		
+	</sql>
+	
+	<!-- 나의문서 > 내 수정 중 문서 (where 조건) -->
+	<sql id="whereCheckout">
+		AND D.DOC_STATUS IN ('C','U')
+	    AND D.IS_EXPIRED = 'F'
+	    AND D.IS_LOCKED = 'T'
+	    <if test="user_id != null and user_id != ''">
+	    	AND D.LOCK_OWNER = #{user_id}
+	    </if>
+	</sql>
+	
+	<!-- 나의문서 > 내 만기 문서 (where 조건) -->
+	<sql id="whereExpired">
+		AND D.DOC_STATUS IN ('C','U')
+	    AND D.IS_EXPIRED = 'T'
+	    <if test="user_id != null and user_id != ''">
+	    	AND D.CREATOR_ID = #{user_id}
+	    </if>
+	</sql>
+	
+	<!-- 나의문서 > 내 소유 문서 (where 조건) -->
+	<sql id="whereOwner">
+		AND D.DOC_STATUS='C'
+		AND D.IS_EXPIRED = 'F'
+		<if test="user_id != null and user_id != ''">
+	    	AND D.OWNER_ID = #{user_id}
+	    </if>
+	</sql>
+	
+	<!-- 나의 문서 > 내 만기 문서 EXPIRED_DATE 사용-->
+	<sql id="whereListExpired">
+		<if test="strIndex != null and strIndex != ''">
+			<choose>
+				<when test="strIndex == 'doc_name'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.DOC_NAME LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+				<when test="strIndex == 'doc_description'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.DOC_DESCRIPTION LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+				<when test="strIndex == 'creator_name'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.CREATOR_NAME LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+			</choose>
+		</if>
+		<if test="sdate != null and sdate != ''">
+			<![CDATA[ AND D.EXPIRED_DATE >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]>
+		</if>		
+		<if test="edate != null and edate != ''">
+			<![CDATA[ AND D.EXPIRED_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999  ]]>
+		</if>
+	</sql>
+	
+	<!-- 나의 문서 > 내 휴지통 문서 MAP_ID 사용-->
+	<sql id="whereListTrash">	
+		<if test="map_id != null"> 
+				AND F.MAP_ID IN 
+				<foreach item="item" index="index" collection="map_id" separator="," open=" ( " close=")" >
+					#{item}
+				</foreach>		
+			 </if>	 
+		<if test="strIndex != null and strIndex != ''">
+			<choose>
+				<when test="strIndex == 'doc_name'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.DOC_NAME LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+				<when test="strIndex == 'doc_description'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.DOC_DESCRIPTION LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+				<when test="strIndex == 'creator_name'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.CREATOR_NAME LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+			</choose>
+		</if>
+		<if test="sdate != null and sdate != ''">
+			<![CDATA[ AND D.DELETE_DATE >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]>
+		</if>		
+		<if test="edate != null and edate != ''">
+			<![CDATA[ AND D.DELETE_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999  ]]>
+		</if>
+	</sql>
+	
+	
+	<sql id="whereListOwner">
+		<if test="map_id != null"> 
+			AND F.MAP_ID IN 
+			<foreach item="item" index="index" collection="map_id" separator="," open=" ( " close=")" >
+				#{item}
+			</foreach>		
+		</if>
+		<if test="strIndex != null and strIndex != ''">
+			<choose>
+				<when test="strIndex == 'doc_name'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.DOC_NAME LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+				<when test="strIndex == 'doc_description'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.DOC_DESCRIPTION LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+				<when test="strIndex == 'creator_name'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.CREATOR_NAME LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+				<when test="strIndex == 'author_list'">
+					<if test="strKeyword1 != null and strKeyword1 != ''">
+						AND D.AUTHOR_LIST LIKE '%${strKeyword1}%'
+					</if>
+				</when>
+			</choose>
+		</if>
+		<if test="sdate != null and sdate != ''">
+			<![CDATA[ AND D.CREATE_DATE >= TO_DATE(#{sdate},'YYYY-MM-DD')  ]]>
+		</if>		
+		<if test="edate != null and edate != ''">
+			<![CDATA[ AND D.CREATE_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999  ]]>
+		</if>
+		<if test="keyword != null and keyword != ''">
+			AND D.KEYWORD LIKE '%${keyword}%'
+		</if>
+	</sql>
+	
+	<!-- XR_REF_DOC :: 관련문서가 이미 추가되어있는지 확인 -->
+	<select id="isUsingRefDocId" parameterType="HashMap" resultType="Int">
+		SELECT COUNT(ROOT_DOC_ID) AS CNT
+		FROM XR_REF_DOC
+		<where>
+			<if test="root_doc_id != null and root_doc_id !=''">
+				AND ROOT_DOC_ID = #{root_doc_id}
+			</if>		
+			<if test="select_action == 'INSERT'">
+				<if test="root_ref_id != null and root_ref_id !=''">
+					AND ROOT_REF_ID = #{root_ref_id}
+				</if>
+			</if>
+			
+		</where>
+	</select>
+	
+	<!-- 사용자가 만든 문서 카운트 -->
+	<select id="documentCountByCreatorId" parameterType="String" resultType="Int">
+		SELECT COUNT(*)
+		FROM XR_DOCUMENT
+		WHERE
+			CREATOR_ID = #{creator_id}
+	</select>
+	
+	<!-- 사용자가 소유한  문서 카운트 -->
+	<select id="documentCountByOwnerId" parameterType="String" resultType="Int">
+		SELECT COUNT(*)
+		FROM XR_DOCUMENT
+		WHERE
+			OWNER_ID = #{owner_id} AND DOC_STATUS='C'
+	</select>
+	
+		
+	<!-- 문서댓글  목록 수 :: XR_COMMENT -->
+	<select id="docCommentPagingCount" parameterType="String" resultType="Int">
+		SELECT 
+			COUNT(COM_ID)
+		FROM XR_COMMENT	
+		WHERE DOC_ROOT_ID = #{root_id, jdbcType=VARCHAR} AND STATUS='C'
+	</select>
+			
+	<!-- 문서댓글  목록 수 :: XR_COMMENT -->
+	<select id="docCommentList" parameterType="HashMap" resultType="Comment">
+		SELECT COM_ID,DOC_ROOT_ID,COM_STEP,COM_ORDER,CREATOR_ID,CREATOR_NAME,PARENT_CREATOR_NAME,CREATE_DATE,CONTENT,STATUS
+		FROM XR_COMMENT	
+		WHERE DOC_ROOT_ID = #{root_id, jdbcType=VARCHAR}
+		ORDER BY COM_STEP DESC, COM_ORDER ASC
+	</select>
+	<!-- com_order 의견에 대한 답글(추가의견)의 최신값 얻기 -->
+	<select id="checkMaxOrder" parameterType="HashMap" resultType="Int">
+		SELECT MAX(COM_ORDER) COM_ORDER
+		FROM XR_COMMENT
+		WHERE DOC_ROOT_ID = #{doc_root_id} AND COM_STEP = #{com_step}
+	</select>
+	<!-- com_step 의견(원글)의 최신값 얻기 -->
+	<select id="checkMaxStep" parameterType="HashMap" resultType="Int">
+		SELECT COALESCE( MAX(COM_STEP), -1) COM_STEP
+		FROM XR_COMMENT
+		WHERE DOC_ROOT_ID = #{doc_root_id} AND COM_ORDER = 0
+	</select>
+	<!-- 삭제시 원글의 상태값 확인 -->
+	<select id="checkCommentStatus" parameterType="HashMap" resultType="Int">
+		SELECT COALESCE( COUNT(COM_ID), 0) COM_ID
+		FROM XR_COMMENT
+		WHERE DOC_ROOT_ID = #{doc_root_id} AND COM_STEP = #{com_step} AND STATUS = 'D'
+	</select>
+	<!-- 의견 삭제 -->
+	<delete id="deleteComment2" parameterType="HashMap">
+		DELETE FROM XR_COMMENT
+		WHERE COM_ID = #{com_id}
+		<!-- WHERE DOC_ROOT_ID = #{doc_root_id} AND COM_STEP = #{com_step} AND STATUS = 'D'-->
+	</delete>
+	
+	<insert id="docCommentWrite" parameterType="Comment">
+		INSERT INTO XR_COMMENT 
+		( 
+			COM_ID,DOC_ROOT_ID,COM_STEP,COM_ORDER,CREATOR_ID,CREATOR_NAME,PARENT_CREATOR_NAME,CREATE_DATE,CONTENT
+		) 
+		VALUES (
+			#{com_id},#{doc_root_id},#{com_step},#{com_order},#{creator_id},#{creator_name},#{parent_creator_name},sysdate,#{content}
+		)		 				
+	</insert>	
+	
+	<!-- 문서의견 갱신처리 -->
+	<update id="docCommentUpdate" parameterType="HashMap">
+		UPDATE XR_COMMENT
+		SET CONTENT=#{content}			
+		WHERE COM_ID = #{com_id}
+	</update>	
+	
+	<!-- 문서의견 삭제처리  -->
+	<update id="docCommentDelete" parameterType="HashMap">
+		UPDATE XR_COMMENT
+		SET STATUS = 'D' , CONTENT=#{content}	
+		WHERE COM_ID = #{com_id} AND CREATOR_ID= #{creator_id}
+	</update>	
+	<select id="docComment" parameterType="String" resultType="Comment">
+		SELECT COM_ID,DOC_ROOT_ID,COM_STEP,COM_ORDER,CREATOR_ID,CREATOR_NAME,PARENT_CREATOR_NAME,CREATE_DATE,CONTENT,STATUS
+		FROM XR_COMMENT	
+		WHERE DOC_ROOT_ID = #{root_id, jdbcType=VARCHAR} AND STATUS='C'
+	</select>
+	
+	<!-- 조회수 update -->
+	<update id="docReadCountUpdate" parameterType="HashMap">
+		UPDATE XR_DOCUMENT
+		SET	READ_CNT =  #{readcnt} 
+		WHERE
+			DOC_ID = #{doc_id, jdbcType=VARCHAR} 
+	</update>
+</mapper>

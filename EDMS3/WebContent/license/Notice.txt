@@ -1,0 +1,38 @@
+본 제품에 사용된 오픈소스 라이브러리는 각각 다음 라이센스를 따릅니다.
+
+The Apache Software License, Version 2.0
+- spring-*.jar,commons-*.jar,tiles-*.jar,poi-*.jar,mybatis-*.jar
+- jackson-*.jar
+- urlrewritefilter-4.0.4.jar,xmlbeans-2.3.0.jar
+- standard-1.1.2.jar
+- ehcache-2.2.0-*.jar
+- json-lib-2.2.1-jdk15.jar, json-lib-ext-spring-1.0.2.jar
+- jsp-api-2.2.jar,jstl-api-1.2.1.jar
+
+Eclipse Public License - v 1.0
+- aspectjrt-1.7.2.jar,aspectjweaver-1.7.1.jar
+
+MIT
+- slf4j-api-1.7.5.jar,slf4j-log4j12-1.7.5.jar
+
+Common Development and Distribution License (CDDL) v1.0
+- mail.jar
+
+GNU Lesser General Public License
+- jxl.jar
+
+CDDL + GPLv2 with classpath exception 
+- jfreechart-1.0.13.jar,jcommon-1.0.16.jar
+
+GPLv3 with Classpath Exception.
+- jackson-2.1.0-all.jar,servlet-api-2.5.jar
+
+BSD License
+- antlr-2.7.7.jar,
+
+Common Public License Version 1.0
+- junit-4.10.jar
+
+본 제품에 사용된 일부 라이브러리는 오류정정 및 제품의 특성을 반영하기 위해 일부 수정되었으며
+
+해당 부분의 수정된 소스코드는 ㈜ 엑스소프트를 통하여 획득하실 수 있습니다.

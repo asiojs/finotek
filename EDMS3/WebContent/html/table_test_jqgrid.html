@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <title>index</title>
+  <script src="/js/jquery-2.1.3.min.js"></script>
+  <script src="/lib/jstree/jstree.js"></script>
+  <script src="/js/tree.js"></script>
+  <script src="/js/jquery-ui.js"></script>
+  <script src="/lib/jqgrid/js/jquery.jqGrid.min.js"></script>
+  <script src="/js/jquery.ddslick.custom.js"></script>
+  <script src="/js/jquery.cookie.js"></script>
+  <script src="/js/jquery.alerts.js"></script>
+  <script src="/js/ecm.js"></script>
+
+  <link rel="stylesheet" href="/css/ecm.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/jqtree-custom.css">
+  <link rel="stylesheet" href="/css/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery.alerts.css">
+  <link rel="stylesheet" href="/css/jquery.ddslick.custom.css">
+  <link rel="stylesheet" href="/lib/jqgrid/css/ui.jqgrid.css">
+  <link rel="stylesheet" href="/lib/jstree/themes/default/style.css">
+  
+  
+   <script src="/lib/scrollbar/jquery.tinyscrollbar.js"></script>
+   <script type="text/javascript">
+       $(function(){
+           $('.scrollbar1').tinyscrollbar();
+       });
+   </script>
+</head>
+
+<body>
+  <div class="wrap">
+	<div class="top_menu">
+		<div class="top_menu_custom">
+			<ul class="custom_menu_list">
+            	<li class="full_screen">
+                	<a href="#" class="full_screen"><img src="/img/icon/fullscreen.png" alt="" title=""></a>
+                </li>
+                <li class="quick_menu"><a href="#" class="quick_menu">
+                	<img src="/img/icon/quickMenu.png" alt="" title="">퀵메뉴
+                    <span class="quick_menu"></span>
+                   </a>
+                   <div class="quick_sub_wrapper">
+                   <ul class="quick_sub_menu">
+                   		<li><a href="#">내 소유 문서</a></li>
+                        <li><a href="#">내 수정 중인 문서</a></li>
+                        <li><a href="#">내 만기 문서</a></li>
+                        <li><a href="#">휴지통</a></li>
+                        <li><a href="#">즐겨찾기</a></li>
+                        <li><a href="#">공유받은 문서</a></li>
+                        <li><a href="#">공유받은 폴더</a></li>
+                   </ul>
+                   </div>
+                </li>
+            </ul>
+		</div>
+        <div class="top_menu_shape"></div>
+		<div class="top_menu_search"><span class="lbl_integrated_search">통합검색</span>
+			<div class="search_input_form">
+				<form class="" name="" method="post">
+					<input type="text" class="search_text" placeholder="검색어를 입력하세요">
+					<button type="submit" class="search_submit"></button>
+				</form>
+			</div>
+			<div class="search_detail">
+				<a href="#" class="dropDown_img"><img src="/img/icon/search_detail_btn.png" alt=""></a>
+				<div class="integrated_dropDown_menu hide">
+					<form>
+						<table class="srch_integrated_tbl">
+							<tr>
+							<th>기본검색</th>
+							<td>
+								<input type="text" class="srch_integrated_txt" placeholder="검색어를 입력하세요">
+								<label><input type="checkbox" id="" name="" class="" value="">결과내 재 검색</label>
+							</td>
+							</tr>
+							<tr>
+							<th>등록기간</th>
+							<td>
+								<a href="#" id="0" class="srch_integrated_regDate">전체</a>
+								<a href="#" id="1" class="srch_integrated_regDate">1개월</a>
+								<a href="#" id="2" class="srch_integrated_regDate">3개월</a>
+								<a href="#" id="3" class="srch_integrated_regDate">6개월</a>
+								<a href="#" id="4" class="srch_integrated_regDate">1년</a>			
+								<input type="text" id="datepicker3" name="" class="srch_integrated_startDate input-text calend" name="start_date" readonly="readonly">
+								<span class="dateto">-</span>
+								<input type="text" id="datepicker4" name="" class="srch_integrated_endDate input-text calend" name="end_date" readonly="readonly">
+							</td>
+							</tr>
+							<tr>
+							<th></th>
+							<td>
+								<label><input type="radio" name="" class="" value="">전체</label>
+								<label><input type="radio" name="" class="" value="">제목</label>
+								<label><input type="radio" name="" class="" value="">본문</label>
+								<label><input type="radio" name="" class="" value="">등록자</label>
+								<label><input type="radio" name="" class="" value="">첨부파일명</label>
+								<label><input type="radio" name="" class="" value="">첨부내용</label>
+							</td>
+							</tr>
+							<tr>
+							<th>문서유형</th>
+							<td>
+								<select id="srch_type5" name="">
+									<option value="" selected="selected">전체</option>
+									<option value="">일반문서</option>
+									<option value="">파일문서</option>
+								</select>							
+							</td>
+							</tr>
+							<tr>
+							<th>폴더위치</th>
+							<td>
+								<input type="text" id="" name="" class="srch_integrated_folder">
+								<button type="button" id="" name="" class="srch_integrated_folderChoose">선택</button>
+								<label><input type="checkbox" id="" name="" class="" value="">하위폴더 포함</label>
+							</td>
+							</tr>
+							<tr>
+							<td colspan="2" class="srch_integrated_btnGrp">
+								<button type="submit" id="srch_integrated_submit" class="srch_integrated_btn">검색</button>
+								<button type="reset" id="" class="srch_integrated_btn">초기화</button>
+							</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+    <header class="header">
+		<div class="logo">
+			<h1>
+				<a href="#"><img src="/img/logo.png"></a>
+			</h1>
+		</div>
+		<div class="header_menu_wrapper">
+			<div class="header_icon">
+				<ul class="header_icon_menu">
+					<li class="selected"><a href="#" class="page selected"></a>
+                    	<div class="hide">나의 문서</div>
+                    </li>
+					<li><a href="#" class="user"></a>
+                    	<div class="hide">사용자 정보</div>
+                    </li>
+					<li><a href="#" class="inbox"></a>
+                    	<div class="hide">문서함</div>
+                    </li>
+					<li><a href="#" class="usergroup"></a>
+                    	<div class="hide">사용자 그룹</div>
+                    </li>
+					<li><a href="#" class="piechart"></a>
+                    	<div class="hide">통계</div>
+                    </li>
+				</ul>
+			</div>
+			<div class="header_user">
+				<ul class="header_user_menu">
+					<li class="user_info">
+						<a href="#">
+							<img src="/img/icon/user_info.png" alt="">
+							홍길동님(일반)
+							<img src="/img/icon/head_dropdown.png" class="head_dropDown">
+						</a>
+                        <div class="info_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                            <div>
+                                <ul>
+                                    <li><a href="#">내정보</a></li>
+                                    <li><a href="#">보안 설정</a></li>
+                                </ul>
+                            </div>
+                        </div>
+					</li>
+					<li class="user_note">
+						<a href="#">
+							<img src="/img/icon/user_note.png" alt="">
+							<span class="num_cnt">99</span>
+						</a>
+                        <div class="note_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                           	<ul>
+                            	<li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                            	<li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                            </ul>
+                        </div>
+					</li>
+					<li class="user_inbox">
+						<a href="#">
+							<img src="/img/icon/user_inbox.png" alt="">
+							<span class="num_cnt">999</span>
+						</a>
+						<!-- 
+						<div class="inbox_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                           	<ul>
+                            	<li><a href="#">이동</a></li>
+                            	<li><a href="#">다운로드</a></li>
+                                <li><a href="#">연결문서 설정</a></li>
+                                <li><a href="#">메일발송</a></li>
+                                <li><a href="#">비우기</a></li>
+                            </ul>
+                        </div>
+                        -->
+					</li>
+					<li class="user_setting">
+						<a href="#">
+							<img src="/img/icon/user_setting.png" alt="">
+							<img src="/img/icon/head_dropdown.png" class="head_dropDown">
+						</a>
+						<!-- 
+						<div class="setting_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                           	<ul>
+                            	<li><a href="#">스킨 설정</a></li>
+                            	<li><a href="#">언어 설정</a></li>
+                                <li><a href="#">문서목록수 설정</a></li>
+                                <li><a href="#">환경변수 추가</a></li>
+                            </ul>
+                        </div>
+                        -->
+					</li>
+					<li class="user_logout">
+						<a href="#">
+							<img src="/img/icon/user_logout.png" alt="">
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</header>
+
+	<div class="cnt_wrapper">
+		<nav class="lnb_menu">
+			<section class="lnb_menu_info">
+				<div class="lnb_menu_reg">
+					<ul>
+						<li class="reg_doc"><a href="#">문서등록</a></li>
+						<li class="reg_work"><a href="#">업무등록</a></li>
+					</ul>
+				</div>
+				<div class="lnb_menu_summary">
+					<table class="summary_table">
+					<caption>문서등록 요약</caption>
+					<colgroup>
+						<col width="144"/>
+						<col width="25"/>
+					</colgroup>
+					<tr>
+					<td class="summary_info">새 쪽지</td>
+					<td class="summary_cnts"><span>5</span></td>
+					</tr>
+					<tr>
+					<td class="summary_info">승인요청문서</td>
+					<td class="summary_cnts"><span>12</span></td>
+					</tr>
+					<tr>
+					<td class="summary_info">신규문서</td>
+					<td class="summary_cnts"><span>123</span></td>
+					</tr>
+					<tr>
+					<td class="summary_info">협업진행</td>
+					<td class="summary_cnts"><span>1</span></td>
+					</tr>
+					</table>
+				</div>
+			</section>
+			<section class="lnb_tree">
+				<div class="tree_menu">
+					<ul class="tree_menu_list">
+						<li><a href="#">부서</a></li>
+						<li><a href="#">전사</a></li>
+						<li><a href="#" class="focus">프로젝트</a></li>
+					</ul>
+					<div class="tree_menu_more">
+                        <ul class="menu_more_list">
+                        	<li><a href="#"><img src="/img/icon/tree_more.png" alt="" title=""></a></li>
+                            <li><a href="#"><img src="/img/icon/tree_refresh.png" alt="" title=""></a></li>
+                        </ul>
+                    </div>
+				</div>
+				<div class="lnb_tree_list">
+				
+				</div>
+			</section>
+	    </nav>
+
+		<div class="contents">
+			<div class="cnts_srch_wrapper">
+				<div class="toggle_tree_menu"></div>
+				<div class="cnts_srch_detail">	
+					<div class="cnts_srch">
+						<form class="cnts_srch_form" method="post">
+						<select id="srch_type1">
+							<option value="0" selected="selected">전체</option>
+							<option value="1">제목</option>
+							<option value="2">등록자</option>
+						</select>
+						<input type="text" class="srch_keyword" name="srch_keyword" placeholder="검색어를 입력하세요">
+						<button type="submit" class="srch_btn"></button>
+						</form>
+					</div>
+					<div class="srch_detail_dropDown"> 
+						<a class="dropDown_txt">
+							<label>상세</label>
+							<span class="dropDown_arrow down"></span>
+						</a>
+						<div class="detail_dropDown_menu hide">
+							<form>
+								<table class="srch_detail_tbl">
+									<tr>
+										<th>기본검색</th>
+										<td>
+											<select id="srch_type2">
+												<option value="0" selected="selected">전체</option>
+												<option value="1">제목</option>
+												<option value="2">등록자</option>
+												<option value="3">첨부파일명</option>
+											</select>
+											<input type="text" class="srch_detail_txt" placeholder="검색어를 입력하세요">
+										</td>
+									</tr>
+									<tr>
+										<th>&nbsp;</th>
+										<td>
+											<label class="srch_detail_lbl">
+												<input type="checkbox" class="srch_detail_checkbox">
+												<span>하위폴더 포함</span>
+											</label>
+										</td>
+									</tr>
+									<tr>
+										<th>등록기간</th>
+										<td>
+											<a href="#" class="srch_detail_regDate">전체</a> 
+											<a href="#" class="srch_detail_regDate">1개월</a> 
+											<a href="#" class="srch_detail_regDate">3개월</a> 
+											<a href="#" class="srch_detail_regDate">6개월</a> 
+											<a href="#" class="srch_detail_regDate">1년</a>
+											<input type="text" id="datepicker1" name="" class="srch_detail_startDate input-text calend" name="start_date" readonly="readonly">
+											<span class="dateto">-</span>
+											<input type="text" id="datepicker2" name="" class="srch_detail_endDate input-text calend" name="end_date" readonly="readonly">
+										</td>
+									</tr>
+									<tr>
+										<th>첨부파일명</th>
+										<td><input type="text" id="" name="" class="srch_detail_keyword"></td>
+									</tr>
+									<tr>
+										<th>키워드</th>
+										<td><input type="text" class="srch_detail_keyword"></td>
+									</tr>
+									<tr>
+										<th>문서유형</th>
+										<td>
+											<select id="srch_type3">
+												<option selected="selected">전체</option>
+												<option>내용</option>
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="2" class="srch_detail_btnGrp">
+											<button type="submit" id="srch_detail_submit" class="srch_detail_btn">검색</button>
+											<button type="reset" id="" class="srch_detail_btn">초기화</button>
+										</td>
+									</tr>
+								</table>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="depth_navi">
+                	<span>
+                		<strong>20. 안전관리규정</strong>
+                    	<span class="depth_navi_path hide">
+                            <a href="#">부서</a> &gt; 
+                            <a href="#">경영지원팀</a> &gt; 
+                            <a href="#">20. 안전관리규정</a>
+                        </span>
+                    </span>
+                </div>
+			</div>
+			<div class="cnts_tbl_menu">
+				<div class="tbl_menu_left">
+					<button type="button" class="tbl_reg">등록</button>
+					<button type="button" class="tbl_del">삭제</button>
+					<div class="tbl_extFunction">
+						<a class="dropDown_txt">
+                        	<label>추가기능</label>
+                        	<span class="dropDown_arrow down"></span>
+                        </a>
+                        <div class="extFunction_dropDown_wrapper hide">
+                        	<ul class="extFunction_dropDown_menu">
+                            	<li><a href="#" class="move">이동</a></li>
+                                <li><a href="#" class="copy">복사</a></li>
+                                <li><a href="#" class="favorite">즐겨찾기 추가</a></li>
+                                <li><a href="#" class="tempbox">작업카트 추가</a></li>
+                            </ul>
+                        </div>
+					</div>
+				</div>
+				<div class="tbl_menu_right">
+					<ul class="tbl_thumbMenu">
+						<li class="excel_download"><a href="#" class="menu"></a></li>
+						<li class="layout_view"><a href="#" class="menu"></a>
+                        	<div class="layout_view_dropDown hide">
+                            	<ul>
+                                	<li id="list_only"><a href="#">메일 목록만 보기</a></li>
+                                	<li id="horizontal_divide"><a href="#">좌우 분할로 보기</a></li>
+                                	<li id="vertical_divide"><a href="#">상하 분할로 보기</a></li>
+                                </ul>
+                            </div>
+                        </li>
+						<li class="menu_refresh"><a href="#" class="menu"></a></li>
+					</ul>
+					<select id="tbl_rowCount" name="">
+						<option value="10">10개</option>
+                        <option value="15">15개</option>
+                        <option value="20">20개</option>
+                        <option value="25">25개</option>
+					</select>
+				</div>
+			</div>	
+			<div class="cnts_tbl_wrapper" id="targetLoginGridcontainer">
+				<div class="ui-jqgrid ui-widget ui-widget-content ui-corner-all" id="gbox_loginLogGridList" dir="ltr" style="width: 1199px;border: 0;"><div class="ui-widget-overlay jqgrid-overlay" id="lui_loginLogGridList" style="height: 917px; width: 1419px;"></div><div class="loading ui-state-default ui-state-active" id="load_loginLogGridList" style="top: 293px; left: 609px; display: none;">조회중...</div><div class="ui-jqgrid-view" role="grid" id="gview_loginLogGridList" style="width: 1199px;border: 0;"><div class="ui-jqgrid-titlebar ui-jqgrid-caption ui-widget-header ui-corner-top ui-helper-clearfix" style="display: none;"><a role="link" class="ui-jqgrid-titlebar-close ui-corner-all HeaderButton" title="Toggle Expand Collapse Grid" style="right: 0px;"><span class="ui-icon ui-icon-circle-triangle-n"></span></a><span class="ui-jqgrid-title">로그인 이력</span></div><div class="ui-state-default ui-jqgrid-hdiv" style="width: 1199px;/* border: 1px solid transparent; */border: 0;"><div class="ui-jqgrid-hbox"><table class="grid_liteGray" style="width: 1199px;" role="presentation" aria-labelledby="gbox_loginLogGridList" cellspacing="0" cellpadding="0" border="0"><thead><tr class="ui-jqgrid-labels ui-sortable" role="row"><th id="loginLogGridList_cb" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 20px;"><div id="jqgh_loginLogGridList_cb"><input role="checkbox" id="cb_loginLogGridList" class="cbox" type="checkbox"><span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="loginLogGridList_connect_time" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 191px; text-align: center;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_loginLogGridList_connect_time" class="ui-jqgrid-sortable" style="height: 19px;">접속일자<span class="s-ico" style=""><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="loginLogGridList_user_nm" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 191px; text-align: center;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_loginLogGridList_user_nm" class="ui-jqgrid-sortable" style="height: 19px;">사용자명<span class="s-ico" style=""><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="loginLogGridList_user_id" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 191px; text-align: center;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_loginLogGridList_user_id" class="ui-jqgrid-sortable" style="height: 19px;">사용자ID<span class="s-ico" style=""><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="loginLogGridList_group_nm" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 191px; text-align: center;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_loginLogGridList_group_nm" class="ui-jqgrid-sortable" style="height: 19px;">부서명<span class="s-ico" style=""><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="loginLogGridList_connect_ip" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 191px; text-align: center;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_loginLogGridList_connect_ip" class="ui-jqgrid-sortable" style="height: 19px;">IP주소<span class="s-ico" style=""><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th><th id="loginLogGridList_cert_nm" role="columnheader" class="ui-state-default ui-th-column ui-th-ltr" style="width: 189px; text-align: center;"><span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span><div id="jqgh_loginLogGridList_cert_nm" class="ui-jqgrid-sortable" style="height: 19px;">인증여부<span class="s-ico" style=""><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr"></span></span></div></th></tr></thead></table></div></div><div class="ui-jqgrid-bdiv" style="height: 390px; width: 1199px; overflow-y: auto; overflow-x: hidden;"><div style="position:relative;"><div></div><table id="loginLogGridList" tabindex="0" cellspacing="0" cellpadding="0" border="0" role="presentation" aria-multiselectable="true" aria-labelledby="gbox_loginLogGridList" class="ui-jqgrid-btable grid_liteGray" style="width: 1199px;"><tbody><tr class="jqgfirstrow" role="row" style="height:auto"><td role="gridcell" style="height:0px;width:20px;"></td><td role="gridcell" style="height: 0px; width: 191px;"></td><td role="gridcell" style="height: 0px; width: 191px;"></td><td role="gridcell" style="height: 0px; width: 191px;"></td><td role="gridcell" style="height: 0px; width: 191px;"></td><td role="gridcell" style="height: 0px; width: 191px;"></td><td role="gridcell" style="height: 0px; width: 189px;"></td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;width: 20px;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 14:48:39" aria-describedby="loginLogGridList_connect_time">2015-04-01 14:48:39</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 14:45:45" aria-describedby="loginLogGridList_connect_time">2015-04-01 14:45:45</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 14:32:49" aria-describedby="loginLogGridList_connect_time">2015-04-01 14:32:49</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="0:0:0:0:0:0:0:1" aria-describedby="loginLogGridList_connect_ip">0:0:0:0:0:0:0:1</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 14:32:17" aria-describedby="loginLogGridList_connect_time">2015-04-01 14:32:17</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 14:23:10" aria-describedby="loginLogGridList_connect_time">2015-04-01 14:23:10</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 14:03:23" aria-describedby="loginLogGridList_connect_time">2015-04-01 14:03:23</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="0:0:0:0:0:0:0:1" aria-describedby="loginLogGridList_connect_ip">0:0:0:0:0:0:0:1</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 14:01:47" aria-describedby="loginLogGridList_connect_time">2015-04-01 14:01:47</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 13:41:29" aria-describedby="loginLogGridList_connect_time">2015-04-01 13:41:29</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 13:38:43" aria-describedby="loginLogGridList_connect_time">2015-04-01 13:38:43</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="0:0:0:0:0:0:0:1" aria-describedby="loginLogGridList_connect_ip">0:0:0:0:0:0:0:1</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 13:37:12" aria-describedby="loginLogGridList_connect_time">2015-04-01 13:37:12</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 13:30:36" aria-describedby="loginLogGridList_connect_time">2015-04-01 13:30:36</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 13:29:25" aria-describedby="loginLogGridList_connect_time">2015-04-01 13:29:25</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 13:15:39" aria-describedby="loginLogGridList_connect_time">2015-04-01 13:15:39</td><td role="gridcell" style="text-align:center;" title="유재석" aria-describedby="loginLogGridList_user_nm">유재석</td><td role="gridcell" style="text-align:center;" title="user001" aria-describedby="loginLogGridList_user_id">user001</td><td role="gridcell" style="text-align:center;" title="경영기획팀" aria-describedby="loginLogGridList_group_nm">경영기획팀</td><td role="gridcell" style="text-align:center;" title="0:0:0:0:0:0:0:1" aria-describedby="loginLogGridList_connect_ip">0:0:0:0:0:0:0:1</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 13:10:40" aria-describedby="loginLogGridList_connect_time">2015-04-01 13:10:40</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 13:06:18" aria-describedby="loginLogGridList_connect_time">2015-04-01 13:06:18</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 12:52:45" aria-describedby="loginLogGridList_connect_time">2015-04-01 12:52:45</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 11:57:56" aria-describedby="loginLogGridList_connect_time">2015-04-01 11:57:56</td><td role="gridcell" style="text-align:center;" title="장보리" aria-describedby="loginLogGridList_user_nm">장보리</td><td role="gridcell" style="text-align:center;" title="user028" aria-describedby="loginLogGridList_user_id">user028</td><td role="gridcell" style="text-align:center;" title="프로젝트팀" aria-describedby="loginLogGridList_group_nm">프로젝트팀</td><td role="gridcell" style="text-align:center;" title="192.168.0.164" aria-describedby="loginLogGridList_connect_ip">192.168.0.164</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 11:39:07" aria-describedby="loginLogGridList_connect_time">2015-04-01 11:39:07</td><td role="gridcell" style="text-align:center;" title="유재석" aria-describedby="loginLogGridList_user_nm">유재석</td><td role="gridcell" style="text-align:center;" title="user001" aria-describedby="loginLogGridList_user_id">user001</td><td role="gridcell" style="text-align:center;" title="경영기획팀" aria-describedby="loginLogGridList_group_nm">경영기획팀</td><td role="gridcell" style="text-align:center;" title="0:0:0:0:0:0:0:1" aria-describedby="loginLogGridList_connect_ip">0:0:0:0:0:0:0:1</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 11:36:52" aria-describedby="loginLogGridList_connect_time">2015-04-01 11:36:52</td><td role="gridcell" style="text-align:center;" title="시스템관리자" aria-describedby="loginLogGridList_user_nm">시스템관리자</td><td role="gridcell" style="text-align:center;" title="edmsadmin" aria-describedby="loginLogGridList_user_id">edmsadmin</td><td role="gridcell" style="text-align:center;" title="엑스소프트" aria-describedby="loginLogGridList_group_nm">엑스소프트</td><td role="gridcell" style="text-align:center;" title="192.168.0.171" aria-describedby="loginLogGridList_connect_ip">192.168.0.171</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr><tr role="row" id="성공" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr"><td role="gridcell" style="text-align:center;" aria-describedby="loginLogGridList_cb"><input role="checkbox" type="checkbox" id="jqg_loginLogGridList_성공" class="cbox" name="jqg_loginLogGridList_성공"></td><td role="gridcell" style="text-align:center;" title="2015-04-01 11:34:35" aria-describedby="loginLogGridList_connect_time">2015-04-01 11:34:35</td><td role="gridcell" style="text-align:center;" title="시스템관리자" aria-describedby="loginLogGridList_user_nm">시스템관리자</td><td role="gridcell" style="text-align:center;" title="edmsadmin" aria-describedby="loginLogGridList_user_id">edmsadmin</td><td role="gridcell" style="text-align:center;" title="엑스소프트" aria-describedby="loginLogGridList_group_nm">엑스소프트</td><td role="gridcell" style="text-align:center;" title="192.168.0.171" aria-describedby="loginLogGridList_connect_ip">192.168.0.171</td><td role="gridcell" style="text-align:center;" title="성공" aria-describedby="loginLogGridList_cert_nm">성공</td></tr></tbody></table></div></div></div><div class="ui-jqgrid-resize-mark" id="rs_mloginLogGridList">&nbsp;</div><div class="pg_navi_wrapper ui-state-default ui-jqgrid-pager ui-corner-bottom" id="loginLogGridPager" dir="ltr" style="width: 1199px;"><div id="pg_loginLogGridPager" class="ui-pager-control" role="group"><table cellspacing="0" cellpadding="0" border="0" class="ui-pg-table" style="width:100%;table-layout:fixed;height:100%;" role="row"><tbody><tr><td id="loginLogGridPager_left" align="left"><table cellspacing="0" cellpadding="0" border="0" class="ui-pg-table navtable" style="float:left;table-layout:auto;"><tbody><tr></tr></tbody></table></td><td id="loginLogGridPager_center" align="center" style="white-space: pre; width: 264px;"><table cellspacing="0" cellpadding="0" border="0" style="table-layout:auto;" class="ui-pg-table"><tbody><tr><td id="first_loginLogGridPager" class="ui-pg-button ui-corner-all ui-state-disabled" title="First Page"><span class="ui-icon ui-icon-seek-first"></span></td><td id="prev_loginLogGridPager" class="ui-pg-button ui-corner-all ui-state-disabled" title="Previous Page"><span class="ui-icon ui-icon-seek-prev"></span></td><td class="ui-pg-button ui-state-disabled" style="width:4px;"><span class="ui-separator"></span></td><td dir="ltr">페이지 <input class="ui-pg-input" type="text" size="2" maxlength="7" value="0" role="textbox" style="height: 19px; margin-bottom: 0px; margin-left: 0px; width: 35px;"> / <span id="sp_1_loginLogGridPager">45</span></td><td class="ui-pg-button ui-state-disabled" style="width:4px;"><span class="ui-separator"></span></td><td id="next_loginLogGridPager" class="ui-pg-button ui-corner-all" title="Next Page"><span class="ui-icon ui-icon-seek-next"></span></td><td id="last_loginLogGridPager" class="ui-pg-button ui-corner-all" title="Last Page"><span class="ui-icon ui-icon-seek-end"></span></td><td dir="ltr"><select class="ui-pg-selbox" role="listbox" title="Records per Page"><option role="option" value="5">5</option><option role="option" value="10">10</option><option role="option" value="15">15</option><option role="option" value="20" selected="selected">20</option><option role="option" value="30">30</option><option role="option" value="50">50</option></select></td></tr></tbody></table></td><td id="loginLogGridPager_right" align="right"><div dir="ltr" style="text-align:right" class="ui-paging-info"></div></td></tr></tbody></table></div></div></div>		
+			</div>
+			
+			
+			<div class="pg_navi_wrapper">
+            	<ul class="pg_navi">
+                	<li class="first"><a href="#"><img src="/img/icon/pg_first.png" alt="" title=""></a></li>
+                    <li class="prev"><a href="#"><img src="/img/icon/pg_prev.png" alt="" title=""></a></li>
+                	<li class="curr"><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                    <li><a href="#">6</a></li>
+                    <li><a href="#">7</a></li>
+                    <li><a href="#">8</a></li>
+                    <li><a href="#">9</a></li>
+                    <li><a href="#">10</a></li>
+                    <li class="next"><a href="#"><img src="/img/icon/pg_next.png" alt="" title=""></a></li>
+					<li class="last"><a href="#"><img src="/img/icon/pg_last.png" alt="" title=""></a></li>
+                </ul>    
+            </div>
+        </div>
+	</div>
+   
+	<footer class="footer">
+		<ul class="footer_menu">
+			<li class="ft_lyr_tooltip"><a href="#">도움말</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>도움말에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_help" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">프로그램설치</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>프로그램 설치에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_prog" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">시스템관리</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>시스템 관리에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_system" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">퀵메뉴추가</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>퀵메뉴 추가에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_quickmn" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+		</ul>
+		<p class="copyright">
+			Copyright eXsoft All Rights Reserved.
+		</p>
+    </footer>
+    
+    <!-- 테이블 첨부파일 시작 -->
+    <div class="attach_window hide">
+        <div class="attach_title">
+            첨부파일
+            <a href="#" class="close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+        </div>
+        <div class="attach_cnts">	
+            <div class="attach_summary">
+                <span class="file_cnt">파일 : 2</span>
+                <a href="#" class="attach_save_all">모두저장</a>
+            </div>
+            <ul class="attach_file_list">
+                <li>
+                    <span class="attach_name">
+                        <a href="#">워드문서.docx</a>
+                    </span>                                    
+                    <span class="attach_detail">
+                        111.111k
+                        <a href="#"><img src="/img/icon/attach_download.png"></a>
+                    </span>                                    
+                </li>
+                <li>
+                    <span class="attach_name">
+                        <a href="#">워드문서.docx</a>
+                    </span>                                    
+                    <span class="attach_detail">
+                        111.111k
+                        <a href="#"><img src="/img/icon/attach_download.png"></a>
+                    </span>                                    
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- 테이블 첨부파일 끝 -->
+    
+    <!-- 테이블 관련문서 시작 -->
+    <div class="relative_docs_window hide">
+        <div class="relative_docs_title">
+            관련문서
+            <a href="#" class="close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+        </div>
+        <div class="relative_docs_cnts">	
+            <table>
+                <colgroup>
+                    <col width="32">
+                    <col width="210">
+                    <col width="52">
+                    <col width="86">
+                </colgroup>
+                <thead>
+                    <tr>
+                    <th>No.</th>
+                    <th>제목</th>
+                    <th>등록자</th>
+                    <th>등록일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>1</td>
+                    <td>프로세스흐름도_퇴직금_v1.013068</td>
+                    <td>김주혁</td>
+                    <td>2014-12-23</td>
+                    </tr>
+                    <tr>
+                    <td>1</td>
+                    <td>프로세스흐름도_퇴직금_v1.013068</td>
+                    <td>김주혁</td>
+                    <td>2014-12-23</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- 테이블 관련문서 끝 -->
+    
+    <!-- 반출정보 시작 -->
+    <div class="doc_lock_info hide">
+    	<p>반출자 : <span class="lock_usr">홍길동</span></p>
+        <p>반출일시 : <span class="lock_date">2014.08.28</span></p>
+    </div>
+    <!-- 반출정보 끝 -->
+    
+    <!-- 권한조회 시작 -->
+    <div class="previlege_inquiry hide">
+    	<p>소유자 : <span class="previlege_owner">홍길동</span></p>
+        <p>기본권한 : <span class="previlege_default">조회</span></p>
+        <p>반출취소 : <span class="lock_cancel">없음</span></p>
+        <p>권한변경 : <span class="previlege_modify">없음</span></p>
+    </div>
+    <!-- 권한조회 끝 -->
+    
+    <!-- 공통 우클릭 컨텍스트 메뉴 시작 -->
+    <div class="tbl_context_menu hide">
+    	<ul>
+        	<li><a href="#" class="modify"><span class="left"></span><span class="right">수정</span></a></li>
+            <li><a href="#" class="delete"><span class="left"></span><span class="right">삭제</span></a></li>
+            <li><a href="#" class="move"><span class="left"></span><span class="right">이동</span></a></li>
+            <li><a href="#" class="copy"><span class="left"></span><span class="right">복사</span></a></li>
+            <li><a href="#" class="favorite"><span class="left"></span><span class="right">즐겨찾기 추가</span></a></li>
+            <li><a href="#" class="tempbox"><span class="left"></span><span class="right">작업카트 추가</span></a></li>
+        </ul>
+    </div>
+    <!-- 공통 우클릭 컨텍스트 메뉴 끝 -->
+    
+    <!-- 폴더 선택 -->
+    <div class="doc_folder_choose2 hide">
+    	<input type="hidden" class="context_choose">
+   		<div class="doc_folder_title">
+        	폴더 선택
+        	<a href="#" class="doc_folder_close"><img src="/img/icon/window_close1.png" alt="" title=""></a>
+    	</div>
+     	<div class="doc_folder_cnts">
+     		<div class="doc_folder_box">
+	     		<span class="box_lbl">문서함</span>
+	     		<select id="doc_folder_list">
+	     			<option value="">부서</option>
+	     			<option value="">경영지원팀</option>
+	     		</select>
+	     	</div>
+	     	<div class="doc_folder_tree2">
+	     	
+	     	</div>
+	     	<div class="doc_folder_btnGrp2">
+	     		<button type="button" class="confirm">확인</button>
+	     		<button type="button" class="cancel">취소</button>
+	    	</div>
+		</div>
+   	</div>
+   	<!-- 폴더 선택 끝 -->
+   
+    <!-- 즐겨찾기 선택 -->
+    <div class="doc_favorite_choose hide">
+   		<div class="doc_favorite_title">
+        	즐겨찾기 선택
+        	<a href="#" class="doc_favorite_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+    	</div>
+     	<div class="doc_favorite_cnts">
+	     	<div class="doc_favorite_tree">
+	     	
+	     	</div>
+	     	<div class="doc_favorite_btnGrp">
+	     		<button type="button" class="confirm">확인</button>
+	     		<button type="button" class="cancel">취소</button>
+	    	</div>
+		</div>
+   	</div>
+   	<!-- 즐겨찾기 끝 -->
+   	
+   	<!-- 트리 컨텍스트 시작 -->
+   	<div class="doc_tree_context hide">
+   		<ul>
+        	<li><a href="#" class="register"><span class="left"></span><span class="right">폴더 등록</span></a></li>
+            <li><a href="#" class="modify"><span class="left"></span><span class="right">폴더 수정</span></a></li>
+            <li><a href="#" class="move"><span class="left"></span><span class="right">폴더 이동</span></a></li>
+            <li><a href="#" class="delete"><span class="left"></span><span class="right">폴더 삭제</span></a></li>
+            <li><a href="#" class="favorite"><span class="left"></span><span class="right">즐겨찾기 추가</span></a></li>
+        </ul>
+   	</div>
+   	<!-- 트리 컨텍스트 끝 -->
+   	
+   	<!-- 퀵메뉴 추가 시작 -->
+   	<div class="quickMenu_wrapper hide"></div>
+   	<div class="quickMenu hide">
+   		<div class="quickMenu_title">
+   			퀵메뉴 추가
+            <a href="#" class="quickMenu_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+        </div>
+        <div class="quickMenu_cnts">
+        	<p class="right">퀵메뉴는 최대 5개까지 선택가능합니다.</p>
+        	<div class="quickMenu_sub_wrapper">
+        		<label><input type="checkbox" class="" name="" class="" value=""><span>내 소유 문서</span></label>
+        		<label><input type="checkbox" class="" name="" class="" value=""><span>내 수정 문서</span></label>
+        		<label><input type="checkbox" class="" name="" class="" value=""><span>내 만기 문서</span></label>
+        		<label><input type="checkbox" class="" name="" class="" value=""><span>휴지통</span></label>
+        		<label><input type="checkbox" class="" name="" class="" value=""><span>즐겨찾기</span></label>
+        		<label><input type="checkbox" class="" name="" class="" value=""><span>공유받은 문서</span></label>
+        		<label><input type="checkbox" class="" name="" class="" value=""><span>공유받은 폴더</span></label>
+        		<label><input type="checkbox" class="" name="" class="" value=""><span>최신 문서</span></label>
+        	</div>
+	        <div class="quickMenu_btnGrp">
+	        	<button type="button" class="quickMenu_reset" class="">초기화</button>
+	        	<button type="button" class="quickMenu_save" class="">저장</button>
+	        	<button type="button" class="quickMenu_cancel" class="">취소</button>
+	        </div>
+        </div>
+    </div>
+   	<!-- 퀵메뉴 추가 끝 -->
+  </div>
+</body>
+</html>

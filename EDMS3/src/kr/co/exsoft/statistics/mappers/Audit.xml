@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.statistics.dao.AuditDao">
+
+	<sql id="AuditCommonSql">
+		<if test="part == 'GROUP' or part == 'TEAM' ">
+			INNER JOIN XR_GROUPED G ON T.USER_ID = G.USER_ID AND IS_DEFAULT='T'
+		</if>		
+		<where>
+			<if test="sdate != null and sdate != ''">
+				<![CDATA[ AND T.AUDIT_DATE >= #{sdate} ]]>
+			</if>		
+			<if test="edate != null and edate != ''">
+				<![CDATA[ AND T.AUDIT_DATE <= #{edate} ]]>
+			</if>		
+			<choose>
+			<when test="part == 'GROUP' or part == 'TEAM' ">
+				<if test="authGroupList != null"> 
+					AND G.GROUP_ID IN 
+					<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+						#{item}
+					</foreach>		
+				 </if>								
+			</when>		
+			</choose>	
+		</where>
+	</sql>
+	
+	<!-- 대량문서열람 목록 카운트 -->
+	<select id="auditPagingCount" parameterType="HashMap" resultType="Int">
+		SELECT 					
+			COUNT(T.AUDIT_DATE) AS CNT 				   
+		FROM XR_AUDIT_TRAIL T
+			INNER JOIN XR_USER U ON T.USER_ID = U.USER_ID
+		<include refid="AuditCommonSql" />
+	</select>
+	
+	<!-- 대량문서열람 목록 가져오기 -->
+	<select id="auditPagingList" parameterType="HashMap" resultType="AuditTrail">
+		SELECT
+			AUDIT_DATE, USER_ID, READ_COUNT,REPORT_MAIL_RECEIVER_ADDRESS,USER_NAME,
+			TO_CHAR(REPORT_MAIL_SENT_DATE, 'YYYY-MM-DD') REPORT_MAIL_SENT_DATE		
+		FROM
+		(
+			SELECT 					
+				T.AUDIT_DATE, T.USER_ID, T.READ_COUNT, T.REPORT_MAIL_SENT_DATE, T.REPORT_MAIL_RECEIVER_ADDRESS,
+				U.USER_NAME_KO AS USER_NAME,
+				CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM    
+			FROM XR_AUDIT_TRAIL T 
+				INNER JOIN XR_USER U ON T.USER_ID = U.USER_ID
+			<include refid="AuditCommonSql" />
+		)LIST
+		WHERE LIST.PAGENUM = #{nPage}		
+	</select>
+	
+	<!-- 대량문서열람 상세 목록 카운트 -->
+	<select id="auditDetailCount" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(P.PAGE_NAME) AS CNT
+		FROM XR_PAGE_HT H 
+			INNER JOIN XR_PAGE P ON H.TARGET_ID = P.PAGE_ID	
+		<where>
+			<if test="user_id != null and user_id != ''">
+				AND H.ACTOR_ID = #{user_id}
+			</if>
+			<if test="audit_date != null and audit_date != ''">
+				<![CDATA[  AND H.ACTION_DATE >= TO_DATE(#{audit_date},'YYYY-MM-DD') AND H.ACTION_DATE < TO_DATE(#{audit_date},'YYYY-MM-DD')+0.99999  ]]>
+			</if>		
+		</where>	
+	</select>
+	
+	<!-- 대량문서열람 상세 목록 가져오기 -->
+	<select id="auditDetailList" parameterType="HashMap" resultType="CaseMap">
+		SELECT
+			PAGE_NAME,PAGE_SIZE,TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') CREATE_DATE,DOC_ID,TO_CHAR(ACTION_DATE, 'YYYY-MM-DD') AS ACTION_DATE
+		FROM
+		(
+			SELECT 
+				P.PAGE_NAME,P.PAGE_SIZE,P.CREATE_DATE,P.DOC_ID,H.ACTION_DATE,
+				CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM    
+			FROM XR_PAGE_HT H INNER JOIN XR_PAGE P ON H.TARGET_ID = P.PAGE_ID
+			<where>
+				<if test="user_id != null and user_id != ''">
+					AND H.ACTOR_ID = #{user_id}
+				</if>
+				<if test="audit_date != null and audit_date != ''">
+					<![CDATA[  AND H.ACTION_DATE >= TO_DATE(#{audit_date},'YYYY-MM-DD') AND H.ACTION_DATE < TO_DATE(#{audit_date},'YYYY-MM-DD')+0.99999  ]]> 
+				</if>
+			</where>
+		) LIST 
+		WHERE LIST.PAGENUM = #{nPage}		
+	</select>
+	
+	<!-- 감사기록 등록처리 -->
+	<insert id="writeAudit" parameterType="HashMap">
+		INSERT INTO XR_AUDIT_TRAIL
+			(
+				AUDIT_DATE, USER_ID, READ_COUNT,REPORT_MAIL_RECEIVER_ADDRESS
+			) 
+		VALUES 
+			(
+				#{audit_date}, #{user_id}, #{read_count},#{report_mail_receiver_address, jdbcType=VARCHAR}
+			)
+	</insert>	
+</mapper>

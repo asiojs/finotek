@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.quartz.dao.QuartzDao">
+	
+	<!-- 배치작업 로그 등록처리 :: XR_BATCHWORK -->
+	<insert id="batchWorkWrite" parameterType="BatchWork">
+		INSERT INTO XR_BATCHWORK	
+		(
+			WORK_IDX,WORK_NM,WORK_TYPE,WORK_STATE,MESSAGE
+		) 
+		VALUES 
+		( 
+			#{work_idx},#{work_nm},#{work_type},#{work_state},#{message}
+		)
+	</insert>
+	
+	<!-- 배치작업 로그 수행완료처리 :: XR_BATCHWORK -->
+	<update id="batchWorkUpdate" parameterType="HashMap">
+		UPDATE XR_BATCHWORK 
+		<set>
+			<if test="work_edate != null and work_edate != ''">
+				WORK_EDATE = TO_DATE(#{work_edate}, 'YYYY-MM-DD HH24:MI:SS'),
+			</if>			
+			<if test="work_state != null and work_state != ''">
+				WORK_STATE = #{work_state} ,
+			</if>			
+			<if test="message != null and message != ''">
+				MESSAGE = #{message} ,
+			</if>			
+		</set>
+		<where>
+			<if test="work_idx != null and work_idx != ''">
+					AND WORK_IDX = #{work_idx}
+			</if>			
+		</where> 		
+	</update>
+	
+	<!-- 배치작업 수행여부. -->
+	<select id="isBatchWork" resultType="Int">
+		SELECT 
+			COUNT(WORK_IDX) AS CNT
+		FROM XR_BATCHWORK		
+		<where>
+			<if test="work_type != null and work_type != ''">
+					AND WORK_TYPE = #{work_type}
+			</if>
+			<if test="work_nm != null and work_nm != ''">
+					AND WORK_NM = #{work_nm}
+			</if>
+			<if test="work_state != null and work_state != ''">
+					AND WORK_STATE = #{work_state}
+			</if>										
+			<if test="work_sdate != null and work_sdate != ''">
+					AND TO_CHAR(WORK_SDATE, 'YYYY-MM-DD') = #{work_sdate}
+			</if>			
+		</where> 		
+	</select>	
+	
+	<!-- 기준 열람수 초과자 목록 리스트 -->
+	<select id="auditExceedList" parameterType="HashMap" resultType="CaseMap">
+		SELECT 
+			RESULT.USER_ID,RESULT.USER_NAME,RESULT.READ_COUNT,
+			G2.GROUP_NAME_KO AS GROUP_NAME,G2.GROUP_ID
+		FROM
+		(            
+  			SELECT  
+      			ACTOR_ID AS USER_ID, ACTOR_NM AS USER_NAME, COUNT(ACTOR_ID) AS READ_COUNT
+  			FROM XR_PAGE_HT            
+  			WHERE ACTION_ID = 'READ' AND TO_CHAR(ACTION_DATE, 'YYYY-MM-DD') = #{audit_date}
+  			GROUP BY ACTOR_ID, ACTOR_NM 
+  			HAVING COUNT(ACTOR_ID) > #{read_count_threshold}
+		) RESULT
+		INNER JOIN XR_GROUPED G1 ON RESULT.USER_ID = G1.USER_ID AND G1.IS_DEFAULT = 'T'
+		INNER JOIN XR_GROUP G2 ON G1.GROUP_ID = G2.GROUP_ID
+		ORDER BY READ_COUNT DESC
+	</select>
+	
+	<!-- 만기 처리 대상 목록 얻기 -->	
+	<select id="expiredDocList" parameterType="HashMap" resultType="CaseMap">
+		<![CDATA[
+			SELECT	
+				DOC_ID, ROOT_ID,IS_LOCKED,DOC_TYPE
+			FROM XR_DOCUMENT 
+			WHERE IS_CURRENT = 'T' AND IS_EXPIRED = 'F' AND IS_LOCKED = 'F' AND EXPIRED_DATE IS NOT NULL
+			AND EXPIRED_DATE <  TO_DATE(#{expiredDate},'YYYY-MM-DD HH24:MI:SS')
+		]]>
+	</select>
+	
+	<!-- 개인휴지통 대상 목록 얻기 :: MULTI DB 변경쿼리대상 -->	
+	<select id="privateTrashDocList" parameterType="HashMap" resultType="CaseMap">
+		<![CDATA[
+			SELECT	
+				DOC_ID, ROOT_ID,IS_LOCKED,DOC_TYPE
+			FROM XR_DOCUMENT 
+			WHERE IS_CURRENT = 'T' 
+				AND TO_CHAR(DELETE_DATE,'YYYYMMDD') <= TO_CHAR(SYSDATE - ${decade}, 'YYYYMMDD')			
+				AND DOC_STATUS = #{doc_status}			
+		]]>
+	</select>
+	
+	<!-- 시스템 휴지통 대상 목록 얻기 :: MULTI DB 변경쿼리대상 -->	
+	<select id="systemTrashDocList" parameterType="HashMap" resultType="CaseMap">
+		<![CDATA[
+			SELECT	
+				DOC_ID, ROOT_ID,IS_LOCKED,DOC_TYPE
+			FROM XR_DOCUMENT_DEL
+			WHERE IS_CURRENT='T' AND TO_CHAR(WASTE_DATE,'YYYYMMDD') <= TO_CHAR(SYSDATE - ${decade}, 'YYYYMMDD')
+		]]>
+	</select>
+	
+	<!-- EDMS 시스템 관리자 정보 :: 배치프로그램로그정보-->
+	<select id="systemUserInfo" parameterType="HashMap" resultType="CaseMap">
+		SELECT 
+			U.USER_ID,U.USER_NAME_KO AS USER_NAME,
+            G.GROUP_ID,G.GROUP_NAME_KO AS GROUP_NAME
+		FROM XR_USER U 
+           	INNER JOIN XR_GROUPED GR ON U.USER_ID = GR.USER_ID AND GR.IS_DEFAULT = 'T'
+			INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID
+		WHERE ROLE_ID = 'SYSTEM_OPERATOR' 
+	</select>
+		
+	
+	<!-- 사용자별 문서현황 집계  :: MULTI DB 변경쿼리대상 -->
+	<select id="userDocStatus" parameterType="HashMap" resultType="CaseMap">
+		SELECT
+			ACTION_DATE,ACTOR_NM,ACTOR_ID,GROUP_NM, GROUP_ID, TYPE_ID,
+			CREATE_CNT,READ_CNT,UPDATE_CNT,DELETE_CNT
+		FROM
+		(
+			SELECT
+				ACTION_DATE,ACTOR_NM,ACTOR_ID,GROUP_NM, GROUP_ID, TYPE_ID,
+				SUM(CREATE_CNT) AS CREATE_CNT,SUM(READ_CNT) AS READ_CNT,SUM(UPDATE_CNT) AS UPDATE_CNT,SUM(DELETE_CNT) AS DELETE_CNT 
+			FROM
+			(
+				SELECT 
+					ACTOR_NM, TO_CHAR(ACTION_DATE, 'YYYY-MM-DD') AS ACTION_DATE,ACTOR_ID, GROUP_NM, GROUP_ID, TYPE_ID,
+	    			COALESCE(CASE WHEN ACTION_ID = 'CREATE' THEN COUNT(1) END,0) AS CREATE_CNT,
+	    			COALESCE(CASE WHEN ACTION_ID = 'READ' THEN COUNT(1) END,0) AS READ_CNT,    
+	    			COALESCE(CASE WHEN ACTION_ID = 'UPDATE' THEN COUNT(1) END,0) AS UPDATE_CNT,
+	    			COALESCE(CASE WHEN ACTION_ID = 'DELETE' THEN COUNT(1) END,0) AS DELETE_CNT
+				FROM XR_DOCUMENT_HT
+				<where>
+					<if test="sdate != null and sdate != ''">
+						AND TO_CHAR(ACTION_DATE, 'YYYY-MM-DD') = #{sdate}
+					</if>
+				</where>			
+				GROUP BY ACTION_ID, ACTOR_NM, ACTOR_ID, GROUP_NM, GROUP_ID, TYPE_ID,TO_CHAR(ACTION_DATE, 'YYYY-MM-DD')
+			) INLINE
+			 GROUP BY ACTION_DATE,ACTOR_NM,ACTOR_ID,GROUP_NM, GROUP_ID, TYPE_ID
+		) DATA	
+	</select>
+	
+	<!-- 사용자별 문서현황 집계 등록처리 -->
+	<insert id="userDocHtWrite" parameterType="HashMap">
+		INSERT INTO XR_DOCUMENT_USER_HT	
+		(
+			UDATE,USER_ID,TYPE_ID,USER_NM,GROUP_ID,GROUP_NM,CREATE_CNT,READ_CNT,UPDATE_CNT,DELETE_CNT
+		) 
+		VALUES 
+		( 
+			#{udate},#{user_id},#{type_id},#{user_nm},#{group_id},#{group_nm},#{create_cnt},#{read_cnt},#{update_cnt},#{delete_cnt}
+		)
+	</insert>
+	
+			
+	<!-- 부서별 문서현황 집계  :: MULTI DB 변경쿼리대상 -->
+	<select id="groupDocStatus" parameterType="HashMap" resultType="CaseMap">
+		SELECT
+			ACTION_DATE,GROUP_NM, GROUP_ID, TYPE_ID,CREATE_CNT,READ_CNT,UPDATE_CNT,DELETE_CNT
+		FROM
+		(
+			SELECT
+				ACTION_DATE,GROUP_NM, GROUP_ID, TYPE_ID,
+				SUM(CREATE_CNT) AS CREATE_CNT,SUM(READ_CNT) AS READ_CNT,SUM(UPDATE_CNT) AS UPDATE_CNT,SUM(DELETE_CNT) AS DELETE_CNT 
+			FROM
+			(
+				SELECT 
+					TO_CHAR(ACTION_DATE, 'YYYY-MM-DD') AS ACTION_DATE,GROUP_NM, GROUP_ID, TYPE_ID,
+	    			COALESCE(CASE WHEN ACTION_ID = 'CREATE' THEN COUNT(1) END,0) AS CREATE_CNT,
+	    			COALESCE(CASE WHEN ACTION_ID = 'READ' THEN COUNT(1) END,0) AS READ_CNT,    
+	    			COALESCE(CASE WHEN ACTION_ID = 'UPDATE' THEN COUNT(1) END,0) AS UPDATE_CNT,
+	    			COALESCE(CASE WHEN ACTION_ID = 'DELETE' THEN COUNT(1) END,0) AS DELETE_CNT
+				FROM XR_DOCUMENT_HT
+				<where>
+					<if test="sdate != null and sdate != ''">
+						AND TO_CHAR(ACTION_DATE, 'YYYY-MM-DD') = #{sdate}
+					</if>
+				</where>							
+				GROUP BY ACTION_ID, GROUP_NM, GROUP_ID, TYPE_ID,TO_CHAR(ACTION_DATE, 'YYYY-MM-DD')
+			) INLINE
+			 GROUP BY ACTION_DATE,GROUP_NM, GROUP_ID, TYPE_ID
+		) DATA	
+	</select>
+		
+	<!-- 부서별 문서현황 집계 등록처리 -->
+	<insert id="groupDocHtWrite" parameterType="HashMap">
+		INSERT INTO XR_DOCUMENT_GROUP_HT	
+		(
+			GDATE,GROUP_ID,TYPE_ID,CREATE_CNT,READ_CNT,UPDATE_CNT,DELETE_CNT
+		) 
+		VALUES 
+		( 
+			#{gdate},#{group_id},#{type_id},#{create_cnt},#{read_cnt},#{update_cnt},#{delete_cnt}
+		)
+	</insert>
+	
+	<!-- 폐기문서 완전삭제처리 :: XR_PAGE IS_DELETED=T   :: MULTI DB 변경쿼리대상 -->
+	<select id="delPageList" parameterType="HashMap" resultType="Page">
+		SELECT
+			PAGE_ID,VOLUME_ID,CONTENT_PATH,PAGE_SIZE,IS_DELETED
+		FROM XR_PAGE
+		<where>
+		<if test="is_deleted != null and is_deleted != ''">
+			AND IS_DELETED = #{is_deleted}
+		</if>			
+		<if test="rows != null and rows != 0">				
+			<![CDATA[ AND ROWNUM < ${rows}	]]>		
+		</if>
+		</where>									
+	</select>
+	
+	<!-- 임시작업함 대상 목록 얻기 :: MULTI DB 변경쿼리대상 -->	
+	<select id="tempDelDocList" parameterType="HashMap" resultType="CaseMap">
+		<![CDATA[
+			SELECT	
+				USER_ID,ROOT_ID,WORK_DATE
+			FROM XR_TEMP_DOC
+			WHERE  TO_CHAR(WORK_DATE,'YYYYMMDD') <= TO_CHAR(SYSDATE - ${decade}, 'YYYYMMDD') 	
+		]]>
+	</select>
+	
+	<!-- 임시작업함 삭제처리 :: XR_TEMP_DOC -->
+	<delete id="tempDocDelete" parameterType="HashMap">
+		DELETE FROM XR_TEMP_DOC
+		<where>
+			<if test="root_id != null and root_id != ''">
+				AND ROOT_ID = #{root_id}
+			</if>		
+			<if test="user_id != null and user_id != ''">
+				AND USER_ID = #{user_id}
+			</if>
+		</where>      
+	</delete>
+	
+	<!-- QUEUE 테이블 조회  -->
+	<select id="fileQueueDeleteList"  resultType="FileQueue">
+			SELECT VOLUME_ID,CONTENT_PATH FROM XR_DELETEFILE_QUEUE
+	</select>
+	
+	<!-- QUEUE 테이블 삭제  -->
+	<delete id ="deleteQueue" parameterType="HashMap">
+	DELETE FROM XR_DELETEFILE_QUEUE	
+		WHERE 
+		CONTENT_PATH = #{content_path}		
+	</delete>
+	
+		
+</mapper>

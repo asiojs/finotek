@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.rgate.dao.RgateDao">
+
+	<!-- rGate 정책 등록 :: XR_RGATE_POLICY -->
+	<insert id="rgatePolicyWrite" parameterType="HashMap">
+		INSERT INTO XR_RGATE_POLICY (
+			CKEY, CVALUE
+		) VALUES (
+			#{ckey},#{cvalue}
+		)
+	</insert>
+			
+	<!-- rGate 정책 삭제  :: XR_RGATE_POLICY -->
+	<delete id="rgatePolicyDelete" parameterType="HashMap">
+		DELETE FROM XR_RGATE_POLICY 
+		<where>			
+			<if test="ckey != null and ckey != ''">
+				AND CKEY = #{ckey}
+			</if>			
+		</where> 				
+	</delete>
+	
+	<!-- rGate 정책 조회  :: XR_RGATE_POLICY -->
+	<select id="rgatePolicyDetail" parameterType="HashMap" resultType="String">
+		SELECT 
+			CVALUE
+		FROM XR_RGATE_POLICY
+		<where>			
+			<if test="ckey != null and ckey != ''">
+				AND CKEY = #{ckey}
+			</if>			
+		</where> 				
+	</select>
+		
+	
+	<!-- 관리 대상 확장자나 프로세스를 등록 한다.  :: XR_RGATE_LIST-->
+	<insert id="rgateListWrite" parameterType="RGateList">
+		INSERT INTO	XR_RGATE_LIST
+		(
+			MANAGE_TYPE, MANAGE_NAME, IS_DEFAULT
+		)
+		VALUES
+		(
+			#{manage_type},#{manage_name},#{is_default}
+		)
+	</insert>
+	
+	
+	<!-- 관리 대상 확장자나 프로세스 목록 조회 :: XR_RGATE_LIST -->
+	<select id="rgateList" parameterType="HashMap" resultType="RGateList">
+		SELECT
+			MANAGE_TYPE, MANAGE_NAME, IS_DEFAULT
+		FROM XR_RGATE_LIST
+		<where>			
+			<if test="manage_type != null and manage_type != ''">
+				AND MANAGE_TYPE = #{manage_type}
+			</if>			
+		</where> 				
+		ORDER BY ${orderCol} ${orderType}
+	</select>
+	
+	<!-- 관리 대상 확장자나 프로세스 수정 :: XR_RGATE_LIST -->
+	<update id="rgatePolicyUpdate" parameterType="HashMap">
+		UPDATE XR_RGATE_POLICY			
+		<set>
+			<if test="cvalue != null and cvalue != ''">
+				CVALUE = #{cvalue} ,
+			</if>			
+		</set>
+		<where>			
+			<if test="ckey != null and ckey != ''">
+				AND CKEY = #{ckey}
+			</if>					
+		</where> 				
+	</update>		
+	
+	<!-- 관리 대상 확장자나 프로세스를 삭제 한다  :: XR_RGATE_LIST -->
+	<delete id="rgateListDelete" parameterType="HashMap">
+		DELETE FROM XR_RGATE_LIST
+		<where>			
+			<if test="manage_name != null and manage_name != ''">
+				AND MANAGE_NAME = #{manage_name}
+			</if>			
+		</where> 				
+	</delete>
+	
+	<!-- 프로세스 예외 폴더 리스트를 얻는다. :: XR_RGATE_PROCESS -->
+	<select id="rgateProcessList" parameterType="HashMap" resultType="RGateProcess">
+		SELECT
+			WORK_TYPE, PROCESS, FOLDER_PATH
+		FROM XR_RGATE_PROCESS				
+		ORDER BY PROCESS ASC		
+	</select>	
+	
+	<!--  프로세스 예외 폴더 리스트를 등록 한다. :: XR_RGATE_PROCESS -->
+	<insert id="rgateProcessWrite" parameterType="RGateProcess">
+		INSERT INTO XR_RGATE_PROCESS
+		(
+			WORK_TYPE, PROCESS, FOLDER_PATH
+		)
+		VALUES
+		(
+			#{work_type},#{process},#{folder_path}
+		)
+	</insert>
+	
+	<!-- 프로세스 예외 폴더 리스트를 수정 한다 :: XR_RGATE_PROCESS -->
+	<update id="rgateProcessUpdate" parameterType="HashMap">
+		UPDATE XR_RGATE_PROCESS			
+		<set>
+			<if test="folder_path != null">
+				FOLDER_PATH = #{folder_path},
+			</if>					
+		</set>
+		<where>			
+			<if test="process != null and process != ''">
+				AND PROCESS = #{process}
+			</if>			
+		</where> 				
+	</update>		
+	
+	<!-- 프로세스 예외 폴더 리스트를 삭제 한다  :: XR_RGATE_PROCESS -->
+	<delete id="rgateProessDelete" parameterType="HashMap">
+		DELETE FROM XR_RGATE_PROCESS
+		<where>			
+			<if test="process != null and process != ''">
+				AND PROCESS = #{process}
+			</if>			
+		</where> 				
+	</delete>
+	
+	<!-- 프로세스가 사용중인지 체크한다. :: XR_RGATE_PROCESS/XR_RGATE_MAPPING -->
+	<select id="isProessUsing" parameterType="HashMap" resultType="Int">
+		SELECT
+			COUNT(WORK_TYPE) AS CNT
+		FROM ${table_nm}
+		<where>			
+			<choose>
+			<when test="table_nm == 'XR_RGATE_MAPPING' ">
+				<if test="work_type != null and work_type != ''">
+					AND WORK_TYPE = #{work_type}
+				</if>		
+				<if test="manage_type != null and manage_type == 'PROC'">
+					AND PROCESS LIKE '%${strKeyword}%'
+				</if>							
+				<if test="manage_type != null and manage_type == 'IP'">
+					AND IP_ADDRESS LIKE '%${strKeyword}%'
+				</if>						
+			</when>
+			<when test="table_nm == 'XR_RGATE_PROCESS' ">
+				<if test="process != null and process != ''">
+					AND PROCESS = #{process}
+				</if>					
+			</when>
+			</choose>				
+		</where> 				
+	</select>
+	
+	
+	<!-- 로컬저장금지정책 목록을 등록 한다.  :: XR_RGATE_MAPPING -->
+	<insert id="rgateMappingWrite" parameterType="RGateMapping">
+		INSERT INTO XR_RGATE_MAPPING
+		(
+			CKEY,WORK_TYPE, USER_TYPE, USER_ID, EXTENSION, PROCESS, IS_UNACTIVE, IS_USB_ACTIVE, IP_ADDRESS, PASSWD
+		)
+		VALUES
+		(
+			#{ckey},#{work_type},#{user_type},#{user_id},#{extension},#{process},#{is_unactive},#{is_usb_active},#{ip_address},#{passwd}
+		)
+	</insert>
+	
+	<!-- 로컬저장금지정책 목록을 수정 한다.  :: XR_RGATE_MAPPING -->
+	<update id="rgateMappingUpdate" parameterType="HashMap">
+		UPDATE XR_RGATE_MAPPING
+		<set>
+			<if test="extension != null and extension != ''">
+				EXTENSION = #{extension},
+			</if>					
+			<if test="process != null and process != ''">
+				PROCESS = #{process},
+			</if>					
+			<if test="is_unactive != null and is_unactive != ''">
+				IS_UNACTIVE = #{is_unactive},
+			</if>					
+			<if test="is_usb_active != null and is_usb_active != ''">
+				IS_USB_ACTIVE = #{is_usb_active},
+			</if>					
+			<if test="ip_address != null and ip_address != ''">
+				IP_ADDRESS = #{ip_address},
+			</if>					
+			<if test="passwd != null and passwd != ''">
+				PASSWD = #{passwd},
+			</if>						
+		</set>
+		<where>					
+			<if test="ckey != null and ckey != ''">
+				AND CKEY = #{ckey}
+			</if>			
+		</where> 				
+	</update>		
+	
+	<!-- 로컬저장금지정책 목록을 삭제 한다.  :: XR_RGATE_MAPPING -->
+	<delete id="rgateMappingDelete" parameterType="HashMap">
+		DELETE FROM XR_RGATE_MAPPING
+		<where>					
+			<if test="ckey != null and ckey != ''">
+				AND CKEY = #{ckey}
+			</if>			
+		</where> 				
+	</delete>
+
+	<sql id="whereRgateSelectCommon">
+		SELECT 
+				RGM.CKEY,RGM.WORK_TYPE, RGM.USER_ID,RGM.USER_TYPE,RGM.EXTENSION, RGM.PROCESS, 
+				RGM.IS_UNACTIVE, RGM.IS_USB_ACTIVE, RGM.IP_ADDRESS, RGM.PASSWD,G1.GROUP_ID,
+				(
+					CASE RGM.USER_TYPE 
+						WHEN 'ALL' 		THEN '' 
+			    		WHEN 'GROUP' 	THEN G1.GROUP_NAME_KO
+			    		WHEN 'USER' 	THEN G2.GROUP_NAME_KO     
+						ELSE 'NONE' 
+					END
+				) AS GROUP_NAME, 
+				( 
+					CASE RGM.USER_TYPE 
+						WHEN 'ALL' 		THEN '' 
+					    WHEN 'GROUP' 	THEN ''
+					    WHEN 'USER' 	THEN U.USER_NAME_KO
+					    ELSE 'NONE'   
+		            END 
+				) AS USER_NAME,
+				COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='RGATE_POLICY' AND CODE_ID = #{work_type} ),'') AS WORK_TYPE_NM,
+				COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='RGATE_USER_TYPE' AND CODE_ID = RGM.USER_TYPE ),'') AS USER_TYPE_NM
+		FROM XR_RGATE_MAPPING RGM 
+				LEFT OUTER JOIN	XR_GROUP G1 ON RGM.USER_ID = G1.GROUP_ID
+				LEFT OUTER JOIN XR_USER U ON RGM.USER_ID = U.USER_ID
+	      		LEFT OUTER JOIN XR_GROUPED GD ON U.USER_ID = GD.USER_ID AND GD.IS_DEFAULT = 'T'
+	      		LEFT OUTER JOIN XR_GROUP G2 ON GD.GROUP_ID = G2.GROUP_ID		
+	</sql>
+	
+	<sql id="whereRgateCommon">
+			<where>
+			<if test="work_type != null and work_type != ''">
+				AND WORK_TYPE = #{work_type}
+			</if>
+			<if test="strIndex != null and strIndex != ''">
+				<choose>
+				<when test="strIndex == 'ALL' ">
+					AND USER_TYPE = 'ALL'
+				</when>
+				<when test="strIndex == 'GROUP' ">
+					<if test="strKeyword != null and strKeyword != ''">
+						AND ( GROUP_ID LIKE '%${strKeyword}%' OR GROUP_NAME LIKE '%${strKeyword}%' )
+					</if>
+				</when>
+				<when test="strIndex == 'USER' ">
+					<if test="strKeyword != null and strKeyword != ''">
+						AND ( USER_ID LIKE '%${strKeyword}%' OR USER_NAME LIKE '%${strKeyword}%' )
+					</if>
+				</when>
+				</choose>				
+			</if>				
+			<if test="strKeyword != null and strKeyword != ''">
+				<if test="strIndex != 'ALL'">
+					AND ( 
+						GROUP_ID LIKE '%${strKeyword}%' OR GROUP_NAME LIKE '%${strKeyword}%' OR
+						USER_ID LIKE '%${strKeyword}%' OR USER_NAME LIKE '%${strKeyword}%'
+					)	
+				</if>	
+			</if>			
+			</where>					
+	</sql>
+	
+	<!-- 로컬저장금지정책 목록 카운트.  -->
+	<select id="rgatePolicyPagingCount" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(CKEY) AS CNT
+		FROM
+		(
+			SELECT 
+				CKEY,WORK_TYPE, USER_ID,USER_TYPE,EXTENSION, PROCESS,GROUP_ID, 
+				IS_UNACTIVE, IS_USB_ACTIVE, IP_ADDRESS, PASSWD,GROUP_NAME,USER_NAME,WORK_TYPE_NM,USER_TYPE_NM
+			FROM
+			(			
+				<include refid="whereRgateSelectCommon" />
+			) DATA
+			<include refid="whereRgateCommon" />
+		)LIST				
+	</select>
+	
+	<!-- 로컬저장금지정책 목록을 얻는다.  -->
+	<select id="rgatePolicyPagingList" parameterType="HashMap" resultType="RgateMapping">
+		SELECT 
+			CKEY,WORK_TYPE, USER_ID,USER_TYPE,EXTENSION, PROCESS,GROUP_ID, 
+			IS_UNACTIVE, IS_USB_ACTIVE, IP_ADDRESS, PASSWD,GROUP_NAME,USER_NAME,WORK_TYPE_NM,USER_TYPE_NM
+		FROM
+		(
+			SELECT 
+				CKEY,WORK_TYPE, USER_ID,USER_TYPE,EXTENSION, PROCESS,GROUP_ID, 
+				IS_UNACTIVE, IS_USB_ACTIVE, IP_ADDRESS, PASSWD,GROUP_NAME,USER_NAME,WORK_TYPE_NM,USER_TYPE_NM,
+				CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM
+			FROM
+			(			
+				<include refid="whereRgateSelectCommon" />
+			) DATA
+		<include refid="whereRgateCommon" />
+		)LIST
+		WHERE LIST.PAGENUM = #{nPage}						
+	</select>
+	
+	<!-- 로컬저장금지 목록 리스트 :: 중복입력체크 -->
+	<select id="rgatePolicyList" parameterType="HashMap" resultType="CaseMap">
+		SELECT 
+			RGM.CKEY,RGM.WORK_TYPE, RGM.USER_TYPE,RGM.USER_ID,G1.GROUP_ID
+		FROM XR_RGATE_MAPPING RGM 
+			LEFT OUTER JOIN	XR_GROUP G1 ON RGM.USER_ID = G1.GROUP_ID
+			LEFT OUTER JOIN XR_USER U ON RGM.USER_ID = U.USER_ID
+	      	LEFT OUTER JOIN XR_GROUPED GD ON U.USER_ID = GD.USER_ID AND GD.IS_DEFAULT = 'T'
+		<where>
+			<if test="work_type != null and work_type != ''">
+				AND RGM.WORK_TYPE = #{work_type}
+			</if>
+		</where>
+	</select>
+	
+</mapper>

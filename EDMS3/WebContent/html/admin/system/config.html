@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <title>index</title>
+  <script src="/js/jquery-2.1.3.min.js"></script>
+  <script src="/lib/jstree/jstree.js"></script>
+  <script src="/js/tree.js"></script>
+  <script src="/js/jquery-ui.js"></script>
+  <script src="/lib/jqgrid/js/jquery.jqGrid.min.js"></script>
+  <script src="/js/jquery.ddslick.custom.js"></script>
+  <script src="/js/jquery.cookie.js"></script>
+  <script src="/js/jquery.alerts.js"></script>
+  <script src="/js/admin/ecm.js"></script>
+
+  <link rel="stylesheet" href="/css/admin/ecm.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/jqtree-custom.css">
+  <link rel="stylesheet" href="/css/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery.alerts.css">
+  <link rel="stylesheet" href="/css/jquery.ddslick.custom.css">
+  <link rel="stylesheet" href="/lib/jqgrid/css/ui.jqgrid.css">
+</head>
+
+<body>
+	<div class="wrap">
+	    <header class="header">
+	    	<div class="header_subWrapper">
+	    		<div class="logo">
+					<h1><a href="#"><img src="/img/logo.png"></a></h1>
+				</div>
+				<div class="header_menu_wrapper">
+					<div class="header_icon">
+						<ul class="header_icon_menu">
+							<li class="main_menu">
+								<a href="#" class="system selected">시스템 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#" class="selected">그룹관리</a></li>
+										<li><a href="#">사용자관리</a></li>
+										<li><a href="#">메뉴접근제한관리</a></li>
+										<li><a href="#">환경설정 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="document">문서 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">문서유형 관리</a></li>
+										<li><a href="#">폴더 관리</a></li>
+										<li><a href="#">권한 관리(ACL)</a></li>
+										<li><a href="#">만기 문서 관리</a></li>
+										<li><a href="#">소유권 변경</a></li>
+										<li><a href="#">휴지통 관리</a></li>
+										<li><a href="#">중복 파일 관리</a></li>
+										<li><a href="#">대량문서 열람 검사 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="rGate">rGate 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">저장금지 확장자 관리</a></li>
+										<li><a href="#">저장 허용 프로그램 관리</a></li>
+										<li><a href="#">로컬 저장 허용 관리</a></li>
+										<li><a href="#">USB 저장 허용 관리</a></li>
+									</ul>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="header_user">
+						<ul class="header_user_menu">
+							<li class="user_info">
+								<a href="#">
+									<img src="/img/icon/user_info.png" alt="">
+									<strong>관리자</strong>님 환영합니다.
+								</a>
+							</li>
+							<li class="user_account">
+								<a href="#"><img src="/img/icon/admin/pwd.png" alt=""></a>
+							</li>
+							<li class="user_logout">
+								<a href="#"><img src="/img/icon/user_logout.png" alt=""></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+	    	</div>
+		</header>
+		<div class="cnt_wrapper">
+			<div class="depth_navigation">
+				시스템 관리 &gt; 환경설정 관리
+			</div>
+			
+			<div class="config_menu">
+				<ul>
+					<li><a href="#" class="selected">문서관리</a>	</li>
+					<li><a href="#" class="">문서중앙화설정</a></li>
+					<li><a href="#" class="">FC설정</a></li>
+				</ul>
+			</div>
+			
+			<div class="config_sub_wrapper">
+				<div class="tab_menu">
+					<div class="tab_elem_wrapper">
+						<span class="tab_element">파일설정</span>
+						<span class="tab_element">버전설정</span> 
+						<span class="tab_element">열람감사설정</span> 
+						<span class="tab_element">휴지통설정</span> 
+						<span class="tab_element selected">URL유통설정</span> 
+					</div>
+				</div>
+				
+				<div class="tab_form hide">
+					<table>
+						<colgroup>
+						<col width="205">
+						<col width="1023">
+						</colgroup>
+						<tr>
+							<th>등록파일제한</th>
+							<td>
+								<input type="text" name="" class="limit_extension">
+								<span class="dim">선택한 메일함이 첫 화면으로 표시되고 새 메일에만 설정한 내용이 적용됩니다.</span>
+							</td>
+						</tr>
+						<tr>
+							<th>첨부파일 갯수 제한</th>
+							<td>
+								<input type="checkbox" id="" name="" class="" value="">
+								문서당 첨부파일을
+								<input type="text" name="" class="limit">
+								개로 제한합니다.
+							</td>
+						</tr>
+						<tr>
+							<th>첨부파일 사이즈 제한</th>
+							<td>
+								<input type="checkbox" id="" name="" class="" value="">
+								<input type="text" name="" class="limit">
+								MB 이상은 등록을 제한합니다. (최대 2GB)
+							</td>
+						</tr>
+						<tr>
+							<th>문서당 첨부파일 총 사이즈 제한</th>
+							<td>
+								<input type="checkbox" id="" name="" class="" value="">
+								<input type="text" name="" class="limit">
+								MB 이상은 등록을 제한합니다.
+							</td>
+						</tr>
+					</table>
+				</div>
+				
+				<div class="tab_form hide">
+					<table>
+						<colgroup>
+						<col width="205">
+						<col width="1023">
+						</colgroup>
+						<tr>
+							<th>개인문서 버전관리 사용</th>
+							<td>
+								<p>
+									<input type="checkbox" id="" name="" class="" value="">
+									문서당 첨부파일을
+									<input type="text" name="" class="limit">
+									개로 제한합니다.
+								</p>
+								<label><input type="radio" name="" class="" value="">현재 버전 유지</label>
+								<label><input type="radio" name="" class="" value="">부버전 증가</label>
+								<label><input type="radio" name="" class="" value="">주버전 증가</label>
+							</td>
+						</tr>
+						<tr>
+							<th>업무문서 버전관리 사용</th>
+							<td>
+								<p>
+									<input type="checkbox" id="" name="" class="" value="">
+									문서당 첨부파일을
+									<input type="text" name="" class="limit">
+									개로 제한합니다.
+								</p>
+								<label><input type="radio" name="" class="" value="">현재 버전 유지</label>
+								<label><input type="radio" name="" class="" value="">부버전 증가</label>
+								<label><input type="radio" name="" class="" value="">주버전 증가</label>
+							</td>
+						</tr>
+					</table>
+				</div>
+				
+				<div class="tab_form hide">
+					<table>
+						<colgroup>
+						<col width="205">
+						<col width="1023">
+						</colgroup>
+						<tr>
+							<th>열람건수 기준</th>
+							<td>
+								<p><input type="text" name="" class="limit">건</p>
+								<label><input type="checkbox" name="" class="" value="">메일 자동 전송</label>
+							</td>
+						</tr>
+						<tr>
+							<th>메일 수신자</th>
+							<td>
+								<textarea id="" name="" class=""></textarea>
+								<span class="dim">* 다수의 메일 수신자 지정 시 세미콜론(;)으로 구분합니다.</span>
+							</td>
+						</tr>
+					</table>
+				</div>
+				
+				<div class="tab_form hide">
+					<table>
+						<colgroup>
+						<col width="205">
+						<col width="1023">
+						</colgroup>
+						<tr>
+							<th>개인 휴지통 자동 비우기</th>
+							<td>
+								<label><input type="checkbox" name="" class="" value="">삭제 후</label>
+								<label><input type="text" name="" class="limit">일 지난 문서 자동 비우기</label>
+							</td>
+						</tr>
+						<tr>
+							<th>시스템 휴지통 자동 비우기</th>
+							<td>
+								<label><input type="checkbox" name="" class="" value="">삭제 후</label>
+								<label><input type="text" name="" class="limit">일 지난 문서 자동 비우기</label>
+							</td>
+						</tr>
+					</table>
+				</div>
+				
+				<div class="tab_form">
+					<table>
+						<colgroup>
+						<col width="205">
+						<col width="1023">
+						</colgroup>
+						<tr>
+							<th>URL 유통 시 조회 유효기간</th>
+							<td>
+								<label><input type="text" name="" class="limit">일로 제한 (0일 경우 제한 없음)</label>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>	
+			
+			<div class="btnGrp">
+				<button type="button" class="btn1 left">기본 설정으로</button>
+				<button type="button" class="btn1 bold">확인</button>
+				<button type="button" class="btn1">취소</button>
+			</div>		
+		</div>
+		<footer class="footer">
+			<p class="copyright">Copyright eXsoft All Rights Reserved.</p>
+		</footer>
+	</div>
+</body>
+</html>

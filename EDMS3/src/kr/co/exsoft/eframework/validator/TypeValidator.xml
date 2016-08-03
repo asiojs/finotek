@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+ 
+<form-validation>
+ 
+    <formset>
+ 		<!-- XR_TYPE -->
+        <form name="typeVO">
+         	<field property="type_id" depends="required">
+				<arg0 key="typeVO.type_id" />
+			</field>          
+			<field property="type_name" depends="required">
+				<arg0 key="typeVO.type_name" />
+			</field>          
+			<!--
+			<field property="sort_index" depends="required,integer">
+				<msg name="mask" key="errors.integer"/>
+				<arg0 key="typeVO.sort_index" /><var>
+        		<var-name>mask</var-name>
+        		<var-value>^[0-9]*$</var-value>
+    			</var>				
+			</field>
+			-->            
+        </form>
+ 
+    </formset>
+ 
+</form-validation>

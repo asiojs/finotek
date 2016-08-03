@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.document.dao.MyDocumentDao">
+
+ <!-- 확장문서 유형 검색 / 첨부파일명 -->
+<sql id="myExtendDoc">
+	<if test="tbl_name != null and tbl_name != ''">
+		WITH EXTEND_DOC AS 
+		( 
+			SELECT DOC_ID 
+		  	FROM ${tbl_name}
+		  	<where>
+		  		<foreach item="item" index="index" collection="attrList">
+				<choose>
+					<when test="(item.display_type == 'CHECK' or item.display_type == 'INPUT') and (item.search_word != null and item.search_word != '')">
+						AND ${item.attr_id} LIKE '%${item.search_word}%'
+					</when>
+					<when test="item.search_word != null and item.search_word != ''">
+						AND ${item.attr_id} = #{item.search_word}
+					</when>
+				</choose>
+				</foreach>
+		  	</where>
+		)
+	 </if>	
+	 <if test="page_name != null and page_name != ''">
+		WITH PAGE_DOC AS
+		(
+			SELECT DISTINCT F.DOC_ID 
+			FROM XR_FILED F
+			INNER JOIN XR_PAGE P ON P.PAGE_NAME LIKE '%${page_name}%' AND F.PAGE_ID = P.PAGE_ID
+		)
+	</if>	
+</sql>	
+
+<!-- ACL 권한 체크 -->
+<sql id="myPageAclCommon">
+	<if test="acl_check != null and acl_check == 'true'">
+	AND (EXISTS( 
+			   SELECT A.ACL_ID FROM XR_ACLITEM A 
+			   WHERE D.ACL_ID = A.ACL_ID 
+				 AND ACT_BROWSE = 'T'
+				 AND A.IS_TYPE = 'D' 
+				 AND (   (A.ACCESSOR_ISALIAS = 'T' AND A.ACCESSOR_ID = 'OWNER' AND D.OWNER_ID = #{user_id} ) 
+					  OR (A.ACCESSOR_ISALIAS = 'T' AND A.ACCESSOR_ID = 'WORLD') 
+					  OR (A.ACCESSOR_ISALIAS = 'F' AND A.ACCESSOR_ISGROUP = 'F' AND A.ACCESSOR_ID = #{user_id}) 
+					  OR (A.ACCESSOR_ISALIAS = 'F' AND A.ACCESSOR_ISGROUP = 'T' AND A.ACCESSOR_ID IN
+					  		<foreach item="item" index="index" collection="group_id_list" separator="," open=" ( " close=")" >
+								#{item}
+							</foreach>
+					     ) 
+					 )  
+			  )
+		OR
+		EXISTS( 
+			   SELECT E.DOC_ID FROM XR_EXACLITEM E 
+			   WHERE D.DOC_ID = E.DOC_ID 
+				 AND ACT_BROWSE = 'T'
+				 AND (   (E.ACCESSOR_ISALIAS = 'T' AND E.ACCESSOR_ID = 'OWNER' AND D.OWNER_ID = #{user_id} ) 
+					  OR (E.ACCESSOR_ISALIAS = 'T' AND E.ACCESSOR_ID = 'WORLD') 
+					  OR (E.ACCESSOR_ISALIAS = 'F' AND E.ACCESSOR_ISGROUP = 'F' AND E.ACCESSOR_ID = #{user_id}) 
+					  OR (E.ACCESSOR_ISALIAS = 'F' AND E.ACCESSOR_ISGROUP = 'T' AND E.ACCESSOR_ID IN
+					  		<foreach item="item" index="index" collection="group_id_list" separator="," open=" ( " close=")" >
+								#{item}
+							</foreach>
+					     ) 
+					 )  
+			  )
+		)
+	</if>			  
+</sql>
+
+<!-- 나의 문서 공통 SQL -->
+<sql id="myPageCommon">
+	SELECT 
+		D.DOC_ID, D.DOC_NAME, D.PAGE_CNT, D.VERSION_NO, T.TYPE_NAME, D.ROOT_ID, D.DOC_TYPE, D.IS_INHERIT_ACL,		
+		D.CREATOR_NAME, D.CREATE_DATE, D.IS_LOCKED, D.LOCK_DATE,D.EXPIRED_DATE,D.DELETER_ID, D.DELETER_NAME, D.DELETE_DATE, D.OWNER_ID,
+		( SELECT COUNT(R.ROOT_DOC_ID) FROM XR_REF_DOC R WHERE R.ROOT_DOC_ID = D.ROOT_ID OR R.ROOT_DOC_ID = D.DOC_ID ) AS RELATION_DOC,  
+		( SELECT USER_NAME_KO FROM XR_USER U WHERE U.USER_ID =  D.LOCK_OWNER ) AS LOCK_OWNER,		
+		( SELECT USER_NAME_KO FROM XR_USER U WHERE U.USER_ID = D.OWNER_ID ) AS OWNER_NAME,
+		( 	
+			SELECT PAGE_EXTENSION FROM XR_PAGE WHERE PAGE_ID = COALESCE((SELECT PAGE_ID FROM XR_FILED WHERE DOC_ID = D.DOC_ID AND PAGE_NO = 1),'NOPAGE') 
+		) AS  PAGE_EXTENSION
+		<choose>
+			<when test="select_action == 'TEMPDOC'">,TD.WORK_DATE</when><!-- 임시문서함 -->
+			<when test="select_action == 'TRASHCAN' or select_action == 'OWNER' or select_action == 'SHARE' or select_action == 'FAVORITE' or select_action == 'RECENTLYDOC'">
+				,F.MAP_ID, F.FOLDER_ID
+			</when><!-- 휴지통/내소유문서/공유받은문서/공유받은폴더/즐겨찾기/최신문서함 -->
+		</choose>	
+	FROM XR_DOCUMENT D 
+		INNER JOIN XR_TYPE T ON T.TYPE_ID = D.DOC_TYPE
+		<if test="tbl_name != null and tbl_name != ''">
+			INNER JOIN EXTEND_DOC E ON E.DOC_ID = D.DOC_ID
+		</if>		
+		<if test="page_name != null and page_name != ''">
+			INNER JOIN PAGE_DOC P ON P.DOC_ID = D.DOC_ID	
+		</if>	
+		<choose>
+		<when test="select_action == 'FAVORITE'"><!-- 다차원분류인 경우 메인분류체계에서만 가져온다.-->
+			INNER JOIN XR_LINKED L ON L.DOC_ID = D.DOC_ID
+			INNER JOIN XR_FOLDER F ON F.FOLDER_ID = L.FOLDER_ID AND F.FOLDER_ID = D.FOLDER_ID 
+			<if test='is_virtual == "Y"'>
+				INNER JOIN XR_FAVORITE_DOC FD ON FD.FOLDER_ID = #{folder_id} AND ( D.DOC_ID = FD.DOC_ID OR D.ROOT_ID = FD.ROOT_ID ) AND FD.USER_ID = #{user_id}
+			</if>
+			<if test='is_virtual == "N"'>
+				INNER JOIN XR_FAVORITE_FOLDER FF ON FF.FOLDER_ID = L.FOLDER_ID AND FF.FOLDER_ID = #{folder_id} AND FF.USER_ID = #{user_id}
+			</if>
+		</when>
+		<when test="select_action == 'TEMPDOC'">
+			INNER JOIN XR_TEMP_DOC TD ON ( TD.ROOT_ID = D.ROOT_ID OR TD.ROOT_ID = D.DOC_ID )
+		</when>
+		<when test="select_action == 'TRASHCAN' or select_action == 'OWNER' or select_action == 'SHARE' or select_action == 'RECENTLYDOC'"><!-- 다차원분류인 경우 메인분류체계에서만 가져온다.-->			
+			INNER JOIN XR_FOLDER F ON F.FOLDER_ID = D.FOLDER_ID
+		</when>
+		<!-- 내만기문서/내수정문서 조건 제외 -->
+		</choose>	
+	WHERE
+		D.IS_CURRENT = 'T'
+		<if test="user_id != null and user_id != ''">
+			<choose>
+				<when test="select_action == 'FAVORITE' or select_action == 'SHARE' or select_action == 'RECENTLYDOC' "></when>				<!-- 사용자ID 검색조건으로 넘어가는 경우 - 즐겨찾기/공유문서(폴더) 제외 -->
+				<otherwise>AND ${userColumn} = #{user_id} </otherwise>
+			</choose>				
+		</if>	
+		<if test="doc_status != null and doc_status != ''"> AND D.DOC_STATUS = #{doc_status} </if>										<!-- 휴지통인 경우에만 D -->
+		<if test="is_expired != null and is_expired != ''"> AND D.IS_EXPIRED = #{is_expired}  </if>										<!-- 내만기문서인 경우에만 T -->
+		<if test="is_locked != null and is_locked != ''"> AND D.IS_LOCKED = #{is_locked}  </if>											<!-- 내 수정중 문서만 해당됨 -->
+		<if test="is_share != null and is_share != ''"> AND D.IS_SHARE = #{is_share}  </if>												<!-- 공유문서만 해당됨 -->		
+		<if test="strKeyword1 != null and strKeyword1 != ''">	AND ${strIndexColumn} LIKE '%${strKeyword1}%' </if>						<!-- 문서명/문서설명/등록자/작성자리스트 -->
+		<if test="keyword != null and keyword != ''">	AND D.KEYWORD LIKE '%${keyword}%' </if>											<!-- 키워드 -->
+		<if test="sdate != null and sdate != ''">	<![CDATA[ AND ${dateColumn} >= TO_DATE(#{sdate},'YYYY-MM-DD') ]]>	</if>			<!-- 삭제일/등록일/만기일 -->	
+		<if test="edate != null and edate != ''">	<![CDATA[ AND ${dateColumn} < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999  ]]>	</if>	<!-- 삭제일/등록일/만기일 -->
+		<if test="map_id != null"> <!-- 개인휴지통/내소유문서에 해당됨 --> 
+			AND F.MAP_ID IN <foreach item="item" index="index" collection="map_id" separator="," open=" ( " close=")" >	#{item} </foreach>		
+		</if>	 		
+		<include refid="myPageAclCommon"/>	<!-- ACL 권한 체크(공유문서) -->						
+</sql>
+
+<!-- 나의문서 컬럼명 -->
+<sql id="myPageDynamicCol">
+	<choose>
+		<when test="select_action == 'TEMPDOC'">,WORK_DATE	</when><!-- 임시문서함 -->
+		<when test="select_action == 'TRASHCAN' or select_action == 'OWNER' or select_action == 'SHARE' or select_action == 'FAVORITE'">
+			,MAP_ID, FOLDER_ID 
+		</when><!-- 휴지통/내소유문서/공유받은문서/공유받은폴더/즐겨찾기 -->		
+	</choose>	
+</sql>
+
+<!-- 나의문서 목록수(휴지통/내소유문서/공유받은문서/공유받은폴더/즐겨찾기/내수정중문서/임시문서)  -->		
+<select id="myDocumentListCnt" parameterType="HashMap" resultType="Int">
+	<include refid="myExtendDoc"/>
+	SELECT 
+			COUNT(DOC_ID) AS CNT
+	FROM
+	(		
+		<include refid="myPageCommon"/>
+	) INDATA	
+</select>
+
+<!-- 나의문서 목록(휴지통/내소유문서/공유받은문서/공유받은폴더/즐겨찾기/내수정중문서/임시문서) -->	
+<select id="myDocumentList" parameterType="HashMap" resultType="Document">
+	<include refid="myExtendDoc"/>
+	SELECT 
+		DOC_ID, DOC_NAME, PAGE_CNT, PAGE_EXTENSION, VERSION_NO, TYPE_NAME, IS_INHERIT_ACL,
+		ROOT_ID, DOC_TYPE, RELATION_DOC, CREATOR_NAME, CREATE_DATE, IS_LOCKED, LOCK_DATE, LOCK_OWNER,
+		DELETER_ID, DELETER_NAME, DELETE_DATE, OWNER_ID, OWNER_NAME, EXPIRED_DATE
+		<include refid="myPageDynamicCol"/>
+	FROM
+	(		
+		SELECT 
+			DOC_ID, DOC_NAME, PAGE_CNT, PAGE_EXTENSION, VERSION_NO, TYPE_NAME, ROOT_ID, DOC_TYPE, IS_INHERIT_ACL,
+			RELATION_DOC, CREATOR_NAME, CREATE_DATE, IS_LOCKED, LOCK_DATE, LOCK_OWNER, 
+			CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM,
+			DELETER_ID, DELETER_NAME, DELETE_DATE, OWNER_ID, OWNER_NAME, EXPIRED_DATE
+			<include refid="myPageDynamicCol"/>
+		FROM
+		(		
+			<include refid="myPageCommon"/>
+		) INDATA	
+	) LIST 
+	WHERE LIST.PAGENUM = #{nPage}									
+</select>	
+	
+</mapper>

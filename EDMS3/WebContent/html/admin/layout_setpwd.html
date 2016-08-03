@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <title>index</title>
+  <script src="/js/jquery-2.1.3.min.js"></script>
+  <script src="/lib/jstree/jstree.js"></script>
+  <script src="/js/tree.js"></script>
+  <script src="/js/jquery-ui.js"></script>
+  <script src="/lib/jqgrid/js/jquery.jqGrid.min.js"></script>
+  <script src="/js/jquery.ddslick.custom.js"></script>
+  <script src="/js/jquery.cookie.js"></script>
+  <script src="/js/jquery.alerts.js"></script>
+  <script src="/js/admin/ecm.js"></script>
+
+  <link rel="stylesheet" href="/css/admin/ecm.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/jqtree-custom.css">
+  <link rel="stylesheet" href="/css/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery.alerts.css">
+  <link rel="stylesheet" href="/css/jquery.ddslick.custom.css">
+  <link rel="stylesheet" href="/lib/jqgrid/css/ui.jqgrid.css">
+</head>
+
+<body>
+	<div class="wrap">
+	    <header class="header">
+	    	<div class="header_subWrapper">
+	    		<div class="logo">
+					<h1><a href="#"><img src="/img/logo.png"></a></h1>
+				</div>
+				<div class="header_menu_wrapper">
+					<div class="header_icon">
+						<ul class="header_icon_menu">
+							<li class="main_menu">
+								<a href="#" class="system selected">시스템 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#" class="selected">그룹관리</a></li>
+										<li><a href="#">사용자관리</a></li>
+										<li><a href="#">메뉴접근제한관리</a></li>
+										<li><a href="#">환경설정 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="document">문서 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">문서유형 관리</a></li>
+										<li><a href="#">폴더 관리</a></li>
+										<li><a href="#">권한 관리(ACL)</a></li>
+										<li><a href="#">만기 문서 관리</a></li>
+										<li><a href="#">소유권 변경</a></li>
+										<li><a href="#">휴지통 관리</a></li>
+										<li><a href="#">중복 파일 관리</a></li>
+										<li><a href="#">대량문서 열람 검사 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="rGate">rGate 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">저장금지 확장자 관리</a></li>
+										<li><a href="#">저장 허용 프로그램 관리</a></li>
+										<li><a href="#">로컬 저장 허용 관리</a></li>
+										<li><a href="#">USB 저장 허용 관리</a></li>
+									</ul>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="header_user">
+						<ul class="header_user_menu">
+							<li class="user_info">
+								<a href="#">
+									<img src="/img/icon/user_info.png" alt="">
+									<strong>관리자</strong>님 환영합니다.
+								</a>
+							</li>
+							<li class="user_account">
+								<a href="#"><img src="/img/icon/admin/pwd.png" alt=""></a>
+							</li>
+							<li class="user_logout">
+								<a href="#"><img src="/img/icon/user_logout.png" alt=""></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+	    	</div>
+		</header>
+		<div class="cnt_wrapper">
+			<nav class="lnb_menu">
+				<div class="lnb_menu_tab">
+					<ul>
+						<li class="menu_dept selected"><a href="#">부서</a></li>
+						<li class="menu_project"><a href="#">프로젝트</a></li>
+					</ul>
+				</div>
+				<div class="lnb_tree_menu">
+					<div class="lnb_tree_tab">
+						<ul>
+							<li><a href="#" class="register selected">등록</a></li>
+							<li><a href="#" class="move">이동</a></li>
+							<li><a href="#" class="delete">삭제</a></li>
+							<li><a href="#" class="upload">일괄 업로드</a></li>
+							<li><a href="#" class="upload_sample">업로드 샘플</a></li>
+						</ul>
+					</div>
+					<div class="lnb_tree_refresh">
+						<a href="#" class="refresh"></a>
+					</div>
+				</div>
+				<div class="lnb_systemTree">
+					<ul>
+						<li>
+							<a href="#" class="root">엑스소프트</a>
+							<ul class="node">
+								<li><a href="#">·&nbsp;경영기획팀</a></li>
+								<li><a href="#">·&nbsp;기술지원팀</a></li>
+								<li><a href="#">·&nbsp;솔루션사업부</a></li>
+								<li><a href="#">·&nbsp;연구소</a></li>
+								<li><a href="#">·&nbsp;영업팀</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+		    </nav>
+
+			<div class="contents">
+				<div class="depth_navigation">
+					시스템 관리 &gt; 그룹 관리
+				</div>
+				<div class="cnts_sub_wrapper">
+					<div class="group_info">
+						<table>
+						<colgroup>
+							<col width="108"/>
+							<col width="851"/>
+						</colgroup>
+						<tr>
+						<th><span class="bold">경영기획팀</span></th>
+						<th><button type="button" id="" name="" class="delete_group">삭제</button></th>
+						</tr>
+						<tr>
+						<th>부서명<span class="required">*</span></th>
+						<td>	<input type="text" id="" name="" class=""></td>
+						</tr>
+						<tr>
+						<th>부서명(영문)<span class="required">*</span></th>
+						<td><input type="text" id="" name="" class=""></td>
+						</tr>
+						<tr>
+						<th>정렬순서</th>
+						<td>
+							<select id="group_order">
+								<option>0</option>
+								<option>1</option>
+								<option>2</option>
+							</select>
+						</td>
+						</tr>
+						<tr>
+						<th>사용여부</th>
+						<td>
+							<select id="use_yn">
+								<option>0</option>
+								<option>1</option>
+								<option>2</option>
+							</select>
+						</td>
+						</tr>
+						<tr>
+						<th>등록일</th>
+						<td>2015-01-29 13:14:01</td>
+						</tr>
+						<tr>
+						<th>부서경로</th>
+						<td>엑스소프트 &gt; 경영기획팀</td>
+						</tr>
+						</table>
+					</div>
+					
+					<div class="group_list">
+						<table>
+						<colgroup>
+							<col width="108"/>
+							<col width="851"/>
+						</colgroup>
+						<tr>
+						<th><span class="bold">부서원목록</span></th>
+						<th>
+							<button type="button" id="" name="" class="add_groupList bold">추가</button>
+							<button type="button" id="" name="" class="remove_groupList">제외</button>
+						</th>
+						</tr>
+						</table>
+						
+						<div class="cnts_list">
+		                	<div class="thead">
+		                    	<ul class="tbl_head_list">
+		                        	<li class="email">메일
+		                        		<ul class="tbl_head">
+		                                    <li class="check_all"><input type="checkbox" class="checkall"></li>
+		                                    <li class="userName"><a href="#" class="sort_userName up">사용자명</a></li>
+		                                    <li class="empNo"><a href="#" class="sort_empNo down">사용자 ID</a></li>
+		                                    <li class="userPosition"><a href="#" class="sort_userPosition down">직위</a></li>
+		                                    <li class="userRole">역할</li>
+		                                    <li class="userLocked"><a href="#" class="sort_userLocked down">잠금</a></li>
+		                                    <li class="deptName">부서명</li>
+		                                </ul>    	
+		                            </li>
+		                        </ul>                    	
+		                    </div>
+		                    <div class="tbody">
+		                    	<ul class="tbl_data_list">
+		                        	<li class="data_list">
+		                        		<ul class="tbl_data_body">
+		                                    <li class="check"><input type="checkbox" class="check"></li>
+		                                    <li class="userName">사용자명</li>
+		                                    <li class="empNo">사용자 ID</li>
+		                                    <li class="userPosition">직위</li>
+		                                    <li class="userRole">역할</li>
+		                                    <li class="userLocked">잠금</li>
+		                                    <li class="deptName">부서명</li>
+		                                </ul>   
+		                                <div class="email">
+		                                    <a href="#">abcdef@exsoft.com</a>
+		                                </div> 	
+		                            </li>
+		                        </ul>
+		                    	<ul class="tbl_data_list">
+		                        	<li class="data_list">
+		                        		<ul class="tbl_data_body">
+		                                    <li class="check"><input type="checkbox" class="check"></li>
+		                                    <li class="userName">사용자명</li>
+		                                    <li class="empNo">사용자 ID</li>
+		                                    <li class="userPosition">직위</li>
+		                                    <li class="userRole">역할</li>
+		                                    <li class="userLocked">잠금</li>
+		                                    <li class="deptName">부서명</li>
+		                                </ul>   
+		                                <div class="email">
+		                                    <a href="#">abcdef@exsoft.com</a>
+		                                </div> 	
+		                            </li>
+		                        </ul>
+		                    	<ul class="tbl_data_list">
+		                        	<li class="data_list">
+		                        		<ul class="tbl_data_body">
+		                                    <li class="check"><input type="checkbox" class="check"></li>
+		                                    <li class="userName">사용자명</li>
+		                                    <li class="empNo">사용자 ID</li>
+		                                    <li class="userPosition">직위</li>
+		                                    <li class="userRole">역할</li>
+		                                    <li class="userLocked">잠금</li>
+		                                    <li class="deptName">부서명</li>
+		                                </ul>   
+		                                <div class="email">
+		                                    <a href="#">abcdef@exsoft.com</a>
+		                                </div> 	
+		                            </li>
+		                        </ul>
+		                    	<ul class="tbl_data_list">
+		                        	<li class="data_list">
+		                        		<ul class="tbl_data_body">
+		                                    <li class="check"><input type="checkbox" class="check"></li>
+		                                    <li class="userName">사용자명</li>
+		                                    <li class="empNo">사용자 ID</li>
+		                                    <li class="userPosition">직위</li>
+		                                    <li class="userRole">역할</li>
+		                                    <li class="userLocked">잠금</li>
+		                                    <li class="deptName">부서명</li>
+		                                </ul>   
+		                                <div class="email">
+		                                    <a href="#">abcdef@exsoft.com</a>
+		                                </div> 	
+		                            </li>
+		                        </ul>
+		                    	<ul class="tbl_data_list">
+		                        	<li class="data_list">
+		                        		<ul class="tbl_data_body">
+		                                    <li class="check"><input type="checkbox" class="check"></li>
+		                                    <li class="userName">사용자명</li>
+		                                    <li class="empNo">사용자 ID</li>
+		                                    <li class="userPosition">직위</li>
+		                                    <li class="userRole">역할</li>
+		                                    <li class="userLocked">잠금</li>
+		                                    <li class="deptName">부서명</li>
+		                                </ul>   
+		                                <div class="email">
+		                                    <a href="#">abcdef@exsoft.com</a>
+		                                </div> 	
+		                            </li>
+		                        </ul>
+		                    	<ul class="tbl_data_list">
+		                        	<li class="data_list">
+		                        		<ul class="tbl_data_body">
+		                                    <li class="check"><input type="checkbox" class="check"></li>
+		                                    <li class="userName">사용자명</li>
+		                                    <li class="empNo">사용자 ID</li>
+		                                    <li class="userPosition">직위</li>
+		                                    <li class="userRole">역할</li>
+		                                    <li class="userLocked">잠금</li>
+		                                    <li class="deptName">부서명</li>
+		                                </ul>   
+		                                <div class="email">
+		                                    <a href="#">abcdef@exsoft.com</a>
+		                                </div> 	
+		                            </li>
+		                        </ul>
+		                    	<ul class="tbl_data_list">
+		                        	<li class="data_list">
+		                        		<ul class="tbl_data_body">
+		                                    <li class="check"><input type="checkbox" class="check"></li>
+		                                    <li class="userName">사용자명</li>
+		                                    <li class="empNo">사용자 ID</li>
+		                                    <li class="userPosition">직위</li>
+		                                    <li class="userRole">역할</li>
+		                                    <li class="userLocked">잠금</li>
+		                                    <li class="deptName">부서명</li>
+		                                </ul>   
+		                                <div class="email">
+		                                    <a href="#">abcdef@exsoft.com</a>
+		                                </div> 	
+		                            </li>
+		                        </ul>
+		                    </div>
+		                </div>
+					</div>
+					<div class="btnGrp">
+						<button type="button" class="btn1 bold">저장</button>
+						<button type="button" class="btn1">취소</button>
+					</div>
+				</div>
+ 			</div>
+		</div>
+		<footer class="footer">
+			<p class="copyright">
+				Copyright eXsoft All Rights Reserved.
+			</p>
+	    </footer>
+	    
+	    <!-- 등록버튼 클릭, 하위부서 추가 시작 -->
+	   	<div class="subDept_add_wrapper hide"></div>
+	   	<div class="subDept_add hide">
+	   		<div class="window_title">
+	   			하위부서 추가
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="subDept_add_cnts">
+	        	<table>
+	        		<colgroup>
+	        			<col width="150"/>
+	        			<col width="350"/>
+	        		</colgroup>
+	        		<tr>
+	        			<th>부서명</th>
+	        			<td><input type="text" id="" name="" class="" placeholder="부서명을 입력하세요"></td>
+	        		</tr>
+	        		<tr>
+	        			<th>부서명(영문)</th>
+	        			<td><input type="text" id="" name="" class="" placeholder="부서명(영문)을 입력하세요"></td>
+	        		</tr>
+	        		<tr>
+	        			<th>정렬순서</th>
+	        			<td><input type="text" id="" name="" class="" placeholder="숫자를 입력해주세요"></td>
+	        		</tr>
+	        		<tr>
+	        			<th>사용여부</th>
+	        			<td>
+	        				<select id="" name="" class="">
+	        					<option value="">사용</option>
+	        					<option value="">미사용</option>
+	        				</select>
+	        			</td>
+	        		</tr>
+	        		<tr>
+	        			<th>부서경로</th>
+	        			<td><input type="text" id="" name="" class="readonly" placeholder="" readonly="readonly" value="엑스소프트 > 기술지원팀"></td>
+	        		</tr>
+	        	</table>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="subDept_add_btn bold">확인</button>
+        		<button type="button" id="" class="subDept_cancel_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 등록버튼 클릭, 하위부서 추가 끝 -->
+	   	
+	    <!-- 부서 선택 시작 -->
+	   	<div class="dept_choose_wrapper hide"></div>
+	   	<div class="dept_choose hide">
+	   		<div class="window_title">
+	   			부서 선택
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="dept_choose_cnts">
+	        	<div id="" class="dept_choose_tree"></div>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="deptChoose_btn bold">확인</button>
+        		<button type="button" id="" class="deptChoose_cancel_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 부서 선택 끝 -->
+	   	
+	    <!-- 일괄 업로드 시작 -->
+	   	<div class="batch_upload_wrapper hide"></div>
+	   	<div class="batch_upload hide">
+	   		<div class="window_title">
+	   			부서 일괄 업로드
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="batch_upload_cnts">
+	        	<form>
+	        		<input type="file" class="upload_file">
+	        	</form>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="batch_upload_btn">닫기</button>
+        	</div>
+	    </div>
+	   	<!-- 일괄 업로드 끝 -->
+	   	
+	    <!-- 비밀번호 변경 시작 -->
+	   	<div class="passwd_set_wrapper"></div>
+	   	<div class="passwd_set">
+	   		<div class="window_title">
+	   			비밀번호 변경
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="passwd_set_cnts">
+	        	<form id="">
+	        		<table>
+						<tr>	
+							<th>현재 비밀번호</th>
+							<td><input type="password" id="" name="" class=""></td>
+						</tr>
+						<tr>	
+							<th>비밀번호</th>
+							<td><input type="password" id="" name="" class=""></td>
+						</tr>
+						<tr>	
+							<th>비밀번호 확인</th>
+							<td><input type="password" id="" name="" class=""></td>
+						</tr>
+	        		</table>
+	        	</form>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="btn1">저장</button>
+        		<button type="button" id="" class="btn1">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 비밀번호 변경 끝 -->
+	</div>
+</body>
+</html>

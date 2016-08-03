@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <title>index</title>
+  <script src="/js/jquery-2.1.3.min.js"></script>
+  <script src="/lib/jstree/jstree.js"></script>
+  <script src="/js/tree.js"></script>
+  <script src="/js/jquery-ui.js"></script>
+  <script src="/lib/jqgrid/js/jquery.jqGrid.min.js"></script>
+  <script src="/js/jquery.ddslick.custom.js"></script>
+  <script src="/js/jquery.cookie.js"></script>
+  <script src="/js/jquery.alerts.js"></script>
+  <script src="/js/admin/ecm.js"></script>
+
+  <link rel="stylesheet" href="/css/admin/ecm.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/jqtree-custom.css">
+  <link rel="stylesheet" href="/css/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery.alerts.css">
+  <link rel="stylesheet" href="/css/jquery.ddslick.custom.css">
+  <link rel="stylesheet" href="/lib/jqgrid/css/ui.jqgrid.css">
+</head>
+
+<body>
+	<div class="wrap">
+	    <header class="header">
+	    	<div class="header_subWrapper">
+	    		<div class="logo">
+					<h1><a href="#"><img src="/img/logo.png"></a></h1>
+				</div>
+				<div class="header_menu_wrapper">
+					<div class="header_icon">
+						<ul class="header_icon_menu">
+							<li class="main_menu">
+								<a href="#" class="system selected">시스템 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#" class="selected">그룹관리</a></li>
+										<li><a href="#">사용자관리</a></li>
+										<li><a href="#">메뉴접근제한관리</a></li>
+										<li><a href="#">환경설정 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="document">문서 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">문서유형 관리</a></li>
+										<li><a href="#">폴더 관리</a></li>
+										<li><a href="#">권한 관리(ACL)</a></li>
+										<li><a href="#">만기 문서 관리</a></li>
+										<li><a href="#">소유권 변경</a></li>
+										<li><a href="#">휴지통 관리</a></li>
+										<li><a href="#">중복 파일 관리</a></li>
+										<li><a href="#">대량문서 열람 검사 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="rGate">rGate 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">저장금지 확장자 관리</a></li>
+										<li><a href="#">저장 허용 프로그램 관리</a></li>
+										<li><a href="#">로컬 저장 허용 관리</a></li>
+										<li><a href="#">USB 저장 허용 관리</a></li>
+									</ul>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="header_user">
+						<ul class="header_user_menu">
+							<li class="user_info">
+								<a href="#">
+									<img src="/img/icon/user_info.png" alt="">
+									<strong>관리자</strong>님 환영합니다.
+								</a>
+							</li>
+							<li class="user_account">
+								<a href="#"><img src="/img/icon/admin/pwd.png" alt=""></a>
+							</li>
+							<li class="user_logout">
+								<a href="#"><img src="/img/icon/user_logout.png" alt=""></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+	    	</div>
+		</header>
+		<div class="cnt_wrapper">
+			<div class="depth_navigation">
+				문서관리 &gt; 소유권 이전 관리
+			</div>
+			
+			<div class="transfer_sub_wrapper">
+				<div class="sub_left">
+					<div class="srch_form">
+						<form id="">
+							<table>
+								<tr>
+									<th>현소유자</th>
+									<td>
+										<input type="text" id="" name="" class="readonly" value="홍길동" readonly="readonly">
+										<button type="button" id="" class="user_choose_btn">선택</button>
+									</td>
+								</tr>
+								<tr>
+									<th>검색대상</th>
+									<td>
+										<label><input type="radio" name="" class="" value="" checked="checked">개인문서함</label>
+										<label><input type="radio" name="" class="" value="" checked="checked">업무문서함</label>
+									</td>
+								</tr>
+								<tr>
+									<th>등록일</th>
+									<td>
+										<!-- datepicker -->
+										<input type="text" id="" name="" class="cal" value="" placeholder="">
+										<a href="#"><img src="/img/icon/calendar.png" alt="" title=""></a>
+										~
+										<!-- datepicker -->
+										<input type="text" id="" name="" class="cal" value="" placeholder="">
+										<a href="#"><img src="/img/icon/calendar.png" alt="" title=""></a>
+									</td>
+								</tr>
+								<tr>
+									<th>제목</th>
+									<td>
+										<input type="text" id="" name="" class="">
+										<button type="button" id="" class="">검색</button>
+									</td>
+								</tr>
+							</table>
+						</form>
+					</div>
+					<div class="srch_result_wrapper">
+						<div>
+							<button type="button" id="" class="transfer_owner_btn">소유권 이전</button>
+						</div>
+						<div class="srch_result">
+							jqGrid 영역
+							<table id=""></table>
+						</div>
+					</div>
+				</div>
+				
+				<div class="sub_right">
+					<div class="tab_doc_info">
+						<div class="title">CD 방법론</div>
+						<div>
+							<div class="tab_menu">
+				                 <div class="tab_elem_wrapper">
+				                     <span class="tab_element selected">기본</span>
+				                     <span class="tab_element">버전</span>
+				                     <span class="tab_element">이력</span>
+				                 </div>
+							</div>
+							
+							<!-- 기본 -->
+				            <div class="tab_form">
+				            	<table>
+				            		<tr>
+				            			<th>제목</th>
+				            			<td colspan="3">CDB 방법론</td>
+				            		</tr>
+				            		<tr>
+				            			<th>폴더</th>
+				            			<td colspan="3">/엑스소프트/연구소/방법론</td>
+				            		</tr>
+				            		<tr>
+				            			<th>문서유형</th>
+				            			<td>일반문서</td>
+				            			<th>버전</th>
+				            			<td>1.0</td>
+				            		</tr>
+				            		<tr>
+				            			<th>보존연한</th>
+				            			<td>5년</td>
+				            			<th>보안등급</th>
+				            			<td>대외비</td>
+				            		</tr>
+				            		<tr>
+				            			<th>등록자</th>
+				            			<td>최방법</td>
+				            			<th>등록일</th>
+				            			<td>2014-01-01</td>
+				            		</tr>
+				            		<tr>
+				            			<th>수정자</th>
+				            			<td>나수정</td>
+				            			<th>수정일</th>
+				            			<td>2014-03-02</td>
+				            		</tr>
+				            		<tr>
+				            			<th>설명</th>
+				            			<td colspan="3">설명</td>
+				            		</tr>
+				            	</table>
+				            </div>
+				            
+							<!-- 버전 -->
+				            <div class="tab_form hide">
+				            	2
+				            </div>
+				            
+							<!-- 이력 -->
+				            <div class="tab_form hide">
+				            	3
+				            </div>
+						</div>
+					</div>
+					
+					<div class="dropDown_wrapper">
+						<a class="dropDown_txt">
+							<label>
+								<strong>권한 : 연구소(기본권한)</strong>
+							</label>
+						</a>
+						<span class="dropDown_arrow down"></span>
+						<div class="dropDown_subWrapper hide">
+							<div class="auth_tbl_wrapper">
+								<table>
+		         				<tr>
+			         				<th>접근자</th>
+			         				<th>기본권한</th>
+			         				<th>반출취소</th>
+			         				<th>권한변경</th>
+		         				</tr>
+		         				<tr>
+			         				<td>소유자</td>
+			         				<td><img src="/img/icon/prev_d.png" class="auth_grade" alt="" title="">삭제</td>
+			         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+		         				</tr>
+		         				<tr>
+			         				<td>전체</td>
+			         				<td><img src="/img/icon/prev_r.png" class="auth_grade" alt="" title="">조회</td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+		         				</tr>
+		         				<tr>
+			         				<td>연구소</td>
+			         				<td><img src="/img/icon/prev_u.png" class="auth_grade" alt="" title="">수정</td>
+			         				<td><img src="/img/icon/auth_nopass.png" alt="" title=""></td>
+			         				<td><img src="/img/icon/auth_pass.png" alt="" title=""></td>
+		         				</tr>
+		         				</table>
+							</div>
+						</div>
+					</div>
+					
+					<div class="dropDown_wrapper">
+						<a class="dropDown_txt">
+							<label>
+								<strong>파일</strong>
+							</label>
+						</a>
+						<span class="dropDown_arrow down"></span>
+						<div class="dropDown_subWrapper hide">
+							<div class="auth_tbl_wrapper">
+								<table>
+		         				<tr>
+			         				<th>번호</th>
+			         				<th>파일명</th>
+			         				<th>크기</th>
+			         				<th>저장</th>
+		         				</tr>
+		         				<tr>
+			         				<td>1</td>
+			         				<td>CBD방법론.pptx</td>
+			         				<td>756.3KB</td>
+			         				<td><a href="#"><img src="/img/icon/attach_download.png" alt="" title=""></a></td>
+		         				</tr>
+		         				</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btnGrp">
+				<button type="button" class="btn1 bold">저장</button>
+				<button type="button" class="btn1">취소</button>
+			</div>
+		</div>
+		<footer class="footer">
+			<p class="copyright">Copyright eXsoft All Rights Reserved.</p>
+		</footer>
+		
+		<!-- 보존기간 연장 시작 -->
+	   	<div class="extend_preserve_wrapper hide"></div>
+	   	<div class="extend_preserve hide">
+	   		<div class="window_title">
+	   			보존기간 연장
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="extend_preserve_cnts">
+	        	<div>
+	        	<p><span class="cnts_txt">선택한 문서의 보존기간을</span></p>
+	        	<p>
+	        		<select id="set_extend_preserve">
+		        		<option>3년</option>
+		        		<option>5년</option>
+		        		<option>7년</option>
+		        		<option>10년</option>
+		        	</select>
+			        <span class="cnts_txt left">연장합니다.</span>
+	        	</p>
+	        	</div>
+	        	
+	        	<div class="btnGrp">
+	        		<button type="button" id="" class="btn1 bold">확인</button>
+	        		<button type="button" id="" class="btn1">취소</button>
+	        	</div>
+	        </div>
+	    </div>
+	   	<!-- 보존기간 연장 끝 -->
+	   	
+	   	<!-- 사용자 선택 시작 -->
+   		<div class="user_choose_wrapper hide"></div>
+	   	<div class="user_choose hide">
+	   		<div class="window_title">
+	   			사용자 선택
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="user_choose_cnts">
+	        	<div class="user_tree">
+	        		트리 부분
+	        	</div>
+	        	<div class="user_result_wrapper">
+	        		<div class="">
+	        			<form>
+	        				<label>성명<input type="text" id="" name="" class="result_filter" value=""></label>
+	        				<label>부서<input type="text" id="" name="" class="result_filter" value=""></label>
+	        			</form>
+	        		</div>
+	        		<div class="user_result">
+	        			jqGrid 영역
+	        			<table id="">
+	        				<tr>
+	        					<th>성명</th>
+	        					<th>ID</th>
+	        					<th>부서</th>
+	        				</tr>
+	        			</table>
+	        		</div>
+	        	</div>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="folder_choose_btn bold">확인</button>
+        		<button type="button" id="" class="folder_choose_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 사용자 선택 끝 -->
+	   	
+	   	<!-- 소유권 이전 시작 -->
+   		<div class="transfer_owner_wrapper hide"></div>
+	   	<div class="transfer_owner hide">
+	   		<div class="window_title">
+	   			소유권 이전
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="transfer_owner_cnts">
+       			<table id="">
+       				<tr>
+       					<th>현소유자</th>
+       					<td>홍길동</td>
+       				</tr>
+       				<tr>
+       					<th>인수인계 범위</th>
+       					<td>
+       						업무문서함
+       						<select id="" name="" class="">
+       							<option value="">모든 문서</option>
+       						</select>
+       					</td>
+       				</tr>
+       				<tr>
+       					<th>인수자</th>
+       					<td>
+       						<input type="text" id="" name="" class="readonly" readonly="readonly" value="최명훈">
+       						<button type="button" id="" class="sub_userChoose_btn">선택</button>
+       					</td>
+       				</tr>
+       			</table>
+       			<div class="confirm_txt">
+       				해당 문서를 인수인계하시겠습니까?
+       			</div>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="choose_btn bold">확인</button>
+        		<button type="button" id="" class="choose_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 사용자 선택 끝 -->
+	   	
+	   	<!-- 사용자 선택 시작 -->
+   		<div class="sub_userChoose_wrapper hide"></div>
+	   	<div class="sub_userChoose hide">
+	   		<div class="window_subtitle">
+	   			사용자 선택
+	            <a href="#" class="window_close"><img src="/img/icon/window_close1.png" alt="" title=""></a>
+	        </div>
+	        <div class="sub_userChoose_cnts">
+	        	<div class="user_tree">
+	        		트리 부분
+	        	</div>
+	        	<div class="user_result_wrapper">
+	        		<div class="">
+	        			<form>
+	        				<label>성명<input type="text" id="" name="" class="result_filter" value=""></label>
+	        				<label>부서<input type="text" id="" name="" class="result_filter" value=""></label>
+	        			</form>
+	        		</div>
+	        		<div class="user_result">
+	        			jqGrid 영역
+	        			<table id="">
+	        				<tr>
+	        					<th>성명</th>
+	        					<th>ID</th>
+	        					<th>부서</th>
+	        				</tr>
+	        			</table>
+	        		</div>
+	        	</div>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="choose_btn bold">확인</button>
+        		<button type="button" id="" class="choose_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 사용자 선택 끝 -->
+	</div>
+</body>
+</html>

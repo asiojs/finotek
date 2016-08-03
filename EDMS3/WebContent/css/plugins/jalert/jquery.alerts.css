@@ -1,0 +1,94 @@
+#popup_container {
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+	min-width: 300px; /* Dialog will be no smaller than this */
+	max-width: 600px; /* Dialog will wrap after this width */
+	background: #FFF;
+	border:1px solid #464854;
+	color: #000;
+}
+
+#popup_title {
+	font-size:14px;
+	font-weight: bold;
+	text-align:left;
+	line-height: 1.75em;
+	color:#fff;
+	background-color:#464854;
+	padding:5px 14px 5px 20px;
+	cursor:default;
+	border-bottom:1px solid #e5e5e5;
+}
+
+/* ver0 : ���������� */
+#popup_content_ver0 {
+	background:url(../../../img/icon/alert_cnts_bg.png) center 20px no-repeat;
+	padding:65px 10px 30px 10px;
+	margin:0em;
+}
+
+/* ver1 : ��������� */
+#popup_content_ver1 {
+	background:url(../../../img/icon/alert_cnts_folder.png) center 20px no-repeat;
+	padding:65px 10px 30px 10px;
+	margin:0em;
+}
+
+/* ver2 : ����������� */
+#popup_content_ver2 {
+	background:url(../../../img/icon/alert_cnts_bin.png) center 20px no-repeat;
+	padding:65px 10px 30px 10px;
+	margin:0em;
+}
+
+/* ver3 : ���ã������� */
+#popup_content_ver3 {
+	background:url(../../../img/icon/alert_cnts_favorite.png) center 20px no-repeat;
+	padding:65px 10px 30px 10px;
+	margin:0em;
+}
+
+/* ver4 : �۾�īƮ ������*/
+#popup_content_ver4 {
+	background:url(../../../img/icon/alert_cnts_tempbox.png) center 20px no-repeat;
+	padding:65px 10px 30px 10px;
+	margin:0em;
+}
+
+/* ver5 : ����� ������*/
+#popup_content_ver5 {
+	background:url(../../../img/icon/alert_cnts_user.png) center 20px no-repeat;
+	padding:65px 10px 30px 10px;
+	margin:0em;
+}
+
+/*
+#popup_content.alert {
+	background-image: url(images/info.gif);
+}
+
+#popup_content.confirm {
+	background-image: url(images/important.gif);
+}
+
+#popup_content.prompt {
+	background-image: url(images/help.gif);
+}
+*/
+
+#popup_message {
+	text-align:center;
+	line-height:19px;
+}
+
+#popup_panel {
+	text-align: center;
+	margin-top:2em;
+}
+
+#popup_prompt {
+	margin: .5em 0em;
+}
+
+#popup_ok{padding:6px 16px 6px 16px;border:1px solid #4d4f58;border-radius:3px;color:#333;cursor:pointer;font-weight:bold}
+#popup_cancel{margin-left:6px;padding:6px 16px 6px 16px;border:1px solid #4d4f58;border-radius:3px;cursor:pointer;color:#585858}

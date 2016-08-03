@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.user.dao.UserDao">
+	
+	<!-- 
+		multivendor 주의점 : Oracle - SYSDATE , TO_CHAR , 문자열 연산 || 등	
+	-->
+	
+	<!-- 사용자 정보 조회 -->
+	<select id="userDetail" parameterType="HashMap" resultType="User">
+		SELECT 
+			USER_ID,EMP_NO,USER_NAME_KO,USER_NAME_EN,USER_STATUS,ROLE_ID,USER_TYPE,USER_PASS
+		FROM XR_USER
+		<where>
+			<if test="emp_no != null and emp_no != ''">
+				AND EMP_NO = #{emp_no}
+			</if>		
+			<if test="user_id != null and user_id != ''">
+				AND USER_ID = #{user_id}
+			</if>		
+		</where> 		
+	</select>
+	
+	<!-- 사용자 상세정보 및 그룹 정보 조회-->
+	<select id="userGroupDetail" parameterType="HashMap" resultType="User">
+		SELECT 
+				U.USER_ID, U.EMP_NO, U.USER_NAME_KO, U.USER_NAME_EN, U.USER_NAME_ZH, U.USER_NAME_JA, U.USER_PASS, 
+				C.LANGUAGE, C.THEME, C.PAGE_SIZE, U.USER_STATUS, U.ROLE_ID, U.USER_NAME_KO AS USER_NM,				 
+				TO_CHAR(U.CREATE_DATE, 'YYYY-MM-DD HH24:MI:SS') CREATE_DATE, U.SHARE_NAME, U.USER_TYPE,
+				U.MANAGE_GROUP, (SELECT GROUP_NAME_KO FROM XR_GROUP WHERE GROUP_ID = U.MANAGE_GROUP) AS MANAGE_GROUP_NM,
+				D.JOBTITLE, D.POSITION, D.EMAIL, D.TELEPHONE,
+				G.GROUP_ID,G.DEPT_CD,G.GROUP_NAME_KO,G.GROUP_NAME_EN,GR.IS_DEFAULT,G.GROUP_NAME_KO AS GROUP_NM,
+				F.STORAGE_QUOTA, F.STORAGE_USAGE,C.VIEW_TYPE,C.ICON_PREVIEW
+			FROM XR_USER U 
+				INNER JOIN XR_USER_DT D ON U.USER_ID = D.USER_ID	
+				INNER JOIN XR_USER_CONFIG C ON U.USER_ID = C.USER_ID		
+				INNER JOIN XR_GROUPED GR ON U.USER_ID = GR.USER_ID AND GR.IS_DEFAULT = 'T'
+				INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID
+				INNER JOIN XR_FOLDER F ON F.FOLDER_ID = U.USER_ID
+			<where>
+			<if test="emp_no != null and emp_no != ''">
+				AND U.EMP_NO = #{emp_no}
+			</if>
+			<if test="user_id != null and user_id != ''">
+				AND U.USER_ID = #{user_id}
+			</if>						
+		</where> 		
+	</select>
+	
+	<!-- 사용자 로그인 처리 :: 다국어처리 대상 -->
+	<select id="userLogin" parameterType="User" resultType="User">
+		SELECT 
+				U.USER_ID,U.EMP_NO,U.USER_NAME_KO,U.USER_NAME_EN,U.ROLE_ID,U.USER_STATUS,U.USER_PASS,U.USER_NAME_KO AS USER_NM,
+				TO_CHAR(U.CREATE_DATE, 'YYYY-MM-DD HH24:MI:SS') CREATE_DATE,
+				U.SHARE_NAME,U.USER_TYPE,D.JOBTITLE,D.POSITION,D.EMAIL,D.TELEPHONE, U.MANAGE_GROUP,
+				G.GROUP_ID,G.DEPT_CD,G.GROUP_NAME_KO,G.GROUP_NAME_EN,GR.IS_DEFAULT,G.GROUP_NAME_KO AS GROUP_NM,C.CODE_NM AS ROLE_NM,
+				(SELECT GROUP_NAME_KO FROM XR_GROUP WHERE GROUP_ID = U.MANAGE_GROUP) AS MANAGE_GROUP_NM,
+				C.LANGUAGE, C.THEME, C.PAGE_SIZE,C.DOC_SEARCH,C.VIEW_TYPE,C.ICON_PREVIEW
+			FROM XR_USER U 
+				INNER JOIN XR_USER_DT D ON U.USER_ID = D.USER_ID			
+				INNER JOIN XR_USER_CONFIG C ON U.USER_ID = C.USER_ID
+				INNER JOIN XR_GROUPED GR ON U.USER_ID = GR.USER_ID AND GR.IS_DEFAULT='T'
+				INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID
+				INNER JOIN XR_CODE C ON U.ROLE_ID = C.CODE_ID AND GCODE_ID='ROLE'
+			<where>
+			<if test="emp_no != null and emp_no != ''">
+				AND U.EMP_NO = #{emp_no}
+			</if>			
+			<if test="login_type == 'admin'" >
+				AND U.ROLE_ID != 'CREATOR' AND U.USER_STATUS != 'D'
+			</if>
+			<if test="login_type == 'user'" >
+				AND U.USER_STATUS != 'D'
+			</if>
+		</where> 		 
+	</select>
+	
+	<!-- 사용자 기본 정보 등록 :: XR_USER -->
+	<insert id="userDefaultWrite" parameterType="User">
+		INSERT INTO XR_USER (
+				USER_ID,EMP_NO,USER_NAME_KO,USER_NAME_EN,USER_NAME_ZH,USER_NAME_JA,USER_PASS,
+				USER_STATUS,ROLE_ID,SHARE_NAME,USER_TYPE, MANAGE_GROUP
+		) VALUES (
+				#{user_id},#{emp_no},#{user_name_ko},#{user_name_en},#{user_name_zh},#{user_name_ja},#{user_pass},
+				#{user_status},#{role_id},#{share_name},#{user_type}, #{manage_group}	
+		)
+	</insert>
+	
+	<!-- 사용자 상세 정보 등록 :: XR_USER_DT -->
+	<insert id="userDetailWrite" parameterType="User">
+		INSERT INTO XR_USER_DT (
+				USER_ID,JOBTITLE,POSITION,EMAIL,TELEPHONE				
+		) VALUES (
+				#{user_id},#{jobtitle},#{position},#{email},#{telephone}
+		)
+	</insert>
+	
+	<!-- 유저 config (사용자 개인 환경설정) 정보 등록 :: XR_USER_CONFIG -->
+	<insert id="userConfigWrite">
+		insert into xr_user_config (
+			USER_ID,LANGUAGE,THEME,PAGE_SIZE,
+			DOC_SEARCH,VIEW_TYPE,ICON_PREVIEW
+		) values (
+			#{user_id}, #{language}, #{theme}, #{page_size},
+			#{doc_search}, #{view_type}, #{icon_preview}
+		)
+	</insert>
+	
+	<!-- 사용자 히스토리 등록 :: XR_USER_HT -->
+	<insert id="userHistoryWrite" parameterType="User">
+		INSERT INTO XR_USER_HT (
+			USER_SEQ, USER_ID, EMP_NO, USER_NAME_KO, USER_NAME_EN, USER_NAME_JA, USER_NAME_ZH, GROUP_ID, GROUP_NM, 
+			JOBTITLE, JOBTITLE_NM, POSITION, POSITION_NM, EMAIL, TELEPHONE, USER_STATUS, ROLE_ID, STATUS
+		) VALUES (
+			#{user_seq}, #{user_id}, #{emp_no}, #{user_name_ko}, #{user_name_en}, #{user_name_ja}, #{user_name_zh}, #{group_id}, #{group_nm}, 
+			#{jobtitle}, #{jobtitle_nm}, #{position}, #{position_nm}, #{email}, #{telephone}, #{user_status}, #{role_id}, #{status} 
+		)
+	</insert>
+	
+	<!-- 사용자 공통 조건 -->	
+	<sql id="whereUserCommon">
+		<where>
+			<if test="strIndex == 'user_nm'" > ( U.USER_NAME_KO LIKE '%'||#{strKeyword}||'%' OR U.USER_NAME_EN LIKE '%'||#{strKeyword}||'%' ) </if>
+			<if test="strIndex == 'user_id'" > U.USER_ID LIKE '%'||#{strKeyword}||'%' </if>	
+			<if test="strIndex == 'role_id'" > U.ROLE_ID = #{role_id} </if>
+			<if test="strIndex == 'jobtitle'" > D.JOBTITLE = #{jobtitle} </if>
+			<if test="strIndex == 'user_type'" > U.USER_TYPE = #{user_type} </if>
+			<if test="strIndex == 'user_status'" > U.USER_STATUS = #{user_status} </if>
+			<if test="strIndex == 'group_id'" > G.GROUP_ID = #{group_id} </if>
+			<if test="strIndex == 'is_default'" > GR.IS_DEFAULT = #{is_default} </if>
+		</where>		
+	</sql>
+	
+	<!-- 사용자 리스트 카운트 :: -->	
+	<select id="userExists" parameterType="HashMap" resultType="Int">
+		SELECT
+			COUNT(USER_ID) AS CNT
+		FROM 
+		(
+			SELECT 
+				U.USER_ID
+			FROM XR_USER U 
+				INNER JOIN XR_USER_DT D ON U.USER_ID = D.USER_ID			
+				INNER JOIN XR_GROUPED GR ON U.USER_ID = GR.USER_ID
+				INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID
+			WHERE
+				U.USER_ID = #{strKeyword}			
+		) LIST
+	</select>
+	
+	<!-- 사용자 리스트   -->
+	<select id="userList" parameterType="HashMap" resultType="User">
+		SELECT
+			USER_ID,EMP_NO,USER_NAME_KO,USER_NAME_EN,ROLE_ID,USER_STATUS,PAGE_SIZE,
+			CREATE_DATE,SHARE_NAME,USER_TYPE,JOBTITLE,POSITION,EMAIL,TELEPHONE,
+			ROLE_NM,USER_TYPE_NM,JOBTITLE_NM,POSITION_NM,
+			G.GROUP_ID,G.DEPT_CD,G.GROUP_NAME_KO,G.GROUP_NAME_EN,GR.IS_DEFAULT
+		FROM 
+		(
+			SELECT 
+				U.USER_ID,U.EMP_NO,U.USER_NAME_KO,U.USER_NAME_EN,U.ROLE_ID,U.USER_STATUS,C.PAGE_SIZE,
+				TO_CHAR(U.CREATE_DATE, 'YYYY-MM-DD HH24:MI:SS') CREATE_DATE,	
+				U.SHARE_NAME,U.USER_TYPE,D.JOBTITLE,D.POSITION,D.EMAIL,D.TELEPHONE,
+				COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='ROLE' AND CODE_ID = U.ROLE_ID),'') AS ROLE_NM,
+				COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='USER_TYPE' AND CODE_ID = U.USER_TYPE),'') AS USER_TYPE_NM,
+				COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='POSITION' AND CODE_ID = D.JOBTITLE),'') AS JOBTITLE_NM,
+				COALESCE( (SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='POSITION' AND CODE_ID = D.POSITION),'') AS POSITION_NM,
+				G.GROUP_ID,G.DEPT_CD,G.GROUP_NAME_KO,G.GROUP_NAME_EN,GR.IS_DEFAULT,
+				CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM		
+			FROM XR_USER U 
+				INNER JOIN XR_USER_DT D ON U.USER_ID = D.USER_ID			
+				INNER JOIN XR_USER_CONFIG C ON U.USER_ID = C.USER_ID
+				INNER JOIN XR_GROUPED GR ON U.USER_ID = GR.USER_ID
+				INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID
+			<include refid="whereUserCommon" />		
+		) LIST
+		WHERE LIST.PAGENUM = #{nPage}			
+	</select>
+	
+			
+	<!-- 사용자 접속로그 등록 :: XR_CONNECT_LOG -->
+	<insert id="connectLogWrite" parameterType="ConnectLog">
+		INSERT INTO XR_CONNECT_LOG (
+			CONNECT_LOG_SEQ,USER_ID,USER_NM,GROUP_ID,GROUP_NM,LOGIN_TYPE,CONNECT_IP,CONNECT_TYPE,CERT_YN,ERROR_CD,ERROR_CONTENT
+		) VALUES (
+			#{connect_log_seq},#{user_id},#{user_nm},#{group_id},#{group_nm},#{login_type},#{connect_ip},#{connect_type},#{cert_yn},#{error_cd},#{error_content}
+		)		
+	</insert>
+	
+	<!-- 사용자 접속로그 공통 Where 문 -->
+	<sql id="whereConnectLog">
+		<where>
+			<if test="strIndex == 'user_nm'" > USER_NM LIKE '%'||#{strKeyword}||'%' </if>	
+			<if test="strIndex == 'group_nm'" > GROUP_NM LIKE '%'||#{strKeyword}||'%' </if>
+			<if test="strIndex == 'connect_type'" > CONNECT_TYPE LIKE '%'||#{strKeyword}||'%' </if>
+			<if test="strIndex == 'user_id'" > USER_ID LIKE '%'||#{strKeyword}||'%' </if>
+			<if test="strIndex == 'startdt'" > CONNECT_TIME BETWEEN TO_DATE(#{startdt},'YYYY-MM-DD') AND TO_DATE(#{enddt},'YYYY-MM-DD')+0.99999</if>
+		</where>	
+	</sql>
+		
+	<!-- 사용자 접속로그 카운트:: XR_CONNECT_LOG -->
+	<select id="connectLogCnt" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(CONNECT_LOG_SEQ) AS CNT
+		FROM XR_CONNECT_LOG
+		<include refid="whereConnectLog" />				
+	</select>
+	
+	<!-- 사용자 접속로그 리스트:: XR_CONNECT_LOG -->
+	<select id="connectLogList" parameterType="HashMap" resultType="ConnectLog">
+		SELECT
+			CONNECT_LOG_SEQ,USER_ID,USER_NM,GROUP_ID,GROUP_NM,LOGIN_TYPE,CONNECT_IP,
+			CONNECT_TYPE,CERT_YN,ERROR_CD,ERROR_CONTENT,CONNECT_TIME
+		FROM
+		(
+			SELECT 
+				CONNECT_LOG_SEQ,USER_ID,USER_NM,GROUP_ID,GROUP_NM,LOGIN_TYPE,CONNECT_IP,
+				CONNECT_TYPE,CERT_YN,ERROR_CD,ERROR_CONTENT,TO_CHAR(CONNECT_TIME, 'YYYY-MM-DD HH24:MI:SS') CONNECT_TIME,
+				CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType})) / ${page_size} ) PAGENUM		
+			FROM XR_CONNECT_LOG
+			<include refid="whereConnectLog" />	
+		) LIST
+		WHERE LIST.PAGENUM = #{nPage}	
+	</select>
+	
+	<!-- 사용자 로그인 세션 공통 Where 문 -->
+	<sql id="whereLoginLog">
+		<where>
+			<if test="user_id != null and user_id != ''">
+				AND USER_ID = #{user_id}
+			</if>			
+			<if test="connect_ip != null and connect_ip != ''">
+				AND CONNECT_IP = #{connect_ip}
+			</if>			
+			<if test="session_id != null and session_id != ''">
+				AND SESSION_ID = #{session_id}
+			</if>			
+		</where> 		
+	</sql>
+		
+	<!-- 사용자 로그인 세션 정보 등록 :: XR_LOGIN_LOG -->	
+	<insert id="loginLogWrite" parameterType="LoginLog">
+		INSERT INTO XR_LOGIN_LOG (
+			USER_ID,SESSION_ID,CONNECT_IP			
+		) VALUES (
+			#{user_id},#{session_id},#{connect_ip}
+		)
+	</insert>
+	
+	<!-- 사용자 로그인 세션 정보 체크 :: XR_LOGIN_LOG -->	
+	<select id="loginLogDetail" parameterType="HashMap" resultType="LoginLog">
+		SELECT 
+			USER_ID,SESSION_ID,CONNECT_IP,
+			TO_CHAR(LOGIN_TIME, 'YYYY-MM-DD HH24:MI:SS') LOGIN_TIME
+		FROM XR_LOGIN_LOG
+		<include refid="whereLoginLog" />	
+	</select>
+	
+	<!-- 사용자 로그인 세션 정보 삭제 :: XR_LOGIN_LOG -->	
+	<delete id="loginLogDelete" parameterType="HashMap">
+		DELETE FROM XR_LOGIN_LOG 
+		<include refid="whereLoginLog" />	
+	</delete>
+	
+	<!-- Named 사용자 수를 얻는다. -->
+	<select id="namedUserCount" resultType="Int">
+		SELECT 
+			COUNT( DISTINCT USER_ID) AS CNT
+		FROM XR_USER U INNER JOIN XR_DOCUMENT D ON D.CREATOR_ID = U.USER_ID
+		WHERE USER_STATUS != 'D'	
+	</select>	
+		
+	<!-- 부서 사용자 목록을 얻는다 -->
+	<select id="groupUserList" parameterType="HashMap" resultType="User">
+		SELECT
+			LIST.* 
+		FROM 
+		(
+			SELECT 
+				U.USER_ID, U.USER_NAME_KO, U.USER_NAME_EN, U.USER_NAME_ZH, UD.EMAIL,U.USER_NAME_KO AS USER_NM,XG.GROUP_ID,
+				UD.POSITION, COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='POSITION' AND CODE_ID = UD.POSITION), '') AS POSITION_NM, 
+				U.ROLE_ID, COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='ROLE' AND CODE_ID = U.ROLE_ID), '') AS ROLE_NM, 
+				U.USER_STATUS, COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='STATUS' AND CODE_ID = U.USER_STATUS), '') AS USER_STATUS_NM,
+				G.GROUP_NAME_KO AS GROUP_NM
+			FROM XR_GROUP G
+			INNER JOIN XR_GROUPED XG ON G.GROUP_ID = XG.GROUP_ID
+			INNER JOIN XR_USER U ON XG.USER_ID = U.USER_ID
+			INNER JOIN XR_USER_DT UD ON U.USER_ID = UD.USER_ID
+		) LIST
+		<where>			
+			<if test="groupId != null and groupId != ''">
+				AND GROUP_ID = #{groupId}
+			</if>			
+			<if test="isSystem != null and isSystem != ''">
+				AND USER_ID != #{isSystem}
+			</if>			
+		</where> 		
+		<if test="orderCol != null and orderCol != '' and orderType != null and orderType != ''">
+			ORDER BY ${orderCol} ${orderType}
+		</if>
+		
+	</select>
+	
+	
+	<!-- 부서 및 사용자 검색 결과를 가져온다 -->
+	<select id="userGroupSearch" parameterType="HashMap" resultType="CaseMap">
+		SELECT 
+			DISTINCT IS_GROUP,UNIQUE_NM,UNIQUE_ID,
+			COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='IS_GROUP' AND CODE_ID = LIST.IS_GROUP ),'') AS IS_GROUP_NM
+		FROM 
+		(
+		<choose>
+		<when test="strIndex == 'ALL' ">
+			SELECT 
+				GROUP_NAME_KO AS UNIQUE_NM,'GROUP' AS IS_GROUP,GROUP_ID AS UNIQUE_ID				
+			FROM XR_GROUP				
+			UNION ALL
+			SELECT 
+				USER_NAME_KO AS UNIQUE_NM,'USER' AS IS_GROUP,USER_ID AS UNIQUE_ID
+			FROM XR_USER
+		</when>
+		<when test="strIndex == 'GROUP' ">
+			SELECT 
+				GROUP_NAME_KO AS UNIQUE_NM,'GROUP' AS IS_GROUP,GROUP_ID AS UNIQUE_ID				
+			FROM XR_GROUP				
+		</when>
+		<when test="strIndex == 'USER' ">
+			SELECT 
+				USER_NAME_KO AS UNIQUE_NM,'USER' AS IS_GROUP,USER_ID AS UNIQUE_ID
+			FROM XR_USER
+		</when>
+		</choose>
+		)LIST		
+		<where>			
+			<if test="strKeyword != null and strKeyword != ''">
+				AND UNIQUE_NM LIKE '%${strKeyword}%' 
+			</if>
+			<if test="isSystem != null and isSystem != ''">
+				AND UNIQUE_ID != #{isSystem}
+			</if>
+		</where> 		
+		ORDER BY ${orderCol} ${orderType}
+	</select>
+		
+	<!-- 사용자 목록을 검색 한다 -->
+	<select id="searchUserList" parameterType="HashMap" resultType="User">
+		SELECT
+			LIST.* 
+		FROM 
+		(
+			SELECT 
+				U.USER_ID, U.USER_NAME_KO, U.USER_NAME_EN, U.USER_NAME_ZH, UD.EMAIL,U.USER_NAME_KO AS USER_NM,XG.GROUP_ID,
+				UD.POSITION, COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='DUTY' AND CODE_ID = UD.POSITION), '') AS POSITION_NM,
+				UD.JOBTITLE, COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='POSITION' AND CODE_ID = UD.JOBTITLE), '') AS JOBTITLE_NM, 
+				U.ROLE_ID, COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='ROLE' AND CODE_ID = U.ROLE_ID), '') AS ROLE_NM, 
+				U.USER_STATUS, COALESCE((SELECT CODE_NM FROM XR_CODE WHERE GCODE_ID='STATUS' AND CODE_ID = U.USER_STATUS), '') AS USER_STATUS_NM,
+				G.GROUP_NAME_KO AS GROUP_NM
+			FROM XR_GROUP G
+			INNER JOIN XR_GROUPED XG ON G.GROUP_ID = XG.GROUP_ID
+			INNER JOIN XR_USER U ON XG.USER_ID = U.USER_ID
+			INNER JOIN XR_USER_DT UD ON U.USER_ID = UD.USER_ID
+		) LIST
+		WHERE ROLE_ID != 'SYSTEM_OPERATOR'
+		<if test="groupId != null and groupId != ''">
+			AND GROUP_ID = #{groupId} 
+		</if>
+		<if test="groupName != null and groupName != ''">
+			AND GROUP_NM LIKE '%${groupName}%'
+		</if>
+		<if test="userName != null and userName != ''">
+			AND USER_NM LIKE '%${userName}%'
+		</if>
+		ORDER BY ${orderCol} ${orderType}
+	</select>
+	
+	<!-- 사용자 정보 수정 -->
+	<update id="userUpdate" parameterType="User">
+		UPDATE XR_USER
+		<set>
+			<if test="user_name_ko != null and user_name_ko != ''">
+				USER_NAME_KO = #{user_name_ko},
+			</if>
+			<if test="user_name_en != null and user_name_en != ''">
+				USER_NAME_EN = #{user_name_en},
+			</if>
+			<if test="user_name_zh != null and user_name_zh != ''">
+				USER_NAME_ZH = #{user_name_zh},
+			</if>
+			<if test="user_name_ja != null and user_name_ja != ''">
+				USER_NAME_JA = #{user_name_ja},
+			</if>
+			<if test="user_pass != null and user_pass != ''">
+				USER_PASS = #{user_pass},
+			</if>
+			<if test="user_status != null and user_status != ''">
+				USER_STATUS = #{user_status},
+			</if>
+			<if test="role_id != null and role_id != ''">
+				ROLE_ID = #{role_id},
+			</if>
+			<if test="share_name != null and share_name != ''">
+				share_name = #{share_name},
+			</if>
+			<if test="user_type != null and user_type != ''">
+				USER_TYPE = #{user_type},
+			</if>
+			<if test="manage_group != null and manage_group != ''">
+				MANAGE_GROUP = #{manage_group},
+			</if> 
+		</set>
+		<where>
+			USER_ID = #{user_id}
+		</where>
+	</update>
+	
+	<!-- 사용자 환경설정 및 비밀번호 변경처리 -->
+	<update id="userConfig" parameterType="HashMap">		
+		UPDATE ${tableName}
+		<set>
+			<choose>	
+			<when test="updateType == 'myconfig' ">
+				<if test="page_size != null and page_size != ''">
+					PAGE_SIZE = #{page_size},
+				</if>
+				<if test="doc_search != null and doc_search != ''">
+					DOC_SEARCH = #{doc_search},
+				</if>
+				<if test="theme != null and theme != ''">
+					THEME = #{theme},
+				</if>
+				<if test="language != null and language != ''">
+					LANGUAGE = #{language},
+				</if>
+				<if test="view_type != null and view_type != ''">
+					VIEW_TYPE = #{view_type},
+				</if>
+			</when>
+			<when test="updateType == 'passwdConf' ">
+				<if test="user_pass != null and user_pass != ''">
+					USER_PASS = #{user_pass},
+				</if>
+			</when>
+			<when test="updateType == 'myinfo' ">
+				<if test="telephone != null and telephone != ''">
+					TELEPHONE = #{telephone},
+				</if>
+				<if test="email != null and email != ''">
+					EMAIL = #{email},
+				</if>
+			</when>
+			<when test="updateType == 'usernm' ">
+				<if test="user_name_en != null ">
+					USER_NAME_EN = #{user_name_en},
+				</if>
+			</when>
+			</choose>
+		</set>
+		WHERE USER_ID = #{user_id}
+	</update>
+	
+	<!-- 관리부서 변경 -->
+	<update id="updateManageGroup" parameterType="HashMap">
+		UPDATE XR_USER
+		SET MANAGE_GROUP = #{manage_group}
+		WHERE USER_ID = #{user_id}
+	</update>
+		
+	<!-- 사용자 상세 정보 조회 : 환경설정 -->
+	<select id="userDetailInfo" parameterType="HashMap" resultType="User">
+			SELECT
+				USER_ID,JOBTITLE,POSITION,EMAIL,TELEPHONE
+			FROM XR_USER_DT
+			WHERE USER_ID = #{user_id}		
+	</select>
+	
+	<!-- 사용자 상세 정보 수정 -->
+	<update id="userDetailUpdate" parameterType="User">
+		UPDATE XR_USER_DT
+		<set>
+			<if test="jobtitle != null and jobtitle != ''">
+				JOBTITLE = #{jobtitle},
+			</if>
+			<if test="position != null and position != ''">
+				POSITION = #{position},
+			</if>
+			<if test="email != null and email != ''">
+				EMAIL = #{email},
+			</if>
+			<if test="telephone != null and telephone != ''">
+				TELEPHONE = #{telephone},
+			</if>
+		</set>
+		WHERE
+			USER_ID = #{user_id}
+		
+	</update>
+	
+	<!-- 사용자 삭제 -->
+	<delete id="userDelete" parameterType="HashMap">
+		DELETE FROM
+			XR_USER
+		WHERE
+			USER_ID = #{user_id}
+	</delete>
+	
+	<!-- 사용자 상세정보 삭제 -->
+	<delete id="userDetailDelete" parameterType="HashMap">
+		DELETE FROM 
+			XR_USER_DT
+		WHERE
+			USER_ID = #{user_id}
+	</delete>
+	
+	<!-- 사용자 환경설정 삭제 -->
+	<delete id="userConfigDelete" parameterType="HashMap">
+		DELETE FROM
+			XR_USER_CONFIG
+		WHERE
+			USER_ID = #{user_id}
+	</delete>
+	
+	<!-- 사용자 스토리지 할당량 변경 -->
+	<update id="updateUserStorageQuota" parameterType="User">
+		UPDATE XR_FOLDER
+		SET
+			STORAGE_QUOTA = #{storage_quota}
+		WHERE
+			FOLDER_TYPE = 'DOCUMENT'
+			AND FOLDER_ID = #{user_id}
+	</update>
+	
+	<!-- 퀵메뉴 정보 가져오기 -->
+	<select id="quickMenuInfo" parameterType="HashMap" resultType="QuickMenu">
+		SELECT
+			MENU_CD,MENU_NM,LINK_PATH,ORD
+		FROM XR_QUICK_MENU 		
+		ORDER BY ORD ASC	
+	</select>
+
+	<select id="topQuickMenu" parameterType="HashMap" resultType="QuickMenu">
+		SELECT
+			M.MENU_CD,M.MENU_NM,M.LINK_PATH,M.ORD
+		FROM XR_QUICK_MENU M LEFT JOIN XR_USER_QUICK_MENU U ON M.MENU_CD = U.MENU_CD
+		WHERE U.USER_ID = #{user_id}
+		ORDER BY ORD ASC	
+	</select>
+	
+	<select id="userQuickMenu" parameterType="HashMap" resultType="CaseMap">
+		SELECT
+			MENU_CD
+		FROM XR_USER_QUICK_MENU 		
+		WHERE USER_ID = #{user_id}			
+	</select>
+	
+	<delete id="quickMenuDelete" parameterType="HashMap">
+		DELETE FROM XR_USER_QUICK_MENU
+		WHERE USER_ID = #{user_id}
+	</delete>
+	
+	<insert id="quickMenuWrite" parameterType="HashMap">
+		INSERT INTO XR_USER_QUICK_MENU (	USER_ID,MENU_CD) VALUES (#{user_id,},#{menu_cd})
+	</insert>
+	
+</mapper>

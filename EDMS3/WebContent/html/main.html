@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <title>index</title>
+ <script type="text/javascript" src="/js/plugins/jquery/jquery-2.1.3.min.js"></script>
+	<script type="text/javascript" src="/js/plugins/jquery/jquery-ui.js"></script>
+	<script type="text/javascript" src="/js/plugins/bxslider/jquery.bxslider.js"></script>
+	<script type="text/javascript" src="/js/plugins/ddslick/jquery.ddslick.custom.js"></script>
+	<script type="text/javascript" src="/js/plugins/cookie/jquery.cookie.js"></script>
+	<script type="text/javascript" src="/js/plugins/jalert/jquery.alerts.js"></script>
+	<script type="text/javascript" src="/js/plugins/scrollbar/jquery.tinyscrollbar.js"></script>
+	<script type="text/javascript" src="/js/plugins/json/json2.js"></script>
+	<script type="text/javascript" src="/js/plugins/jstree/dist/jstree.js"></script>
+	<script type="text/javascript" src="/js/common/util.js"></script>
+	<script type="text/javascript" src="/js/common/ui.js"></script>
+	<script type="text/javascript" src="/js/common/tree.js"></script>
+	<script type="text/javascript" src="/js/common/constant.js"></script>
+	<script type="text/javascript" src="/js/layout/layout.js"></script>
+	<script type="text/javascript" src="/js/common/databinder.js"></script>
+	<script type="text/javascript" src="/js/common/validator.js"></script>
+	<script type="text/javascript" src="/js/common/ecm.js"></script>
+	<script type="text/javascript" src="/js/plugins/jqgrid/js/i18n/grid.locale-kr.js"></script>
+	<script type="text/javascript" src="/js/plugins/jqgrid/plugins/ui.multiselect.js"></script>
+	<script type="text/javascript" src="/js/plugins/jqgrid/js/jquery.jqGrid.src.js"></script>
+	<script type="text/javascript" src="/js/plugins/jqgrid/plugins/jquery.tablednd.js"></script>
+	<script type="text/javascript" src="/js/plugins/jqgrid/plugins/jquery.contextmenu.js"></script>
+    <script type="text/javascript" src="/js/plugins/jqgrid/plugins/jquery.searchFilter.js"></script>
+	<script type="text/javascript" src="/js/plugins/jqgrid/src/grid.celledit.js"></script>
+	<script type="text/javascript" src="/js/plugins/jqgrid/src/grid.subgrid.js"></script>
+	<script type="text/javascript" src="/js/plugins/jqgrid/src/grid.treegrid.js"></script>
+	
+	<link href="/css/common/ecm.css" rel="stylesheet" type="text/css">
+	<link href="/css/common/reset.css" rel="stylesheet" type="text/css">
+	<link href="/css/plugins/themes/jquery-ui.css" rel="stylesheet" type="text/css">
+	<link href="/css/plugins/jalert/jquery.alerts.css" rel="stylesheet" type="text/css">
+	<link href="/css/plugins/ddslick/jquery.ddslick.custom.css" rel="stylesheet" type="text/css">
+	<link href="/js/plugins/jstree/dist/themes/default/style.css" rel="stylesheet" type="text/css">
+	<link href="/js/plugins/jqgrid/css/ui.jqgrid.css" rel="stylesheet" type="text/css">
+	<link href="/js/plugins/jqgrid/plugins/ui.multiselect.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <div class="wrap">
+	<div class="top_menu">
+		<div class="top_menu_custom">
+			<ul class="custom_menu_list">
+            	<li class="full_screen">
+                	<a href="#" class="full_screen"><img src="/img/icon/fullscreen.png" alt="" title=""></a>
+                </li>
+                <li class="quick_menu"><a href="#" class="quick_menu">
+                	<img src="/img/icon/quickMenu.png" alt="" title="">퀵메뉴
+                    <span class="quick_menu"></span>
+                   </a>
+                   <div class="quick_sub_wrapper">
+                   <ul class="quick_sub_menu">
+                   		<li><a href="#">내 소유 문서</a></li>
+                        <li><a href="#">내 수정 중인 문서</a></li>
+                        <li><a href="#">내 만기 문서</a></li>
+                        <li><a href="#">휴지통</a></li>
+                        <li><a href="#">즐겨찾기</a></li>
+                        <li><a href="#">공유받은 문서</a></li>
+                        <li><a href="#">공유받은 폴더</a></li>
+                   </ul>
+                   </div>
+                </li>
+            </ul>
+		</div>
+        <div class="top_menu_shape"></div>
+		<div class="top_menu_search"><span class="lbl_integrated_search">통합검색</span>
+			<div class="search_input_form">
+				<form class="" name="" method="post">
+					<input type="text" class="search_text" placeholder="검색어를 입력하세요">
+					<button type="submit" class="search_submit"></button>
+				</form>
+			</div>
+			<div class="search_detail">
+				<a href="#" class="dropDown_img"><img src="/img/icon/search_detail_btn.png" alt=""></a>
+				<div class="integrated_dropDown_menu hide">
+					<form>
+						<table class="srch_integrated_tbl">
+							<tr>
+							<th>기본검색</th>
+							<td>
+								<input type="text" class="srch_integrated_txt" placeholder="검색어를 입력하세요">
+								<label><input type="checkbox" id="" name="" class="" value="">결과내 재 검색</label>
+							</td>
+							</tr>
+							<tr>
+							<th>등록기간</th>
+							<td>
+								<a href="#" id="0" class="srch_integrated_regDate">전체</a>
+								<a href="#" id="1" class="srch_integrated_regDate">1개월</a>
+								<a href="#" id="2" class="srch_integrated_regDate">3개월</a>
+								<a href="#" id="3" class="srch_integrated_regDate">6개월</a>
+								<a href="#" id="4" class="srch_integrated_regDate">1년</a>			
+								<input type="text" id="datepicker3" name="" class="srch_integrated_startDate input-text calend" name="start_date" readonly="readonly">
+								<span class="dateto">-</span>
+								<input type="text" id="datepicker4" name="" class="srch_integrated_endDate input-text calend" name="end_date" readonly="readonly">
+							</td>
+							</tr>
+							<tr>
+							<th></th>
+							<td>
+								<label><input type="radio" name="" class="" value="">전체</label>
+								<label><input type="radio" name="" class="" value="">제목</label>
+								<label><input type="radio" name="" class="" value="">본문</label>
+								<label><input type="radio" name="" class="" value="">등록자</label>
+								<label><input type="radio" name="" class="" value="">첨부파일명</label>
+								<label><input type="radio" name="" class="" value="">첨부내용</label>
+							</td>
+							</tr>
+							<tr>
+							<th>문서유형</th>
+							<td>
+								<select id="srch_type5" name="">
+									<option value="" selected="selected">전체</option>
+									<option value="">일반문서</option>
+									<option value="">파일문서</option>
+								</select>							
+							</td>
+							</tr>
+							<tr>
+							<th>폴더위치</th>
+							<td>
+								<input type="text" id="" name="" class="srch_integrated_folder">
+								<button type="button" id="" name="" class="srch_integrated_folderChoose">선택</button>
+								<label><input type="checkbox" id="" name="" class="" value="">하위폴더 포함</label>
+							</td>
+							</tr>
+							<tr>
+							<td colspan="2" class="srch_integrated_btnGrp">
+								<button type="submit" id="srch_integrated_submit" class="srch_integrated_btn">검색</button>
+								<button type="reset" id="" class="srch_integrated_btn">초기화</button>
+							</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+    <header class="header">
+		<div class="logo">
+			<h1>
+				<a href="#"><img src="/img/logo.png"></a>
+			</h1>
+		</div>
+		<div class="header_menu_wrapper">
+			<div class="header_icon">
+				<ul class="header_icon_menu">
+					<li class="selected"><a href="#" class="page selected"></a>
+                    	<div class="hide">나의 문서</div>
+                    </li>
+					<li><a href="#" class="user"></a>
+                    	<div class="hide">사용자 정보</div>
+                    </li>
+					<li><a href="#" class="inbox"></a>
+                    	<div class="hide">문서함</div>
+                    </li>
+					<li><a href="#" class="usergroup"></a>
+                    	<div class="hide">사용자 그룹</div>
+                    </li>
+					<li><a href="#" class="piechart"></a>
+                    	<div class="hide">통계</div>
+                    </li>
+				</ul>
+			</div>
+			<div class="header_user">
+				<ul class="header_user_menu">
+					<li class="user_info">
+						<a href="#">
+							<img src="/img/icon/user_info.png" alt="">
+							홍길동님(일반)
+							<img src="/img/icon/head_dropdown.png" class="head_dropDown">
+						</a>
+                        <div class="info_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                            <div>
+                                <ul>
+                                    <li><a href="#">내정보</a></li>
+                                    <li><a href="#">보안 설정</a></li>
+                                </ul>
+                            </div>
+                        </div>
+					</li>
+					<li class="user_note">
+						<a href="#">
+							<img src="/img/icon/user_note.png" alt="">
+							<span class="num_cnt">99</span>
+						</a>
+                        <div class="note_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                           	<ul>
+                            	<li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                            	<li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                            </ul>
+                        </div>
+					</li>
+					<li class="user_inbox">
+						<a href="#">
+							<img src="/img/icon/user_inbox.png" alt="">
+							<span class="num_cnt">999</span>
+						</a>
+						<!-- 
+						<div class="inbox_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                           	<ul>
+                            	<li><a href="#">이동</a></li>
+                            	<li><a href="#">다운로드</a></li>
+                                <li><a href="#">연결문서 설정</a></li>
+                                <li><a href="#">메일발송</a></li>
+                                <li><a href="#">비우기</a></li>
+                            </ul>
+                        </div>
+                        -->
+					</li>
+					<li class="user_setting">
+						<a href="#">
+							<img src="/img/icon/user_setting.png" alt="">
+							<img src="/img/icon/head_dropdown.png" class="head_dropDown">
+						</a>
+						<!-- 
+						<div class="setting_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                           	<ul>
+                            	<li><a href="#">스킨 설정</a></li>
+                            	<li><a href="#">언어 설정</a></li>
+                                <li><a href="#">문서목록수 설정</a></li>
+                                <li><a href="#">환경변수 추가</a></li>
+                            </ul>
+                        </div>
+                        -->
+					</li>
+					<li class="user_logout">
+						<a href="#">
+							<img src="/img/icon/user_logout.png" alt="">
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</header>
+
+	<div class="main_cnt_wrapper">
+		<nav class="main_lnb_menu">
+			<section class="main_lnb_info">
+				<ul>
+					<li class="reg_doc"><a href="#">문서등록</a></li>
+					<li class="reg_work selected"><a href="#">업무등록</a></li>
+				</ul>
+			</section>
+			
+			<section class="main_coop_process">
+				<div class="main_coop_title">협업 업무 현황</div>
+				<div class="coop_proceed_summary">
+					<ul>
+						<li class="composite">
+							<a href="#">
+								<span class="cnt">99+</span>
+								<span class="process_caption">작성중</span>
+							</a>
+						</li>
+						<li class="next_proceed"></li>
+						<li class="approval">
+							<a href="#">
+								<span class="cnt">99+</span>
+								<span class="process_caption">승인중</span>
+							</a>
+						</li>
+						<li class="next_proceed"></li>
+						<li class="supplement">
+							<a href="#">
+								<span class="cnt">99+</span>
+								<span class="process_caption">보완중</span>
+							</a>
+						</li>
+						<li class="next_proceed"></li>
+						<li class="notopen">
+							<a href="#">
+								<span class="cnt">99+</span>
+								<span class="process_caption">미열람</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="coop_doc_list">
+					<table>
+						<colgroup>
+							<col width="17"/>
+							<col width="136"/>
+							<col width="53"/>
+							<col width="92"/>
+						</colgroup>
+						<tr>
+							<td><img src="/img/icon/file.png" alt="" title=""></td>
+							<td>자재업무 매뉴얼</td>
+							<td>김문서</td>
+							<td>2015-03-15</td>
+						</tr>
+						<tr>
+							<td><img src="/img/icon/file.png" alt="" title=""></td>
+							<td>자재업무 매뉴얼</td>
+							<td>김문서</td>
+							<td>2015-03-15</td>
+						</tr>
+						<tr>
+							<td><img src="/img/icon/file.png" alt="" title=""></td>
+							<td>자재업무 매뉴얼</td>
+							<td>김문서</td>
+							<td>2015-03-15</td>
+						</tr>
+						<tr>
+							<td><img src="/img/icon/file.png" alt="" title=""></td>
+							<td>자재업무 매뉴얼</td>
+							<td>김문서</td>
+							<td>2015-03-15</td>
+						</tr>
+						<tr>
+							<td><img src="/img/icon/file.png" alt="" title=""></td>
+							<td>자재업무 매뉴얼</td>
+							<td>김문서</td>
+							<td>2015-03-15</td>
+						</tr>
+					</table>
+				</div>
+			</section>
+			
+			<section class="exsoft_banner">
+				<!-- bxslider -->
+				
+				<ul class="banner_list">
+					<li><img src="/img/slider/banner_img01.png" alt="" title=""></li>
+					<li><img src="/img/slider/banner_img02.png" alt="" title=""></li>
+					<li><img src="/img/slider/banner_img03.png" alt="" title=""></li>
+				</ul>
+			</section>
+	    </nav>
+		
+		<div class="main_contents">
+			<div class="main_doc_group1">
+				<div class="doc_group_element">
+					<div class="main_doc_title">
+						새로운 문서
+						<a href="#" class="view_more">더보기</a>
+					</div>
+					<div class="main_doc_cnts">
+						<table>
+							<colgroup>
+								<col width="53"/>
+								<col width="212"/>
+								<col width="96"/>
+								<col width="93"/>
+							</colgroup>
+							<thead>
+							<tr>
+								<th class="check"><input type="checkbox" id="checkAll" name="" class="" value=""></th>
+								<th>제목</th>
+								<th>등록자</th>
+								<th>
+									<a href="#" class="head_dropDown">
+										등록일
+									</a>
+								</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/no_file.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/no_file.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/no_file.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td colspan="4" class="nodata">데이터가 없습니다.</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="doc_group_element down">
+					<div class="main_doc_title">
+						최다조회 문서
+						<a href="#" class="view_more">더보기</a>
+					</div>
+					<div class="main_doc_cnts">
+						<table>
+							<colgroup>
+								<col width="53"/>
+								<col width="212"/>
+								<col width="96"/>
+								<col width="93"/>
+							</colgroup>
+							<thead>
+							<tr>
+								<th class="check"><input type="checkbox" id="checkAll" name="" class="" value=""></th>
+								<th>제목</th>
+								<th>등록자</th>
+								<th>
+									<a href="#" class="head_dropDown">
+										등록일
+									</a>
+								</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/no_file.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="doc_group_element down">
+					<div class="main_doc_title">
+						최다조회 내 문서
+						<a href="#" class="view_more">더보기</a>
+					</div>
+					<div class="main_doc_cnts">
+						<table>
+							<colgroup>
+								<col width="53"/>
+								<col width="212"/>
+								<col width="96"/>
+								<col width="93"/>
+							</colgroup>
+							<thead>
+							<tr>
+								<th class="check"><input type="checkbox" id="checkAll" name="" class="" value=""></th>
+								<th>제목</th>
+								<th>등록자</th>
+								<th>
+									<a href="#" class="head_dropDown">
+										등록일
+									</a>
+								</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/no_file.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="group_btnMenu">
+					<ul>
+						<li class="new_doc selected">
+							<a href="#">새로운 문서</a>
+						</li>
+						<li class="rank_doc1">
+							<a href="#">
+								최다조회 문서<br>
+								<span class="subtitle">(전체 문서 기준)</span>
+							</a>
+						</li>
+						<li class="rank_doc2">
+							<a href="#">
+								최다조회 내 문서<br>
+								<span class="subtitle">(내 등록 문서 기준)</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="main_doc_group2">
+				<div class="doc_group_element">
+					<div class="main_doc_title">
+						최근조회 문서
+						<a href="#" class="view_more">더보기</a>
+					</div>
+					<div class="main_doc_cnts">
+						<table>
+							<colgroup>
+								<col width="53"/>
+								<col width="212"/>
+								<col width="96"/>
+								<col width="93"/>
+							</colgroup>
+							<thead>
+							<tr>
+								<th class="check"><input type="checkbox" id="checkAll" name="" class="" value=""></th>
+								<th>제목</th>
+								<th>등록자</th>
+								<th>
+									<a href="#" class="head_dropDown">
+										등록일
+									</a>
+								</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/no_file.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="doc_group_element down">
+					<div class="main_doc_title">
+						내 수정중인 문서
+						<a href="#" class="view_more">더보기</a>
+					</div>
+					<div class="main_doc_cnts">
+						<table>
+							<colgroup>
+								<col width="53"/>
+								<col width="212"/>
+								<col width="96"/>
+								<col width="93"/>
+							</colgroup>
+							<thead>
+							<tr>
+								<th class="check"><input type="checkbox" id="checkAll" name="" class="" value=""></th>
+								<th>제목</th>
+								<th>등록자</th>
+								<th>
+									<a href="#" class="head_dropDown">
+										등록일
+									</a>
+								</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/no_file.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="doc_group_element down">
+					<div class="main_doc_title">
+						내 받은 쪽지 현황
+						<a href="#" class="view_more">더보기</a>
+					</div>
+					<div class="main_doc_cnts">
+						<table>
+							<colgroup>
+								<col width="53"/>
+								<col width="212"/>
+								<col width="96"/>
+								<col width="93"/>
+							</colgroup>
+							<thead>
+							<tr>
+								<th class="check"><input type="checkbox" id="checkAll" name="" class="" value=""></th>
+								<th>제목</th>
+								<th>등록자</th>
+								<th>
+									<a href="#" class="head_dropDown">
+										등록일
+									</a>
+								</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/hwp.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							<tr>
+								<td class="check"><input type="checkbox" name="" class="" value=""></td>
+								<td><img src="/img/icon/no_file.png" alt="" title=""> 김등록</td>
+								<td>김등록</td>
+								<td>2015-03-10</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="group_btnMenu">
+					<ul>
+						<li class="recent_doc selected">
+							<a href="#">최근조회 문서</a>
+						</li>
+						<li class="mydoc_modify">
+							<a href="#">내 수정중인 문서</a>
+						</li>
+						<li class="mynote_receive">
+							<a href="#">내 받은 쪽지 현황</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+    </div>
+   	<!-- 퀵메뉴 추가 끝 -->
+   	<footer class="footer">
+		<ul class="footer_menu">
+			<li class="ft_lyr_tooltip"><a href="#">도움말</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>도움말에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_help" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">프로그램설치</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>프로그램 설치에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_prog" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">시스템관리</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>시스템 관리에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_system" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">퀵메뉴추가</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>퀵메뉴 추가에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_quickmn" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+		</ul>
+		<p class="copyright">
+			Copyright eXsoft All Rights Reserved.
+		</p>
+    </footer>
+  </div>
+</body>
+<script>
+	$(function(){
+		$('.banner_list').bxSlider({
+			  auto: true,
+			  controls:false,
+			  adaptiveHeight:true,
+			  pager:true
+		});	
+		
+		
+		$('.group_btnMenu li a').on("click", function(){
+			var idx = $(this).parent().index();
+			var div = $(this).parents('.group_btnMenu').parent().find('.doc_group_element');
+			var currDiv = $(this).parents('.group_btnMenu').parent().find('div[class$="doc_group_element"]');
+			var currIdx = currDiv.index();
+			var toBeShownDiv = div.eq(idx);
+			var parents = $(this).parents('.group_btnMenu');
+			
+			if(idx == currIdx) return false;
+			
+			parents.find('li').removeClass('selected');
+			
+			toBeShownDiv.stop().animate({
+				top:0
+			}, 500, function(r){
+				
+			});
+			
+			currDiv.stop().animate({
+				top:462
+			}, 500, function(r){
+				currDiv.addClass('down');
+			});
+			
+			toBeShownDiv.removeClass('down');
+			$(this).parent().addClass('selected');
+		});
+	});
+</script>
+</html>

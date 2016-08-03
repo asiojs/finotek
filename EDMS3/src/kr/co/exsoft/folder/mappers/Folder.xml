@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.folder.dao.FolderDao">
+	
+	<!-- 폴더 상세 조회 가져오기 :: 다국어변경대상 -->
+	<select id="folderDetail" parameterType="HashMap" resultType="Folder">
+		SELECT 
+    		FOLDER_NAME_KO, FOLDER_NAME_EN, IS_SAVE, FOLDER_STATUS, IS_TYPE,
+    		SORT_INDEX, STORAGE_QUOTA, STORAGE_USAGE, CREATE_DATE,
+    		(SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID = CREATOR_ID) AS CREATOR_NAME,
+    		FOLDER_ID, PARENT_ID, MAP_ID, CREATOR_ID, FOLDER_TYPE, 
+    		ACL_ID, IS_INHERIT_ACL, IS_SHARE
+		FROM XR_FOLDER
+		<where>
+			<if test="folder_id != null and folder_id != ''">
+				AND FOLDER_ID = #{folder_id}
+			</if>		
+			<if test="parent_id != null and parent_id != ''">
+				AND PARENT_ID = #{parent_id}
+			</if>		
+			<if test="folder_name_ko != null and folder_name_ko != ''">
+				AND FOLDER_NAME_KO = #{folder_name_ko}
+			</if>		
+		</where>      		
+	</select>
+	
+	<!-- 동일한 이름을 가진 폴더가 존재하는지 -->
+	<select id="folderIsExistByFolderNameAndParentID" parameterType="Folder" resultType="Int">
+		SELECT
+			COUNT(*)
+		FROM
+			XR_FOLDER
+		WHERE
+			PARENT_ID = #{parent_id}
+			AND FOLDER_NAME_KO = #{folder_name_ko}
+	</select>
+	
+	<!-- 권한이 사용중인지 체크한다. -->
+	<select id="isUsingAcl" parameterType="HashMap" resultType="Int">
+		SELECT COUNT(FOLDER_ID) AS CNT
+        FROM ${table_nm}
+		<where>
+			<if test="acl_list != null"> 
+				ACL_ID IN 
+				<foreach item="item" index="index" collection="acl_list" separator="," open=" ( " close=")" >
+					#{item}
+				</foreach>		
+			 </if>									 	
+		</where>
+	</select>
+	
+	<!-- 폴더-문서 정보 삭제처리 -->
+	<delete id="xrLinkedDelete" parameterType="HashMap">
+		DELETE FROM XR_LINKED 
+		<where>
+			<if test="doc_id != null and doc_id != ''">
+				AND DOC_ID = #{doc_id}
+			</if>		
+			<if test="folder_id != null and folder_id != ''">
+				AND FOLDER_ID = #{folder_id}
+			</if>		
+		</where>      		
+	</delete>
+	
+	<!-- 관리대상 폴더여부체크 :: 멀티DB 변경처리대상 -->
+	<select id="isAuthFolder" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(*) AS CNT
+		FROM 
+		(
+			SELECT 
+				FOLDER_ID,FOLDER_NAME_KO,PARENT_ID, LEVEL AS DEPTH
+			FROM XR_FOLDER
+			START WITH FOLDER_ID = #{parent_id}
+			CONNECT BY PRIOR FOLDER_ID = PARENT_ID
+			ORDER  BY DEPTH
+		)INLINE 
+		WHERE FOLDER_ID = #{folder_id}
+	</select>
+	
+	<!-- ########## [update common  쿼리] Start... ########## -->
+	<!-- CASE1.폴더 수정 -->
+	<sql id="updateUpdateSet">
+		<set>
+	   	  <if test="folder_name_ko != null and folder_name_ko != ''">
+	   	  	  FOLDER_NAME_KO = #{folder_name_ko},
+	   	  </if>
+	   	  <if test="folder_name_en != null and folder_name_en != ''">
+	   	  	  FOLDER_NAME_EN = #{folder_name_en},	
+	   	  </if>
+	   	  <if test="folder_name_ja != null and folder_name_ja != ''">
+	   	  	  FOLDER_NAME_JA = #{folder_name_ja},
+	   	  </if>
+	   	  <if test="parent_id != null and parent_id != ''">
+	   	      PARENT_ID = #{parent_id},
+	   	  </if>
+	   	  <if test="map_id != null and map_id != ''">
+	   	      MAP_ID = #{map_id},
+	   	  </if>
+	   	  <if test="acl_id != null and acl_id != ''">
+	   	      ACL_ID = #{acl_id},
+	   	  </if>
+	   	  <if test="is_inherit_acl != null and is_inherit_acl != ''">
+	   	      IS_INHERIT_ACL = #{is_inherit_acl},
+	   	  </if>
+	   	  <if test="is_save != null and is_save != ''">
+	   	  	  IS_SAVE = #{is_save},
+	   	  </if>
+	   	  <if test="folder_status != null and folder_status != ''">
+	   	      FOLDER_STATUS = #{folder_status},
+	   	  </if>
+	   	  <if test="is_type != null and is_type != ''">
+	   	      IS_TYPE = #{is_type},
+	   	  </if>
+	   	  <if test="sort_index != null and sort_index != ''">
+	   	      SORT_INDEX = #{sort_index},
+	   	  </if>
+	   	  <if test="storage_quota != null and storage_quota != ''">
+	   	      STORAGE_QUOTA = #{storage_quota},
+	   	  </if>
+	   	  <if test="is_share != null and is_share != ''">
+	   	      IS_SHARE = #{is_share},
+	   	  </if>
+	   </set>
+	</sql>
+	
+	<!-- CASE2.폴더 이동 -->
+	<sql id="updateMoveSet">
+		<set>
+			PARENT_ID = #{parent_id},
+			MAP_ID = #{map_id},
+		</set>
+	</sql>
+	
+	<!-- CASE3.폴더권한 일괄 변경시 -->	
+	<sql id="updateAclChangeSet">
+		<set>
+			ACL_ID = #{acl_id},
+		</set>
+	</sql>
+	<!-- ########## [update common  쿼리] End... ########## -->
+	
+	<!-- ########## [where common  쿼리] Start... ########## -->
+	<sql id="whereAclAdd">
+	<if test="acl_check != null and acl_check == 'true'">
+	AND EXISTS( 
+			   SELECT A.ACL_ID FROM XR_ACLITEM A 
+			   WHERE F.ACL_ID = A.ACL_ID 
+				 AND ACT_BROWSE = 'T'
+				 AND A.IS_TYPE = 'F' 
+				 AND (   (A.ACCESSOR_ISALIAS = 'T' AND A.ACCESSOR_ID = 'OWNER' AND F.CREATOR_ID = #{user_id} ) 
+					  OR (A.ACCESSOR_ISALIAS = 'T' AND A.ACCESSOR_ID = 'WORLD') 
+					  OR (A.ACCESSOR_ISALIAS = 'F' AND A.ACCESSOR_ISGROUP = 'F' AND A.ACCESSOR_ID = #{user_id}) 
+					  OR (A.ACCESSOR_ISALIAS = 'F' AND A.ACCESSOR_ISGROUP = 'T' AND A.ACCESSOR_ID IN 
+							<foreach item="item" index="index" collection="group_id_list" separator="," open=" ( " close=")" >
+								#{item}
+							</foreach>
+						) 
+					 )  
+			  )
+	</if>
+	</sql>
+	<!-- ########## [where common  쿼리] End... ########## -->
+	
+	<!-- ########## [사용자 및 관리자 공통 쿼리] Start... ########## -->
+	<!-- 폴더 기본 정보 등록 :: XR_FOLDER -->
+	<insert id="folderWrite" parameterType="Folder">
+		INSERT INTO XR_FOLDER (
+				FOLDER_ID, FOLDER_NAME_KO, FOLDER_NAME_EN, PARENT_ID, FOLDER_TYPE, SORT_INDEX, FOLDER_STATUS,
+				MAP_ID, ACL_ID, CREATOR_ID, STORAGE_QUOTA, STORAGE_USAGE, IS_SAVE, IS_TYPE, IS_INHERIT_ACL, IS_SHARE
+		) VALUES (
+				#{folder_id},#{folder_name_ko},#{folder_name_en},#{parent_id},#{folder_type},#{sort_index},#{folder_status},
+				#{map_id},#{acl_id},#{creator_id},#{storage_quota},#{storage_usage},#{is_save},#{is_type},#{is_inherit_acl}, #{is_share}
+		)
+	</insert>
+	
+	<!-- 폴더 수정 :: XR_FOLDER -->
+	<update id="folderUpdate" parameterType="Folder" >
+		UPDATE XR_FOLDER
+		<choose>
+			<!-- CASE1.폴더 수정 -->
+			<when test="update_action == 'UPDATE'">
+				<include refid="updateUpdateSet" />
+			</when>
+			<!-- CASE2.폴더 이동 -->
+			<when test="update_action == 'MOVE'">
+				<include refid="updateMoveSet" />
+			</when>
+			<!-- CASE3.폴더권한 일괄 변경시 -->		
+			<when test="update_action =='CHANGE_ACL_ID'">
+				<include refid="updateAclChangeSet" />	
+			</when>	
+			<otherwise></otherwise>
+		</choose>
+		WHERE FOLDER_ID = #{folder_id}
+	</update>
+	
+	<!-- 폴더 삭제 :: XR_FOLDER -->
+	<delete id="folderDelete" parameterType="HashMap">
+		DELETE FROM XR_FOLDER
+		WHERE FOLDER_ID = #{folder_id}
+	</delete>
+	
+	<!-- 하위폴더 존재 여부 -->
+	<select id="existChildFolder" parameterType="HashMap" resultType="Int">
+		SELECT 
+		   COUNT(FOLDER_ID) AS CNT
+		FROM XR_FOLDER
+		WHERE PARENT_ID = #{folder_id}  
+	</select>
+	
+	<!-- 현재 폴더에 문서 및 개인휴지통에 현재 폴더 기준 문서 존재 여부 -->
+	<select id="existDocument" parameterType="HashMap" resultType="Int">
+		SELECT 
+		   COUNT(FOLDER_ID) AS CNT
+		FROM XR_LINKED
+		WHERE FOLDER_ID = #{folder_id}  
+	</select>
+	
+	<!-- 최상위 폴더 목록 조회 : XR_Folder, 하위 폴더 건수는 권한 체크 필요 없음. 하위 폴더 가져 오는 쿼리에서 필터링 함-->
+	<select id="rootFolderList" parameterType="HashMap" resultType="Folder">
+		SELECT 
+		    F.FOLDER_ID, F.FOLDER_NAME_KO, F.FOLDER_NAME_EN, F.FOLDER_STATUS, 
+		    F.ACL_ID, F.IS_INHERIT_ACL, F.IS_TYPE, F.MAP_ID, F.FOLDER_TYPE,
+            (
+            	SELECT COUNT(B.FOLDER_ID) 
+            	FROM XR_FOLDER B 
+            	WHERE 
+            		B.PARENT_ID = F.FOLDER_ID 
+            		AND B.MAP_ID = #{mapId}
+            		<if test="rootId != null and rootId != ''">
+            			AND B.FOLDER_ID != #{rootId} 
+            		</if>
+            ) AS CHILDREN_COUNT
+   		FROM 
+   		    XR_FOLDER F
+		<where>
+			<choose>
+				<when test="rootId != null and rootId != ''">
+					F.FOLDER_ID = #{rootId} AND
+				</when>
+				<when test="rootId == null or (rootId != null and rootId == '')">
+					F.FOLDER_ID = F.PARENT_ID AND
+				</when>
+			</choose>
+			F.MAP_ID = #{mapId}
+			<include refid="whereAclAdd"/>
+		</where>
+		ORDER BY F.SORT_INDEX 			
+	</select>
+	
+	<!-- 최상위 공유폴더 목록 조회 -->
+	<select id="rootShareFolderList" parameterType="HashMap" resultType="Folder">
+		SELECT
+			F.FOLDER_ID, F.FOLDER_NAME_KO, F.FOLDER_NAME_EN, F.FOLDER_STATUS, 
+		    F.ACL_ID, F.IS_INHERIT_ACL, F.IS_TYPE, F.MAP_ID, 
+            (
+            	SELECT COUNT(B.FOLDER_ID) 
+            	FROM XR_FOLDER B 
+            	WHERE 
+            		B.PARENT_ID = F.FOLDER_ID 
+            ) AS CHILDREN_COUNT
+   		FROM 
+   		    XR_FOLDER F
+   		WHERE
+   			F.IS_SHARE = 'T'
+   			<include refid="whereAclAdd"/>
+	</select>
+	
+	<!-- 즐겨찾기 루트 폴더 목록 조회 -->
+	<select id="rootFavoriteFolderList" parameterType="HashMap" resultType="FavoriteFolder">
+		SELECT
+			FF.FOLDER_ID, FF.FAVORITE_NM, FF.USER_ID, FF.PARENT_FOLDER_ID, FF.IS_VIRTUAL, FF.SORTS,
+			( 
+				SELECT COUNT(*) 
+				FROM XR_FAVORITE_FOLDER B 
+				LEFT OUTER JOIN XR_FOLDER F ON B.FOLDER_ID = F.FOLDER_ID 
+				WHERE B.PARENT_FOLDER_ID = FF.FOLDER_ID 
+				  AND B.PARENT_FOLDER_ID != B.FOLDER_ID
+				  AND (F.FOLDER_STATUS IS NULL OR F.FOLDER_STATUS != 'D')
+				  <if test="only_virtual != null and only_virtual != ''">
+					AND B.IS_VIRTUAL = #{only_virtual}
+				  </if>
+			) AS CHILDREN_COUNT
+		FROM
+			XR_FAVORITE_FOLDER FF
+		LEFT OUTER JOIN XR_FOLDER F ON FF.FOLDER_ID = F.FOLDER_ID
+		WHERE
+			FF.USER_ID = #{user_id}
+			AND FF.PARENT_FOLDER_ID = FF.FOLDER_ID
+			AND (F.FOLDER_STATUS IS NULL OR F.FOLDER_STATUS != 'D')
+			<if test="only_virtual != null and only_virtual != ''">
+			AND FF.IS_VIRTUAL = #{only_virtual}
+			</if>
+	</select>
+	
+	<!-- 즐겨찾기 자식 폴더 목록 조회 -->
+	<select id="childFavoriteFolderList" parameterType="HashMap" resultType="FavoriteFolder">
+		SELECT
+			FF.FOLDER_ID, FF.FAVORITE_NM, FF.USER_ID, FF.PARENT_FOLDER_ID, FF.IS_VIRTUAL, FF.SORTS,
+			( 
+				SELECT COUNT(*) 
+				FROM XR_FAVORITE_FOLDER B 
+				LEFT OUTER JOIN XR_FOLDER F ON B.FOLDER_ID = F.FOLDER_ID
+				WHERE B.PARENT_FOLDER_ID = FF.FOLDER_ID 
+				  AND B.PARENT_FOLDER_ID != B.FOLDER_ID
+				  AND (F.FOLDER_STATUS IS NULL OR F.FOLDER_STATUS != 'D')
+				  <if test="only_virtual != null and only_virtual != ''">
+					AND B.IS_VIRTUAL = #{only_virtual}
+				  </if>
+			) AS CHILDREN_COUNT
+		FROM
+			XR_FAVORITE_FOLDER FF
+		LEFT OUTER JOIN XR_FOLDER F ON FF.FOLDER_ID = F.FOLDER_ID
+		WHERE
+			FF.USER_ID = #{user_id}
+			AND FF.PARENT_FOLDER_ID = #{parent_folder_id}
+			AND FF.PARENT_FOLDER_ID != FF.FOLDER_ID
+			AND (F.FOLDER_STATUS IS NULL OR F.FOLDER_STATUS != 'D')
+			<if test="only_virtual != null and only_virtual != ''">
+			AND FF.IS_VIRTUAL = #{only_virtual}
+			</if>
+			<if test="sorts != null and sorts != ''">
+			AND FF.SORTS > #{sorts}
+			</if>
+		ORDER BY FF.SORTS ASC
+	</select>
+	
+	
+	
+	<!-- 즐겨찾기 폴더의 자식 폴더 갯수 카운트 -->
+	<select id="favoriteFolderChildCount" parameterType="HashMap" resultType="Int">
+		SELECT
+			COUNT(*) AS CNT
+		FROM
+			XR_FAVORITE_FOLDER
+		WHERE
+			PARENT_FOLDER_ID = #{parent_id}
+			AND USER_ID = #{user_id}
+			<include refid="whereAclAdd"/>
+	</select>
+	
+	<!-- 하위 폴더 목록 조회 : XR_Folder -->
+	<select id="childFolderList" parameterType="HashMap" resultType="Folder">
+		SELECT 
+			F.FOLDER_ID, F.PARENT_ID, F.FOLDER_NAME_KO, F.FOLDER_NAME_EN, F.FOLDER_STATUS, 
+       		(SELECT COUNT(B.FOLDER_ID) FROM XR_FOLDER B WHERE F.FOLDER_ID = B.PARENT_ID) AS CHILDREN_COUNT,
+       		F.IS_SAVE, F.IS_TYPE, F.SORT_INDEX, F.STORAGE_QUOTA, F.STORAGE_USAGE, F.CREATE_DATE,
+    		(SELECT USER_NAME_KO FROM XR_USER WHERE USER_ID = F.CREATOR_ID) AS CREATOR_NAME, 
+    		F.MAP_ID, F.CREATOR_ID, F.FOLDER_TYPE, F.ACL_ID, F.IS_INHERIT_ACL, F.IS_TYPE, F.IS_SHARE
+		FROM 
+			XR_FOLDER F
+		WHERE
+			F.PARENT_ID = #{parentId} AND
+      		F.PARENT_ID != F.FOLDER_ID
+      		<if test="folderType != null and folderType != ''">
+      			AND F.FOLDER_TYPE = 'DOCUMENT'
+      		</if> 
+      		<include refid="whereAclAdd"/>     		
+      	ORDER BY F.SORT_INDEX, F.FOLDER_NAME_KO ASC
+	</select>
+	
+	<!-- 하위폴더LIST 가져오기 -->
+	<select id="childFolderIds" parameterType="HashMap" resultType="String">
+		SELECT 
+			FOLDER_ID
+		FROM XR_FOLDER
+		<where>
+			<if test="parent_id != null and parent_id != ''">
+				AND PARENT_ID = #{parent_id} AND FOLDER_ID != #{parent_id} 
+			</if>
+			<if test="folder_type != null and folder_type != ''">
+      			AND FOLDER_TYPE = 'DOCUMENT'
+      		</if> 		
+		</where>		
+	</select>
+	
+	<select id="folderIdsList" resultType="CaseMap">
+	<![CDATA[ SELECT FOLDER_ID, PARENT_ID, FOLDER_NAME_KO FROM XR_FOLDER WHERE MAP_ID <> 'MYPAGE' ]]>
+	</select>
+	
+	<!-- 즐겨찾기 폴더 추가 -->
+	<insert id="writeFavoriteFolder" parameterType="FavoriteFolder">
+		INSERT INTO XR_FAVORITE_FOLDER
+			(FOLDER_ID, FAVORITE_NM, USER_ID, PARENT_FOLDER_ID, IS_VIRTUAL, SORTS)
+		VALUES
+			(#{folder_id},#{favorite_nm},#{user_id},#{parent_folder_id},#{is_virtual},#{sorts})
+	</insert>
+	
+	<!-- 즐겨찾기 폴더 수정 -->
+	<update id="updateFavoriteFolder" parameterType="HashMap">
+		UPDATE XR_FAVORITE_FOLDER
+		<set>
+			<if test="folder_nm != null and folder_nm != ''">
+				FAVORITE_NM = #{folder_nm},
+			</if>
+			<if test="parent_id != null and parent_id != ''">
+				PARENT_FOLDER_ID = #{parent_id},
+			</if>
+			<if test="sorts != null">
+				SORTS = #{sorts},
+			</if>
+		</set>
+		WHERE
+			FOLDER_ID = #{folder_id}
+			AND USER_ID = #{user_id}
+	</update>
+	
+	<!-- 즐겨찾기 폴더 상세조회 -->
+	<select id="favoriteFolderDetail" parameterType="HashMap" resultType="FavoriteFolder">
+		SELECT
+			FOLDER_ID, FAVORITE_NM, USER_ID, PARENT_FOLDER_ID, IS_VIRTUAL, SORTS
+		FROM
+			XR_FAVORITE_FOLDER
+		WHERE
+			FOLDER_ID = #{folder_id}
+			AND USER_ID = #{user_id}
+	</select>
+	
+	<!-- 즐겨찾기 폴더 삭제 -->
+	<delete id="deleteFavoriteFolder" parameterType="HashMap">
+		DELETE XR_FAVORITE_FOLDER
+		WHERE FOLDER_ID = #{folder_id}
+		  AND USER_ID = #{user_id}
+	</delete>
+	
+	<!-- 사용자의 모든 즐겨찾기 폴더 삭제 -->
+	<delete id="deleteFavoriteFolderOfUser" parameterType="HashMap">
+		DELETE XR_FAVORITE_FOLDER
+		WHERE USER_ID = #{user_id}
+	</delete>
+	
+	<!-- 즐겨찾기 폴더 중복 확인 -->
+	<select id="existsFavoriteFolder" parameterType="HashMap" resultType="Int">
+		SELECT COUNT(*)
+		FROM XR_FAVORITE_FOLDER
+		WHERE
+			USER_ID = #{user_id}
+			AND FOLDER_ID = #{folder_id}
+	</select>
+	
+	<!-- 즐겨찾기 폴더 Index 변경 -->
+	<update id="updateFavoriteFolderIndex" parameterType="HashMap">
+		UPDATE XR_FAVORITE_FOLDER
+		SET
+			SORTS = #{sorts}
+		WHERE
+			FOLDER_ID = #{folder_id}
+			AND USER_ID = #{user_id}
+	</update>
+	<!-- ########## [사용자 및 관리자 공통  쿼리] End... ########## -->
+	
+	<!-- ########## [관리자 폴더 관련 쿼리] Start... ########## -->
+	<select id="folderCountByCreatorId" parameterType="String" resultType="Int">
+		SELECT COUNT(*)
+		FROM XR_FOLDER
+		WHERE
+			CREATOR_ID = #{creator_id}
+			AND FOLDER_ID != #{creator_id}
+	</select>
+	
+	<!-- ########## [관리자 폴더 관련 쿼리] End... ########## -->
+	
+	<!-- ########## [사용자 폴더 관련 쿼리] Start... ########## -->
+	<!-- 폴더-문서 관련 정보 등록 :: 다중분류체계 포함 -->
+	<insert id="writeXrLinked" parameterType="HashMap">
+		INSERT INTO XR_LINKED (FOLDER_ID,DOC_ID) VALUES (#{folder_id},#{doc_id})
+	</insert>
+	
+	<!-- 폴더 이름 조회 -->
+	<select id="getFolderName" parameterType="HashMap" resultType="Folder">
+		SELECT folder_id, folder_name_ko
+        FROM XR_FOLDER
+		<where>
+			<if test="folder_list != null"> 
+				FOLDER_ID IN 
+				<foreach item="item" index="index" collection="folder_list" separator="," open=" ( " close=")" >
+					#{item}
+				</foreach>		
+			 </if>									 	
+		</where>
+	</select>
+	
+	<!-- 폴더 ACL 조회 -->
+	<select id="getFolderAcl" parameterType="Folder" resultType="Folder">
+		SELECT
+			FOLDER_ID, ACL_ID, IS_INHERIT_ACL
+		FROM XR_FOLDER
+		<where>
+			<if test="folder_id != null and folder_id != ''"> 
+				FOLDER_ID = #{folder_id}		
+			 </if>	
+		</where>			
+	</select>
+	
+	<!-- 폴더명/상위폴더명으로 폴더정보가 존재하는지 체크 -->
+	<select id="getFolderInfo" parameterType="HashMap" resultType="CaseMap">
+		SELECT 
+			FOLDER_ID,FOLDER_NAME,PARENT_ID,PARENT_NAME,MAP_ID,CREATOR_ID
+		FROM
+		(
+			SELECT
+				F.FOLDER_ID,F.FOLDER_NAME_KO AS FOLDER_NAME,F.PARENT_ID,F.MAP_ID,F.CREATOR_ID,
+				(SELECT FOLDER_NAME_KO FROM XR_FOLDER WHERE FOLDER_ID = F.PARENT_ID) AS PARENT_NAME
+			FROM XR_FOLDER F
+		) DATA
+		<where>
+			<if test="folder_name != null and folder_name != ''"> 
+				AND DATA.FOLDER_NAME = #{folder_name}
+			 </if>	
+			 <if test="parent_name != null and parent_name != ''"> 
+				AND DATA.PARENT_NAME = #{parent_name}
+			 </if>
+			 <if test="map_id != null and map_id != ''"> 
+				AND DATA.MAP_ID = #{map_id}
+			 </if>
+ 			<if test="creator_id != null and creator_id != ''"> 
+				AND DATA.CREATOR_ID = #{creator_id}
+			 </if>
+		</where>		
+	</select>
+	
+	<!-- ########## [사용자 폴더 관련 쿼리] End... ########## -->
+	
+	<!-- 폴더 Storage 정보 조회 -->
+	<select id="getFolderStorage" parameterType="Folder" resultType="Folder">
+		SELECT
+			STORAGE_QUOTA, STORAGE_USAGE
+		FROM XR_FOLDER
+		<where>
+			<if test="folder_id != null and folder_id != ''">
+				FOLDER_ID = #{folder_id}
+			</if>
+		</where>
+	</select>
+	
+	
+	<!-- map_id와 folder_type으로 폴더 정보 조회 -->
+	<select id="getRootFolderId" parameterType="Folder" resultType="Folder">
+		SELECT FOLDER_ID
+		FROM XR_FOLDER
+		<where>
+			<if test="map_id != null and map_id != ''">
+				AND MAP_ID = #{map_id}
+			</if>
+			<if test="folder_type != null and folder_type != ''">
+				AND FOLDER_TYPE = #{folder_type}
+			</if>
+		</where>
+	</select>
+
+	<select id="recentlyFolderList" parameterType="HashMap" resultType="RecentlyObject">
+		SELECT 
+			RO.IDX, RO.USER_ID, RO.TARGET_ID, RO.TARGET_TYPE, RO.LAST_USED_DATE, F.FOLDER_NAME_KO AS TARGET_NAME
+		FROM 
+			XR_RECENTLY_OBJECT RO
+			INNER JOIN XR_FOLDER F ON RO.TARGET_ID = F.FOLDER_ID
+		WHERE 
+			TARGET_TYPE= 'F' AND
+			USER_ID = #{user_id}
+			
+	</select>
+	
+	<delete id="recentlyFolderDelete" parameterType="HashMap">
+		DELETE
+		FROM
+			XR_RECENTLY_OBJECT
+		WHERE
+			IDX = #{idx}
+	</delete>
+</mapper>

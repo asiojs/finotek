@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring" xmlns:tx="http://www.springframework.org/schema/tx" 	
+    xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util" 
+	xmlns:aop="http://www.springframework.org/schema/aop"     
+    xsi:schemaLocation="    	       
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd                    
+        http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring         
+        http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.2.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd     
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd      
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+	
+	<util:properties id="dbConfig" location="/WEB-INF/config/db.properties" />
+
+	<bean id="dataSourceImp" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="#{dbConfig['DB_DRIVER_IMP']}" />
+		<property name="url" value="#{dbConfig['DB_URL_IMP']}" />
+		<property name="username" value="#{dbConfig['DB_USERNAME_IMP']}" />
+		<property name="password" value="#{dbConfig['DB_PASSWORD_IMP']}" />
+	</bean>
+	
+	<bean id="vendorPropertiesImp" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>	
+				<prop key="SQL Server">sqlserver</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="databaseIdProviderImp" class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
+		<property name="properties" ref="vendorPropertiesImp" />
+	</bean>
+	
+	<bean id="sqlSessionFactoryImp" class="org.mybatis.spring.SqlSessionFactoryBean">
+     	<property name="dataSource" ref="dataSourceImp" />
+     	<property name="configLocation" value="/WEB-INF/config/mybatisImp-config.xml" /> 
+     	<property name="databaseIdProvider" ref="databaseIdProviderImp" />
+	</bean>
+	
+	<bean id="sqlSessionImp" class="org.mybatis.spring.SqlSessionTemplate">
+     	<constructor-arg ref="sqlSessionFactoryImp"/>
+	</bean>
+					
+	<tx:annotation-driven transaction-manager="transactionManagerImp" proxy-target-class="true"/>
+	
+	<bean name="transactionManagerImp" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+     	<property name="dataSource" ref="dataSourceImp" />
+	</bean>
+	
+	<tx:advice id="transactionAdviceImp" transaction-manager="transactionManagerImp">  
+	     <tx:attributes>  
+	            <tx:method name="get*" propagation="NOT_SUPPORTED" read-only="true"/>  
+	            <tx:method name="find*" propagation="NOT_SUPPORTED" read-only="true"/>
+	            <tx:method name="*" propagation="REQUIRED" rollback-for="Exception,BizException"/>  
+	     </tx:attributes>  
+	</tx:advice>  
+	
+	<aop:config>			
+		<aop:pointcut id="transactionPointcutImp" expression="execution(* *..*ServiceImpl.*(..))"/>
+     	<aop:advisor advice-ref="transactionAdviceImp" pointcut-ref="transactionPointcutImp"/>
+ 	</aop:config>
+		
+</beans>		

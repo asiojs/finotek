@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.user.dao.GroupDao">
+	
+	<!-- 사용자-부서 정보 등록 :: XR_GROUPED -->	
+	<insert id="groupedWrite" parameterType="HashMap">
+		INSERT INTO XR_GROUPED (
+				GROUP_ID,USER_ID,IS_DEFAULT
+		) VALUES (
+				#{group_id},#{user_id},#{is_default}
+		)
+	</insert>
+	
+	<!-- 사용자-부서 정보 수정 :: XR_GROUPED -->
+	<update id="groupedUpdate" parameterType="HashMap">
+		UPDATE 
+			XR_GROUPED 
+		SET 
+			GROUP_ID = #{group_id}
+		WHERE
+			USER_ID = #{user_id}
+			AND IS_DEFAULT = 'T'
+	</update>
+	
+	<!-- 사용자-부서 목록 :: XR_GROUPED -->
+	<select id="groupedList" parameterType="String" resultType="Grouped">
+		SELECT
+			GROUP_ID, USER_ID, IS_DEFAULT
+		FROM
+			XR_GROUPED
+		WHERE
+			GROUP_ID = #{group_id}
+	</select>
+	
+	<!-- 사용자-부서 정보 삭제 :: XR_GROUPED -->
+	<delete id="groupedDelete" parameterType="HashMap">
+		DELETE
+			XR_GROUPED
+		<where>
+			<if test="group_id != null and group_id != ''">
+				 AND GROUP_ID = #{group_id}
+			</if>
+			<if test="user_id != null and user_id != ''">
+				 AND USER_ID = #{user_id}
+			</if>
+			<if test="is_default != null and is_default != ''">
+				 AND is_default = #{is_default}
+			</if>
+		</where>
+	</delete>
+	
+	<!-- 부서 기본 정보 등록 :: XR_GROUP -->
+	<insert id="groupWrite" parameterType="Group">
+		INSERT INTO XR_GROUP (
+				GROUP_ID,DEPT_CD,GROUP_NAME_KO,GROUP_NAME_EN,
+				GROUP_STATUS,PARENT_ID,SORT_INDEX,MAP_ID
+		) VALUES (
+				#{group_id},#{dept_cd},#{group_name_ko},#{group_name_en},
+				#{group_status},#{parent_id},#{sort_index},#{map_id}
+		)
+	</insert>
+	
+	<!-- 부서 정보 수정 :: XR_GROUP -->
+	<update id="groupUpdate" parameterType="Group">
+		UPDATE XR_GROUP
+		<set>
+			<if test="group_name_ko != null and group_name_ko != ''">
+				GROUP_NAME_KO = #{group_name_ko},
+			</if>
+			<if test="group_name_en != null and group_name_en != ''">
+				GROUP_NAME_EN = #{group_name_en},
+			</if>
+			<if test="group_name_ja != null and group_name_ja != ''">
+				GROUP_NAME_JA = #{group_name_ja},
+			</if>
+			<if test="group_status != null and group_status != ''">
+				GROUP_STATUS = #{group_status},
+			</if>
+			<if test="parent_id != null and parent_id != ''">
+				PARENT_ID = #{parent_id},
+			</if>
+			<if test="sort_index != null and sort_index != ''">
+				SORT_INDEX = #{sort_index},
+			</if>
+			<if test="map_id != null and map_id != ''">
+				MAP_ID = #{map_id},
+			</if>
+		</set>
+		<where>
+			GROUP_ID = #{group_id}
+		</where>
+	</update>
+	
+	<!-- 부서 히스토리 등록 :: XR_GROUP_HT -->
+	<insert id="groupHistoryWrite" parameterType="Group">
+		INSERT INTO XR_GROUP_HT (
+				GROUP_SEQ, GROUP_ID,DEPT_CD,GROUP_NAME_KO,GROUP_NAME_EN,
+				GROUP_STATUS,PARENT_ID,SORT_INDEX,MAP_ID,STATUS
+		) VALUES (
+				#{group_seq},#{group_id},#{dept_cd},#{group_name_ko},#{group_name_en},
+				#{group_status},#{parent_id},#{sort_index},#{map_id},#{status}
+		)
+	</insert>
+	
+	<!-- 최상위 부서 목록 조회 :: XR_GROUP -->
+	<select id="rootGroupList" parameterType="HashMap" resultType="Group">
+		SELECT 
+			A.GROUP_ID, A.DEPT_CD, A.GROUP_NAME_KO, A.GROUP_NAME_EN, A.GROUP_NAME_JA,
+			A.GROUP_STATUS, A.SORT_INDEX, A.MAP_ID, A.CREATE_DATE, (SELECT COUNT(*) FROM XR_GROUP B WHERE A.GROUP_ID = B.PARENT_ID AND B.GROUP_ID != B.PARENT_ID) AS CHILDREN_COUNT
+		FROM 
+			XR_GROUP A
+		WHERE
+			<choose>
+				<when test="rootId != null and rootId != ''">
+					A.GROUP_ID = #{rootId} AND
+				</when>
+				<when test="rootId == null or rootId == ''">
+					A.GROUP_ID = A.PARENT_ID AND
+				</when>
+			</choose>
+			MAP_ID = #{mapId} AND
+			GROUP_STATUS != 'S'
+	</select>
+	
+	<!-- 하위 부서 목록 조회 :: XR_GROUP -->
+	<select id="childGroupList" parameterType="HashMap" resultType="Group">
+		SELECT 
+			A.GROUP_ID, A.DEPT_CD, A.GROUP_NAME_KO, A.GROUP_NAME_EN, A.GROUP_NAME_JA, A.PARENT_ID,
+			A.GROUP_STATUS, A.SORT_INDEX, A.MAP_ID, A.CREATE_DATE, (SELECT COUNT(*) FROM XR_GROUP B WHERE A.GROUP_ID = B.PARENT_ID) AS CHILDREN_COUNT
+		FROM 
+			XR_GROUP A
+		WHERE
+			A.PARENT_ID = #{parentId} AND
+      		A.PARENT_ID != A.GROUP_ID
+			<if test="treeType == ''">
+				 AND A.GROUP_STATUS != 'S'
+			</if>
+      	ORDER BY A.GROUP_NAME_KO ASC
+	</select>
+	
+	<!-- 부서 상세정보 조회 :: XR_GROUP -->
+	<select id="groupDetail" parameterType="String" resultType="Group">
+		SELECT 
+			A.GROUP_ID, A.DEPT_CD, A.GROUP_NAME_KO, A.GROUP_NAME_EN, A.GROUP_NAME_JA, A.GROUP_STATUS,
+			A.PARENT_ID, A.SORT_INDEX, A.MAP_ID, A.CREATE_DATE
+		FROM 
+			XR_GROUP A
+		WHERE
+			A.GROUP_ID = #{group_id}
+	</select>
+	
+	<!-- 동일한 상위 그룹 하위에 동일한 이름의 그룹이 있는지 확인한다 :: XR_GROUP -->
+	<select id="groupIsExistByGroupNameAndParentIdList" parameterType="Group" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			XR_GROUP
+		WHERE
+			PARENT_ID = #{parent_id}
+			AND GROUP_NAME_KO = #{group_name_ko}
+	</select>
+	
+	<!-- 그룹 이동 -->
+	<update id="groupMove" parameterType="Group">
+		UPDATE
+			XR_GROUP
+		SET
+			PARENT_ID = #{parent_id}
+		WHERE
+			GROUP_ID = #{group_id}
+		
+	</update>
+	
+	<!-- 그룹 삭제 -->
+	<delete id="groupDelete" parameterType="Group">
+		DELETE
+			XR_GROUP
+		WHERE
+			GROUP_ID = #{group_id}
+	</delete>
+	
+	<!-- 프로젝트/겸직 대상 부서 목록 가져오기 -->
+	<select id="dualGroupList" parameterType="HashMap" resultType="String">
+		SELECT 
+			G1.GROUP_ID
+		FROM XR_GROUPED G1 
+			INNER JOIN XR_GROUP G2 ON G1.GROUP_ID = G2.GROUP_ID
+		<where>
+			<if test="is_default != null and is_default != ''">
+				 AND G1.IS_DEFAULT = #{is_default}
+			</if>
+			<if test="map_id != null and map_id != ''">
+				 AND G2.MAP_ID = #{map_id}
+			</if>
+			<if test="user_id != null and user_id != ''">
+				 AND G1.USER_ID = #{user_id}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 그룹일괄등록 체크 -->
+	<select id="chkGroupName" parameterType="HashMap" resultType="Group">
+		SELECT 
+			GROUP_ID,GROUP_NAME_KO,GROUP_NAME_EN,PARENT_ID,MAP_ID
+		FROM
+			XR_GROUP
+		<where>
+			<if test="grpNm != null and grpNm != ''">
+				 AND GROUP_NAME_KO = #{grpNm}
+			</if>
+			<if test="map_id != null and map_id != ''">
+				 AND MAP_ID = #{map_id}
+			</if>
+		</where>
+	</select>
+	
+	<select id="chkGroupCnt" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(GROUP_ID) AS CNT
+		FROM
+			XR_GROUP
+		<where>
+			<if test="grpNm != null and grpNm != ''">
+				 AND GROUP_NAME_KO = #{grpNm}
+			</if>
+			<if test="map_id != null and map_id != ''">
+				 AND MAP_ID = #{map_id}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 사용자일괄등록 그룹정보 체크 -->
+	<select id="chkUserGroupCnt" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(G1.GROUP_ID) AS CNT
+		FROM XR_GROUP G1 LEFT OUTER JOIN XR_GROUP G2 ON G1.PARENT_ID = G2.GROUP_ID
+		<where>
+			<if test="map_id != null and map_id != ''">
+				 AND G1.MAP_ID = #{map_id}
+			</if>
+			<if test="grpNm != null and grpNm != ''">
+				 AND G1.GROUP_NAME_KO = #{grpNm}
+			</if>
+			<if test="suGrpNm != null and suGrpNm != ''">
+				 AND G2.GROUP_NAME_KO = #{suGrpNm}
+			</if>
+		</where>
+	</select>
+	
+	<select id="chkUserGroupInfo" parameterType="HashMap" resultType="Group">
+		SELECT 
+			G1.GROUP_ID,G1.GROUP_NAME_KO,G2.GROUP_ID  AS PARENT_ID,G2.GROUP_NAME_KO AS PARENT_NM
+		FROM XR_GROUP G1 LEFT OUTER JOIN XR_GROUP G2 ON G1.PARENT_ID = G2.GROUP_ID
+		<where>
+			<if test="map_id != null and map_id != ''">
+				 AND G1.MAP_ID = #{map_id}
+			</if>
+			<if test="grpNm != null and grpNm != ''">
+				 AND G1.GROUP_NAME_KO = #{grpNm}
+			</if>
+			<if test="suGrpNm != null and suGrpNm != ''">
+				 AND G2.GROUP_NAME_KO = #{suGrpNm}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 미 소속 부서 조회 -->
+	<select id="independentGroupDetail" resultType="Group">
+		SELECT
+			GROUP_ID, DEPT_CD, GROUP_NAME_KO, GROUP_NAME_EN,
+			GROUP_STATUS, PARENT_ID, SORT_INDEX,MAP_ID
+		FROM
+			XR_GROUP
+		WHERE
+			GROUP_STATUS = 'S'
+	</select>
+	
+	<select id="groupManagerCnt" parameterType="HashMap" resultType="Int">
+		SELECT
+			COUNT(*)
+		FROM
+			XR_GROUP G
+			INNER JOIN XR_USER U ON G.GROUP_ID = U.MANAGE_GROUP
+		WHERE 
+			G.GROUP_ID = #{groupId}
+	</select>
+	
+	<!-- 협업자 테이블 목록에서 부서명 필요 -->
+	<select id="groupInfoByUserId" parameterType="HashMap" resultType="CaseMap">
+		SELECT G.GROUP_NAME_KO AS GROUP_NM, R.USER_ID 
+		FROM XR_GROUP G
+		INNER JOIN XR_GROUPED R ON R.USER_ID IN 
+		<foreach item="item" index="index" collection="userIdList" separator="," open=" ( " close=")" >
+				#{item}
+		</foreach>
+		WHERE G.GROUP_ID = R.GROUP_ID
+	</select>
+</mapper>

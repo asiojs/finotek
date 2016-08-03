@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <title>index</title>
+  <script src="/js/jquery-2.1.3.min.js"></script>
+  <script src="/js/jquery-ui.js"></script>
+  <script src="/lib/jstree/jstree.js"></script>
+  <script src="/lib/jqgrid/js/jquery.jqGrid.min.js"></script>
+  <script src="/js/jquery.ddslick.custom.js"></script>
+  <script src="/js/jquery.cookie.js"></script>
+  <script src="/js/jquery.alerts.js"></script>
+  <script src="/js/ecm.js"></script>
+
+  <link rel="stylesheet" href="/css/ecm.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/jqtree-custom.css">
+  <link rel="stylesheet" href="/css/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery.alerts.css">
+  <link rel="stylesheet" href="/css/jquery.ddslick.custom.css">
+  <link rel="stylesheet" href="/lib/jqgrid/css/ui.jqgrid.css">
+</head>
+
+<body>
+  <div class="wrap">
+	<div class="top_menu">
+		<div class="top_menu_custom">
+			<ul class="custom_menu_list">
+            	<li class="full_screen">
+                	<a href="#" class="full_screen"><img src="/img/icon/fullscreen.png" alt="" title=""></a>
+                </li>
+                <li class="quick_menu"><a href="#" class="quick_menu">
+                	<img src="/img/icon/quickMenu.png" alt="" title="">퀵메뉴
+                    <span class="quick_menu"></span>
+                   </a>
+                   <div class="quick_sub_wrapper">
+                   <ul class="quick_sub_menu">
+                   		<li><a href="#">내 소유 문서</a></li>
+                        <li><a href="#">내 수정 중인 문서</a></li>
+                        <li><a href="#">내 만기 문서</a></li>
+                        <li><a href="#">휴지통</a></li>
+                        <li><a href="#">즐겨찾기</a></li>
+                        <li><a href="#">공유받은 문서</a></li>
+                        <li><a href="#">공유받은 폴더</a></li>
+                   </ul>
+                   </div>
+                </li>
+            </ul>
+		</div>
+        <div class="top_menu_shape"></div>
+		<div class="top_menu_search"><span class="lbl_integrated_search">통합검색</span>
+			<div class="search_input_form">
+				<form class="" name="" method="post">
+					<input type="text" class="search_text" placeholder="검색어를 입력하세요">
+					<button type="submit" class="search_submit"></button>
+				</form>
+			</div>
+			<div class="search_detail">
+				<a href="#" class="dropDown_img"><img src="/img/icon/search_detail_btn.png" alt=""></a>
+				<div class="integrated_dropDown_menu hide">
+					<form>
+						<table class="srch_integrated_tbl">
+							<tr>
+							<th>기본검색</th>
+							<td>
+								<input type="text" class="srch_integrated_txt" placeholder="검색어를 입력하세요">
+								<label><input type="checkbox" id="" name="" class="" value="">결과내 재 검색</label>
+							</td>
+							</tr>
+							<tr>
+							<th>등록기간</th>
+							<td>
+								<a href="#" id="0" class="srch_integrated_regDate">전체</a>
+								<a href="#" id="1" class="srch_integrated_regDate">1개월</a>
+								<a href="#" id="2" class="srch_integrated_regDate">3개월</a>
+								<a href="#" id="3" class="srch_integrated_regDate">6개월</a>
+								<a href="#" id="4" class="srch_integrated_regDate">1년</a>			
+								<input type="text" id="datepicker3" name="" class="srch_integrated_startDate input-text calend" name="start_date" readonly="readonly">
+								<span class="dateto">-</span>
+								<input type="text" id="datepicker4" name="" class="srch_integrated_endDate input-text calend" name="end_date" readonly="readonly">
+							</td>
+							</tr>
+							<tr>
+							<th></th>
+							<td>
+								<label><input type="radio" name="" class="" value="">전체</label>
+								<label><input type="radio" name="" class="" value="">제목</label>
+								<label><input type="radio" name="" class="" value="">본문</label>
+								<label><input type="radio" name="" class="" value="">등록자</label>
+								<label><input type="radio" name="" class="" value="">첨부파일명</label>
+								<label><input type="radio" name="" class="" value="">첨부내용</label>
+							</td>
+							</tr>
+							<tr>
+							<th>문서유형</th>
+							<td>
+								<select id="srch_type5" name="">
+									<option value="" selected="selected">전체</option>
+									<option value="">일반문서</option>
+									<option value="">파일문서</option>
+								</select>							
+							</td>
+							</tr>
+							<tr>
+							<th>폴더위치</th>
+							<td>
+								<input type="text" id="" name="" class="srch_integrated_folder">
+								<button type="button" id="" name="" class="srch_integrated_folderChoose">선택</button>
+								<label><input type="checkbox" id="" name="" class="" value="">하위폴더 포함</label>
+							</td>
+							</tr>
+							<tr>
+							<td colspan="2" class="srch_integrated_btnGrp">
+								<button type="submit" id="srch_integrated_submit" class="srch_integrated_btn">검색</button>
+								<button type="reset" id="" class="srch_integrated_btn">초기화</button>
+							</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+    <header class="header">
+		<div class="logo">
+			<h1>
+				<a href="#"><img src="/img/logo.png"></a>
+			</h1>
+		</div>
+		<div class="header_menu_wrapper">
+			<div class="header_icon">
+				<ul class="header_icon_menu">
+					<li class="selected"><a href="#" class="page selected"></a>
+                    	<div class="hide">나의 문서</div>
+                    </li>
+					<li><a href="#" class="user"></a>
+                    	<div class="hide">사용자 정보</div>
+                    </li>
+					<li><a href="#" class="inbox"></a>
+                    	<div class="hide">문서함</div>
+                    </li>
+					<li><a href="#" class="usergroup"></a>
+                    	<div class="hide">사용자 그룹</div>
+                    </li>
+					<li><a href="#" class="piechart"></a>
+                    	<div class="hide">통계</div>
+                    </li>
+				</ul>
+			</div>
+			<div class="header_user">
+				<ul class="header_user_menu">
+					<li class="user_info">
+						<a href="#">
+							<img src="/img/icon/user_info.png" alt="">
+							홍길동님(일반)
+							<img src="/img/icon/head_dropdown.png" class="head_dropDown">
+						</a>
+                        <div class="info_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                            <div>
+                                <ul>
+                                    <li><a href="#">내정보</a></li>
+                                    <li><a href="#">보안 설정</a></li>
+                                </ul>
+                            </div>
+                        </div>
+					</li>
+					<li class="user_note">
+						<a href="#">
+							<img src="/img/icon/user_note.png" alt="">
+							<span class="num_cnt">99</span>
+						</a>
+                        <div class="note_dropDown_menu hide">
+                        	<div class="tooltip_arrow"></div>
+                           	<ul>
+                            	<li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                            	<li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                                <li><a href="#">
+                                	<span class="sender_name">[홍길동]</span>
+                                    <span class="note_title">문서검토바랍니다.</span>
+                                </a></li>
+                            </ul>
+                        </div>
+					</li>
+					<li class="user_inbox">
+						<a href="#">
+							<img src="/img/icon/user_inbox.png" alt="">
+							<span class="num_cnt">999</span>
+						</a>
+					</li>
+					<li class="user_setting">
+						<a href="#">
+							<img src="/img/icon/user_setting.png" alt="">
+						</a>
+					</li>
+					<li class="user_logout">
+						<a href="#">
+							<img src="/img/icon/user_logout.png" alt="">
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</header>
+
+	<div class="cnt_wrapper">
+		<nav class="lnb_menu">
+			<section class="lnb_menu_info">
+				<div class="lnb_menu_reg">
+					<ul>
+						<li class="reg_doc"><a href="#">문서등록</a></li>
+						<li class="reg_work"><a href="#">업무등록</a></li>
+					</ul>
+				</div>
+				<div class="lnb_menu_summary">
+					<table class="summary_table">
+					<caption>문서등록 요약</caption>
+					<colgroup>
+						<col width="144"/>
+						<col width="25"/>
+					</colgroup>
+					<tr>
+					<td class="summary_info">새 쪽지</td>
+					<td class="summary_cnts"><span>5</span></td>
+					</tr>
+					<tr>
+					<td class="summary_info">승인요청문서</td>
+					<td class="summary_cnts"><span>12</span></td>
+					</tr>
+					<tr>
+					<td class="summary_info">신규문서</td>
+					<td class="summary_cnts"><span>123</span></td>
+					</tr>
+					<tr>
+					<td class="summary_info">협업진행</td>
+					<td class="summary_cnts"><span>1</span></td>
+					</tr>
+					</table>
+				</div>
+			</section>
+			<section class="lnb_tree">
+				<div class="tree_menu">
+					<ul class="tree_menu_list">
+						<li><a href="#">부서</a></li>
+						<li><a href="#">전사</a></li>
+						<li><a href="#" class="focus">프로젝트</a></li>
+					</ul>
+					<div class="tree_menu_more">
+                        <ul class="menu_more_list">
+                        	<li><a href="#"><img src="/img/icon/tree_more.png" alt="" title=""></a></li>
+                            <li><a href="#"><img src="/img/icon/tree_refresh.png" alt="" title=""></a></li>
+                        </ul>
+                    </div>
+				</div>
+				<div id="lnb_tree_list"></div>
+			</section>
+	    </nav>
+
+		<div class="contents">
+			<div class="cnts_srch_wrapper">
+				<div class="toggle_tree_menu"></div>
+				<div class="cnts_srch_detail">	
+					<div class="cnts_srch">
+						<form class="cnts_srch_form" method="post">
+						<select id="processList_select">
+							<option value="0" selected="selected">전체</option>
+							<option value="1">제목</option>
+							<option value="2">등록자</option>
+						</select>
+						<input type="text" class="srch_keyword" name="srch_keyword" placeholder="검색어를 입력하세요">
+						<button type="submit" class="srch_btn"></button>
+						</form>
+					</div>
+					<div class="srch_detail_dropDown"> 
+						<a class="dropDown_txt">
+							<label>상세</label>
+							<span class="dropDown_arrow down"></span>
+						</a>
+						<div class="detail_dropDown_menu hide">
+							<form>
+								<table class="srch_detail_tbl">
+									<tr>
+										<th>기본검색</th>
+										<td>
+											<select id="srch_type2">
+												<option value="0" selected="selected">전체</option>
+												<option value="1">제목</option>
+												<option value="2">등록자</option>
+												<option value="3">첨부파일명</option>
+											</select>
+											<input type="text" class="srch_detail_txt" placeholder="검색어를 입력하세요">
+										</td>
+									</tr>
+									<tr>
+										<th>&nbsp;</th>
+										<td>
+											<label class="srch_detail_lbl">
+												<input type="checkbox" class="srch_detail_checkbox">
+												<span>하위폴더 포함</span>
+											</label>
+										</td>
+									</tr>
+									<tr>
+										<th>등록기간</th>
+										<td>
+											<a href="#" class="srch_detail_regDate">전체</a> 
+											<a href="#" class="srch_detail_regDate">1개월</a> 
+											<a href="#" class="srch_detail_regDate">3개월</a> 
+											<a href="#" class="srch_detail_regDate">6개월</a> 
+											<a href="#" class="srch_detail_regDate">1년</a>
+											<input type="text" id="datepicker1" name="" class="srch_detail_startDate input-text calend" name="start_date" readonly="readonly">
+											<span class="dateto">-</span>
+											<input type="text" id="datepicker2" name="" class="srch_detail_endDate input-text calend" name="end_date" readonly="readonly">
+										</td>
+									</tr>
+									<tr>
+										<th>첨부파일명</th>
+										<td><input type="text" id="" name="" class="srch_detail_keyword"></td>
+									</tr>
+									<tr>
+										<th>키워드</th>
+										<td><input type="text" class="srch_detail_keyword"></td>
+									</tr>
+									<tr>
+										<th>문서유형</th>
+										<td>
+											<select id="srch_type3">
+												<option selected="selected">전체</option>
+												<option>내용</option>
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="2" class="srch_detail_btnGrp">
+											<button type="submit" id="srch_detail_submit" class="srch_detail_btn">검색</button>
+											<button type="reset" id="" class="srch_detail_btn">초기화</button>
+										</td>
+									</tr>
+								</table>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="depth_navi">
+                	<span>
+                		<strong>20. 안전관리규정</strong>
+                    	<span class="depth_navi_path hide">
+                            <a href="#">부서</a> &gt; 
+                            <a href="#">경영지원팀</a> &gt; 
+                            <a href="#">20. 안전관리규정</a>
+                        </span>
+                    </span>
+                </div>
+			</div>
+			<div class="cnts_tbl_menu">
+				<div class="tbl_menu_left">
+					<button type="button" class="tbl_coop_reg">등록</button>
+					<button type="button" class="tbl_coop_del">삭제</button>
+					<div class="tbl_extFunction">
+						<a class="dropDown_txt">
+                        	<label>추가기능</label>
+                        	<span class="dropDown_arrow down"></span>
+                        </a>
+                        <div class="extFunction_dropDown_wrapper hide">
+                        	<ul class="extFunction_dropDown_menu">
+                            	<li><a href="#" class="move">이동</a></li>
+                                <li><a href="#" class="copy">복사</a></li>
+                                <li><a href="#" class="favorite">즐겨찾기 추가</a></li>
+                                <li><a href="#" class="tempbox">작업카트 추가</a></li>
+                            </ul>
+                        </div>
+					</div>
+				</div>
+				<div class="tbl_menu_right">
+					<ul class="tbl_thumbMenu">
+						<li class="excel_download"><a href="#" class="menu"></a></li>
+						<li class="layout_view"><a href="#" class="menu"></a>
+                        	<div class="layout_view_dropDown hide">
+                            	<ul>
+                                	<li class="list_only"><a href="#">메일 목록만 보기</a></li>
+                                	<li class="horizontal_divide"><a href="#">좌우 분할로 보기</a></li>
+                                	<li class="vertical_divide"><a href="#">상하 분할로 보기</a></li>
+                                </ul>
+                            </div>
+                        </li>
+						<li class="menu_refresh"><a href="#" class="menu"></a></li>
+					</ul>
+					<select id="tbl_rowCount" name="">
+						<option value="10">10개</option>
+                        <option value="15">15개</option>
+                        <option value="20">20개</option>
+                        <option value="25">25개</option>
+					</select>
+				</div>
+			</div>	
+			<div class="cnts_tbl_wrapper">
+            	<div class="cnts_list">
+                	<div class="thead">
+                    	<ul class="tbl_head_list">
+                        	<li class="subject2">제목
+                        		<ul class="tbl_head">
+                                    <li class="check_all"><input type="checkbox" class="checkall"></li>
+                                    <li class="coop_num">번호</li>
+                                    <li class="coop_status">상태</li>
+                                    <li class="coop_end">완료예정일</li>
+                                    <li class="coop_lastModified">최종변경일</li>
+                                    <li class="coop_regid">작성자</li>
+                                    <li class="coop_approval">승인</li>
+                                    <li class="coop_read">열람</li>
+                                </ul>    	
+                            </li>
+                        </ul>                    	
+                    </div>
+                    <div class="tbody">
+                    	<ul class="tbl_data_list">
+                        	<li class="data_list2">
+                        		<ul class="tbl_data_body">
+                                    <li class="check"><input type="checkbox"></li>
+                                    <li class="coop_num">1</li>
+                                    <li class="coop_status">완료</li>
+                                    <li class="coop_end">2015-01-23</li>
+                                    <li class="coop_lastModified">2015-01-23</li>
+                                    <li class="coop_regid">홍길동</li>
+                                    <li class="coop_approval">1/1
+                                    	<div class="hide">
+                                    		<p>○ 박승인 : 승인완료</p>
+                                    		<p>◎ 최승인 : 승인대기</p>
+                                    	</div>
+                                    </li>
+                                    <li class="coop_read">2/3
+                                    	<div class="hide">
+                                    		<p>● 박승인 : 미열람</p>
+                                    		<p>○ 최승인 : 열람</p>
+                                    		<p>○ 최승인 : 열람</p>
+                                    	</div>
+                                    </li>
+                                </ul>   
+                                <div class="subject2">
+									<img src="/img/icon/hwp.png" class="extension" alt="" title="">
+                                    <a href="#">문서혁신 변화관리 파트.....
+                                        <div class="hide">문서혁신 변화관리 파트.</div>
+                                    </a>
+                                    <img src="/img/icon/new.png" class="new_doc" alt="" title="">
+                                    <a href="#" class="open_doc_newWindow">
+                                    	<img src="/img/icon/new_window.png" alt="" title="">
+                                    </a>
+                                </div> 	
+                            </li>
+                        </ul>
+                    	<ul class="tbl_data_list">
+                        	<li class="data_list2">
+                        		<ul class="tbl_data_body">
+                                    <li class="check"><input type="checkbox"></li>
+                                    <li class="coop_num">1</li>
+                                    <li class="coop_status">완료</li>
+                                    <li class="coop_end">2015-01-23</li>
+                                    <li class="coop_lastModified">2015-01-23</li>
+                                    <li class="coop_regid">홍길동</li>
+                                    <li class="coop_approval">1/1
+                                    	<div class="hide">
+                                    		<p>○ 박승인 : 승인완료</p>
+                                    		<p>◎ 최승인 : 승인대기</p>
+                                    	</div>
+                                    </li>
+                                    <li class="coop_read">2/3
+                                    	<div class="hide">
+                                    		<p>● 박승인 : 미열람</p>
+                                    		<p>○ 최승인 : 열람</p>
+                                    		<p>○ 최승인 : 열람</p>
+                                    	</div>
+                                    </li>
+                                </ul>   
+                                <div class="subject2">
+									<img src="/img/icon/hwp.png" class="extension" alt="" title="">
+                                    <a href="#">문서혁신 변화관리 파트.....
+                                        <div class="hide">문서혁신 변화관리 파트.</div>
+                                    </a>
+                                    <img src="/img/icon/new.png" class="new_doc" alt="" title="">
+                                    <a href="#" class="open_doc_newWindow">
+                                    	<img src="/img/icon/new_window.png" alt="" title="">
+                                    </a>
+                                </div> 	
+                            </li>
+                        </ul>
+                    	<ul class="tbl_data_list">
+                        	<li class="data_list2">
+                        		<ul class="tbl_data_body">
+                                    <li class="check"><input type="checkbox"></li>
+                                    <li class="coop_num">1</li>
+                                    <li class="coop_status">완료</li>
+                                    <li class="coop_end">2015-01-23</li>
+                                    <li class="coop_lastModified">2015-01-23</li>
+                                    <li class="coop_regid">홍길동</li>
+                                    <li class="coop_approval">1/1
+                                    	<div class="hide">
+                                    		<p>○ 박승인 : 승인완료</p>
+                                    		<p>◎ 최승인 : 승인대기</p>
+                                    	</div>
+                                    </li>
+                                    <li class="coop_read">2/3
+                                    	<div class="hide">
+                                    		<p>● 박승인 : 미열람</p>
+                                    		<p>○ 최승인 : 열람</p>
+                                    		<p>○ 최승인 : 열람</p>
+                                    	</div>
+                                    </li>
+                                </ul>   
+                                <div class="subject2">
+									<img src="/img/icon/hwp.png" class="extension" alt="" title="">
+                                    <a href="#">문서혁신 변화관리 파트.....
+                                        <div class="hide">문서혁신 변화관리 파트.</div>
+                                    </a>
+                                    <img src="/img/icon/new.png" class="new_doc" alt="" title="">
+                                    <a href="#" class="open_doc_newWindow">
+                                    	<img src="/img/icon/new_window.png" alt="" title="">
+                                    </a>
+                                </div> 	
+                            </li>
+                        </ul>
+                    	<ul class="tbl_data_list">
+                        	<li class="data_list2">
+                        		<ul class="tbl_data_body">
+                                    <li class="check"><input type="checkbox"></li>
+                                    <li class="coop_num">1</li>
+                                    <li class="coop_status">완료</li>
+                                    <li class="coop_end">2015-01-23</li>
+                                    <li class="coop_lastModified">2015-01-23</li>
+                                    <li class="coop_regid">홍길동</li>
+                                    <li class="coop_approval">1/1
+                                    	<div class="hide">
+                                    		<p>○ 박승인 : 승인완료</p>
+                                    		<p>◎ 최승인 : 승인대기</p>
+                                    	</div>
+                                    </li>
+                                    <li class="coop_read">2/3
+                                    	<div class="hide">
+                                    		<p>● 박승인 : 미열람</p>
+                                    		<p>○ 최승인 : 열람</p>
+                                    		<p>○ 최승인 : 열람</p>
+                                    	</div>
+                                    </li>
+                                </ul>   
+                                <div class="subject2">
+									<img src="/img/icon/hwp.png" class="extension" alt="" title="">
+                                    <a href="#">문서혁신 변화관리 파트.....
+                                        <div class="hide">문서혁신 변화관리 파트.</div>
+                                    </a>
+                                    <img src="/img/icon/new.png" class="new_doc" alt="" title="">
+                                    <a href="#" class="open_doc_newWindow">
+                                    	<img src="/img/icon/new_window.png" alt="" title="">
+                                    </a>
+                                </div> 	
+                            </li>
+                        </ul>
+                    	<ul class="tbl_data_list">
+                        	<li class="data_list2">
+                        		<ul class="tbl_data_body">
+                                    <li class="check"><input type="checkbox"></li>
+                                    <li class="coop_num">1</li>
+                                    <li class="coop_status">완료</li>
+                                    <li class="coop_end">2015-01-23</li>
+                                    <li class="coop_lastModified">2015-01-23</li>
+                                    <li class="coop_regid">홍길동</li>
+                                    <li class="coop_approval">1/1
+                                    	<div class="hide">
+                                    		<p>○ 박승인 : 승인완료</p>
+                                    		<p>◎ 최승인 : 승인대기</p>
+                                    	</div>
+                                    </li>
+                                    <li class="coop_read">2/3
+                                    	<div class="hide">
+                                    		<p>● 박승인 : 미열람</p>
+                                    		<p>○ 최승인 : 열람</p>
+                                    		<p>○ 최승인 : 열람</p>
+                                    	</div>
+                                    </li>
+                                </ul>   
+                                <div class="subject2">
+									<img src="/img/icon/hwp.png" class="extension" alt="" title="">
+                                    <a href="#">문서혁신 변화관리 파트.....
+                                        <div class="hide">문서혁신 변화관리 파트.</div>
+                                    </a>
+                                    <img src="/img/icon/new.png" class="new_doc" alt="" title="">
+                                    <a href="#" class="open_doc_newWindow">
+                                    	<img src="/img/icon/new_window.png" alt="" title="">
+                                    </a>
+                                </div> 	
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="cnts_aside hide">
+                	<div class="horizontal_draggable"></div>
+                    <div class="aside_cnts_wrapper">
+                    	<div class="cnts_sub_wrapper">
+                    		<div class="aside_title">수평드래그 타이틀
+	                    		<span class="regDate">2010-05-31</span>
+	                    	</div>
+	                    	<div class="aside_cnts">
+	                    		수평드래그 내용
+	                    	</div>
+                    	</div>
+                    </div>
+                </div>
+                <div class="cnts_bottom hide">
+                	<div class="vertical_draggable"></div>
+                    <div class="bottom_cnts_wrapper">
+                   		<div class="bottom_title">
+                   			수직드래그 타이틀
+                   			<span class="regDate">2010-05-31</span>
+                   		</div>
+                    	<div class="bottom_cnts">
+                    		수직드래그 내용
+                    	</div>
+                    </div>
+                </div>
+			</div>
+			<div class="pg_navi_wrapper">
+            	<ul class="pg_navi">
+                	<li class="first"><a href="#"><img src="/img/icon/pg_first.png" alt="" title=""></a></li>
+                    <li class="prev"><a href="#"><img src="/img/icon/pg_prev.png" alt="" title=""></a></li>
+                	<li class="curr"><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                    <li><a href="#">6</a></li>
+                    <li><a href="#">7</a></li>
+                    <li><a href="#">8</a></li>
+                    <li><a href="#">9</a></li>
+                    <li><a href="#">10</a></li>
+                    <li class="next"><a href="#"><img src="/img/icon/pg_next.png" alt="" title=""></a></li>
+					<li class="last"><a href="#"><img src="/img/icon/pg_last.png" alt="" title=""></a></li>
+                </ul>    
+            </div>
+        </div>
+	</div>
+   
+	<footer class="footer">
+		<ul class="footer_menu">
+			<li class="ft_lyr_tooltip"><a href="#">도움말</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>도움말에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_help" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">프로그램설치</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>프로그램 설치에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_prog" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">시스템관리</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>시스템 관리에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_system" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+			<li class="ft_lyr_tooltip"><a href="#">퀵메뉴추가</a>
+            	<div class="ft_lyr_wrapper hide">
+                	<div class="ft_lyr">
+                    <p>퀵메뉴 추가에 대한 안내글이 보여집니다.</p>
+                    <label><input type="checkbox" class="ECM_quickmn" class="ft_tooltip_noshow">다시 보지 않기</label>
+                    </div>
+                    <div class="ft_tt_arrow"></div>
+				</div>
+            </li>
+		</ul>
+		<p class="copyright">
+			Copyright eXsoft All Rights Reserved.
+		</p>
+    </footer>
+    
+    <!-- 테이블 첨부파일 시작 -->
+    <div class="attach_window hide">
+        <div class="attach_title">
+            첨부파일
+            <a href="#" class="close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+        </div>
+        <div class="attach_cnts">	
+            <div class="attach_summary">
+                <span class="file_cnt">파일 : 2</span>
+                <a href="#" class="attach_save_all">모두저장</a>
+            </div>
+            <ul class="attach_file_list">
+                <li>
+                    <span class="attach_name">
+                        <a href="#">워드문서.docx</a>
+                    </span>                                    
+                    <span class="attach_detail">
+                        111.111k
+                        <a href="#"><img src="/img/icon/attach_download.png"></a>
+                    </span>                                    
+                </li>
+                <li>
+                    <span class="attach_name">
+                        <a href="#">워드문서.docx</a>
+                    </span>                                    
+                    <span class="attach_detail">
+                        111.111k
+                        <a href="#"><img src="/img/icon/attach_download.png"></a>
+                    </span>                                    
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- 테이블 첨부파일 끝 -->
+    
+    <!-- 테이블 관련문서 시작 -->
+    <div class="relative_docs_window hide">
+        <div class="relative_docs_title">
+            관련문서
+            <a href="#" class="close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+        </div>
+        <div class="relative_docs_cnts">	
+            <table>
+                <colgroup>
+                    <col width="32">
+                    <col width="210">
+                    <col width="52">
+                    <col width="86">
+                </colgroup>
+                <thead>
+                    <tr>
+                    <th>No.</th>
+                    <th>제목</th>
+                    <th>등록자</th>
+                    <th>등록일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>1</td>
+                    <td>프로세스흐름도_퇴직금_v1.013068</td>
+                    <td>김주혁</td>
+                    <td>2014-12-23</td>
+                    </tr>
+                    <tr>
+                    <td>1</td>
+                    <td>프로세스흐름도_퇴직금_v1.013068</td>
+                    <td>김주혁</td>
+                    <td>2014-12-23</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- 테이블 관련문서 끝 -->
+    
+    <!-- 반출정보 시작 -->
+    <div class="doc_lock_info hide">
+    	<p>반출자 : <span class="lock_usr">홍길동</span></p>
+        <p>반출일시 : <span class="lock_date">2014.08.28</span></p>
+    </div>
+    <!-- 반출정보 끝 -->
+    
+    <!-- 권한조회 시작 -->
+    <div class="previlege_inquiry hide">
+    	<p>소유자 : <span class="previlege_owner">홍길동</span></p>
+        <p>기본권한 : <span class="previlege_default">조회</span></p>
+        <p>반출취소 : <span class="lock_cancel">없음</span></p>
+        <p>권한변경 : <span class="previlege_modify">없음</span></p>
+    </div>
+    <!-- 권한조회 끝 -->
+    
+    <!-- 공통 우클릭 컨텍스트 메뉴 시작 -->
+    <div class="tbl_context_menu hide">
+    	<ul>
+        	<li><a href="#" class="modify"><span class="left"></span><span class="right">수정</span></a></li>
+            <li><a href="#" class="delete"><span class="left"></span><span class="right">삭제</span></a></li>
+            <li><a href="#" class="move"><span class="left"></span><span class="right">이동</span></a></li>
+            <li><a href="#" class="copy"><span class="left"></span><span class="right">복사</span></a></li>
+            <li><a href="#" class="favorite"><span class="left"></span><span class="right">즐겨찾기 추가</span></a></li>
+            <li><a href="#" class="tempbox"><span class="left"></span><span class="right">작업카트 추가</span></a></li>
+        </ul>
+    </div>
+    <!-- 공통 우클릭 컨텍스트 메뉴 끝 -->
+    
+    <!-- 폴더 선택 -->
+    <div class="doc_folder_choose2 hide">
+    	<input type="hidden" class="context_choose">
+   		<div class="doc_folder_title">
+        	폴더 선택
+        	<a href="#" class="doc_folder_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+    	</div>
+     	<div class="doc_folder_cnts">
+     		<div class="doc_folder_box">
+	     		<span class="box_lbl">문서함</span>
+	     		<select id="doc_folder_list">
+	     			<option value="">부서</option>
+	     			<option value="">경영지원팀</option>
+	     		</select>
+	     	</div>
+	     	<div class="doc_folder_tree2">
+	     	
+	     	</div>
+	     	<div class="doc_folder_btnGrp2">
+	     		<button type="button" class="confirm">확인</button>
+	     		<button type="button" class="cancel">취소</button>
+	    	</div>
+		</div>
+   	</div>
+   	<!-- 폴더 선택 끝 -->
+   
+    <!-- 즐겨찾기 선택 -->
+    <div class="doc_favorite_choose hide">
+   		<div class="doc_favorite_title">
+        	즐겨찾기 선택
+        	<a href="#" class="doc_favorite_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+    	</div>
+     	<div class="doc_favorite_cnts">
+	     	<div class="doc_favorite_tree">
+	     	
+	     	</div>
+	     	<div class="doc_favorite_btnGrp">
+	     		<button type="button" class="confirm">확인</button>
+	     		<button type="button" class="cancel">취소</button>
+	    	</div>
+		</div>
+   	</div>
+   	<!-- 즐겨찾기 끝 -->
+   	
+   	<!-- 트리 컨텍스트 시작 -->
+   	<div class="doc_tree_context hide">
+   		<ul>
+        	<li><a href="#" class="register"><span class="left"></span><span class="right">폴더 등록</span></a></li>
+            <li><a href="#" class="modify"><span class="left"></span><span class="right">폴더 수정</span></a></li>
+            <li><a href="#" class="move"><span class="left"></span><span class="right">폴더 이동</span></a></li>
+            <li><a href="#" class="delete"><span class="left"></span><span class="right">폴더 삭제</span></a></li>
+            <li><a href="#" class="favorite"><span class="left"></span><span class="right">즐겨찾기 추가</span></a></li>
+        </ul>
+   	</div>
+   	<!-- 트리 컨텍스트 끝 -->
+   	
+   	<!-- 협업 업무등록 시작 -->
+   	<div class="coop_register_wrapper hide"></div>
+	<div class="coop_register hide">
+  		<div class="coop_register_title">
+        	업무 등록
+        	<a href="#" class="coop_register_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+        </div>	
+         <div class="coop_register_wrap">
+         	<div class="coop_register_cnts">
+         		<table>
+       			<tr>
+   				<th>업무명</th>
+   				<td><input type="text" id="" name="" class="coop_title" value=""></td>
+       			</tr>
+       			<tr>
+   				<th>업무요청자</th>
+  					<td><input type="text" id="" name="" class="coop_requester" value=""></td>
+       			</tr>
+    				<tr>
+   				<th>업무완료 예정일</th>
+   				<td>
+   					<input type="text" id="datepicker5" name="" class="srch_coop_endDate input-text calend" name="" readonly="readonly">
+   					<button type="button" class="cal_btn"></button>
+   				</td>
+       			</tr>
+       			<tr>
+   				<th>업무요청 내용</th>
+   				<td>
+   					
+   					<textarea id="" name="" class="coop_request_cnts"></textarea>
+   					
+   				</td>
+       			</tr>
+       			<tr>
+   				<th>협업자 선택</th>
+   				<td>	<button type="button" id="" class="choose_coop_user">협업자 선택</button></td>
+       			</tr>
+       			<tr>
+   				<th>작성자
+   					<span class="required">*</span>
+   				</th>
+   				<td><input type="text" id="" name="" class="coop_user" value=""></td>
+       			</tr>
+       			<tr>
+   				<th>공동작성자</th>
+   				<td><input type="text" id="" name="" class="coop_additional_user" value=""></td>
+       			</tr>
+       			<tr>
+   				<th>승인자
+   					<span class="required">*</span>
+   				</th>
+   				<td><input type="text" id="" name="" class="coop_approve_user" value=""></td>
+       			</tr>
+       			<tr>
+   				<th>수신자
+   					<span class="required">*</span>
+   				</th>
+   				<td><input type="text" id="" name="" class="coop_receive_user" value=""></td>
+       			</tr>
+         		</table>
+         		
+       			<div class="coop_detail">
+         			<div class="coop_detail_cnts">
+         				<table>
+         				<tr>
+		   				<th>제목
+		   					<span class="required">*</span>
+		   				</th>
+		   				<td><input type="text" id="" name="" class="coop_additional_user" value=""></td>
+		       			</tr>
+         				<tr>
+		   				<th>기본폴더
+							<span class="required">*</span>
+		   				</th>
+		   				<td>
+		   					<input type="text" id="" name="" class="coop_default_folder" value="">
+		   					<button type="button" class="coop_choose_folder">선택</button>
+		   				</td>
+		       			</tr>
+         				</table>
+         			</div>
+         		</div>
+         	</div>
+         	
+         	<div class="coop_register_btnGrp">
+          		<button type="submit">등록</button>
+          		<button type="reset">취소</button>
+          	</div>
+    	</div>
+    	<div class="coop_register_recent">
+       		<div class="recent_coop_title">
+       			최근문서
+       		</div>
+       		<div class="coop_recent_wrap">
+       			<ul class="coop_recent_list">
+       				<li>
+       					<a href="#">자재 업무 매뉴얼</a>
+       					<a href="#" class="coop_recent_del"><img src="/img/icon/recent_doc_del.png" alt="" title=""></a>
+       				</li>
+       				<li>
+       					<a href="#">자재 업무 매뉴얼</a>
+       					<a href="#" class="coop_recent_del"><img src="/img/icon/recent_doc_del.png" alt="" title=""></a>
+       				</li>
+       				<li>
+       					<a href="#">자재 업무 매뉴얼</a>
+       					<a href="#" class="coop_recent_del"><img src="/img/icon/recent_doc_del.png" alt="" title=""></a>
+       				</li>
+       				<li>
+       					<a href="#">자재 업무 매뉴얼</a>
+       					<a href="#" class="coop_recent_del"><img src="/img/icon/recent_doc_del.png" alt="" title=""></a>
+       				</li>
+       				<li>
+       					<a href="#">자재 업무 매뉴얼</a>
+       					<a href="#" class="coop_recent_del"><img src="/img/icon/recent_doc_del.png" alt="" title=""></a>
+       				</li>
+       				<li>
+       					<a href="#">자재 업무 매뉴얼</a>
+       					<a href="#" class="coop_recent_del"><img src="/img/icon/recent_doc_del.png" alt="" title=""></a>
+       				</li>
+       				<li>
+       					<a href="#">자재 업무 매뉴얼</a>
+       					<a href="#" class="coop_recent_del"><img src="/img/icon/recent_doc_del.png" alt="" title=""></a>
+       				</li>
+       				<li>
+       					<a href="#">자재 업무 매뉴얼</a>
+       					<a href="#" class="coop_recent_del"><img src="/img/icon/recent_doc_del.png" alt="" title=""></a>
+       				</li>
+       				<li>
+       					<a href="#">자재 업무 매뉴얼</a>
+       					<a href="#" class="coop_recent_del"><img src="/img/icon/recent_doc_del.png" alt="" title=""></a>
+       				</li>
+       				<li>
+       					<a href="#">자재 업무 매뉴얼</a>
+       					<a href="#" class="coop_recent_del"><img src="/img/icon/recent_doc_del.png" alt="" title=""></a>
+       				</li>
+       				<li>
+       					<a href="#">자재 업무 매뉴얼</a>
+       					<a href="#" class="coop_recent_del"><img src="/img/icon/recent_doc_del.png" alt="" title=""></a>
+       				</li>
+       			</ul>
+       		</div>
+       	</div>
+    </div>
+   	<!-- 협업 업무등록 끝 -->
+   	
+   	<!-- 협업 업무등록 - 사용자 선택 시작 -->
+   	<div class="coopUser_choose_wrapper hide"></div>
+	<div class="coopUser_choose hide">
+   		<div class="coopUser_choose_title">
+			사용자 선택
+			<a href="#" class="coopUser_choose_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+		</div>
+		<div class="coopUser_choose_cnts">
+			<div class="coopUserChoose_sub_wrapper">
+				<div class="coopUser_group">
+					<div class="coopUser_group_title">그룹 선택</div>
+					<div class="coopUser_tree">
+						트리영역
+					</div>
+				</div>
+				<div class="coopUser_list">
+					<div class="coopUser_srch_form">
+						<form>
+							<label>성명<input type="text" class="filter_coopUser_name" name="" class="" value=""></label>
+							<label>부서<input type="text" class="filter_depart_name" name="" class="" value=""></label>
+							<button type="button" class="coopUser_filter_btn" name="" class="">선택</button>
+						</form>
+					</div>
+					<div class="coopUser_list_result">
+						<table>
+						<thead>
+						<tr>
+						<th><input type="checkbox" class="" name="" class=""></th>
+						<th>사용자</th>
+						<th>ID</th>
+						<th>부서</th>
+						<th class="hidden">메일 ID</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr>
+						<td><input type="checkbox" class="" name="" class=""></td>
+						<td>홍길동</td>
+						<td>kimbj</td>
+						<td>솔루션사업부</td>
+						<td class="hidden">kkk@exsoft.co.kr</td>
+						</tr>
+						<tr>
+						<td><input type="checkbox" class="" name="" class=""></td>
+						<td>최명호</td>
+						<td>parkkj</td>
+						<td>솔루션사업부</td>
+						<td class="hidden">kkk1@exsoft.co.kr</td>
+						</tr>
+						<tr>
+						<td><input type="checkbox" class="" name="" class=""></td>
+						<td>김부장</td>
+						<td>kimbj</td>
+						<td>솔루션사업부</td>
+						<td class="hidden">kkk@exsoft.co.kr</td>
+						</tr>
+						<tr>
+						<td><input type="checkbox" class="" name="" class=""></td>
+						<td>박과장</td>
+						<td>parkkj</td>
+						<td>솔루션사업부</td>
+						<td class="hidden">kkk1@exsoft.co.kr</td>
+						</tr>
+						<tr>
+						<td><input type="checkbox" class="" name="" class=""></td>
+						<td>김부장</td>
+						<td>kimbj</td>
+						<td>솔루션사업부</td>
+						<td class="hidden">kkk@exsoft.co.kr</td>
+						</tr>
+						<tr>
+						<td><input type="checkbox" class="" name="" class=""></td>
+						<td>박과장</td>
+						<td>parkkj</td>
+						<td>솔루션사업부</td>
+						<td class="hidden">kkk1@exsoft.co.kr</td>
+						</tr>
+						</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="selected_coopUser_list">
+					<div class="selected_receiver">
+						<div class="selected_btnGrp1">
+							<a href="#" class="">
+								<img src="/img/icon/add_user.png" alt="" title="">
+							</a>
+							<a href="#" class="">
+								<img src="/img/icon/sub_user.png" alt="" title="">
+							</a>
+						</div>
+						<div class="selected_cnts">
+							<span class="bold">작성자</span>
+							<span class="required">*</span>
+							<div class="selected_sub_wrapper1">
+								<table>
+								<thead>
+								<tr>
+								<th><input type="checkbox" class="" name="" value=""></th>
+								<th>사용자</th>
+								<th>메일 ID</th>
+								</tr>
+								</thead>
+								<tbody>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="coop_additional_user">
+						<div class="selected_btnGrp">
+							<a href="#" class="">
+								<img src="/img/icon/add_user.png" alt="" title="">
+							</a>
+							<a href="#" class="">
+								<img src="/img/icon/sub_user.png" alt="" title="">
+							</a>
+						</div>
+						<div class="selected_cnts">
+							<span class="bold">공동 작성자</span>
+							<div class="selected_sub_wrapper">
+								<table>
+								<thead>
+								<tr>
+								<th><input type="checkbox" class="" name="" value=""></th>
+								<th>사용자</th>
+								<th>메일 ID</th>
+								</tr>
+								</thead>
+								<tbody>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="coop_approve_user">
+						<div class="selected_btnGrp">
+							<a href="#" class="">
+								<img src="/img/icon/add_user.png" alt="" title="">
+							</a>
+							<a href="#" class="">
+								<img src="/img/icon/sub_user.png" alt="" title="">
+							</a>
+						</div>
+						<div class="selected_cnts">
+							<span class="bold">승인자</span>
+							<span class="required">*</span>
+							<div class="selected_sub_wrapper">
+								<table>
+								<thead>
+								<tr>
+								<th><input type="checkbox" class="" name="" value=""></th>
+								<th>사용자</th>
+								<th>메일 ID</th>
+								</tr>
+								</thead>
+								<tbody>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="coop_receive_user">
+						<div class="selected_btnGrp">
+							<a href="#" class="">
+								<img src="/img/icon/add_user.png" alt="" title="">
+							</a>
+							<a href="#" class="">
+								<img src="/img/icon/sub_user.png" alt="" title="">
+							</a>
+						</div>
+						<div class="selected_cnts">
+							<span class="bold">수신자</span>
+							<span class="required">*</span>
+							<div class="selected_sub_wrapper">
+								<table>
+								<thead>
+								<tr>
+								<th><input type="checkbox" class="" name="" value=""></th>
+								<th>사용자</th>
+								<th>메일 ID</th>
+								</tr>
+								</thead>
+								<tbody>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								<tr>
+								<td><input type="checkbox" class="" name="" class=""></td>
+								<td>홍길동</td>
+								<td>kkk@exsoft.co.kr</td>
+								</tr>
+								</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="coopUser_choose_btnGrp">
+			<button type="button" class="coopUser_chooseConfirm_btn" class="">확인</button>
+			<button type="button" class="coopUser_chooseCancel_btn" class="">취소</button>
+		</div>
+    </div>
+   	<!-- 사용자 선택 끝 -->
+   	
+   	<!-- 협업 업무상세조회 시작 -->
+   	<div class="coopUser_detail_wrapper"></div>
+	<div class="coopUser_detail">
+   		<div class="coopUser_detail_title">
+   			업무 상세조회
+			<a href="#" class="coopUser_detail_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+		</div>
+		<div class="coopUser_detail_cnts">
+			<div class="coopUser_sub_wrapper">
+				<span class="bold">문서혁신 변화관리 파트</span>
+				<div>
+					<button type="button" id="" class="requestApproval_btn">수정</button>
+					<button type="button" id="" class="requestApproval_btn">삭제</button>
+				</div>			
+			</div>
+			<div class="coop_process_procedure">
+				<ul>
+					<li class="coop_process">작성단계</li>
+					<li class="coop_process current">승인단계</li>
+					<li class="coop_process">보완단계</li>
+					<li class="coop_process">완료</li>
+				</ul>
+			</div>
+			<div class="coop_approvalRequest_form">
+				<button type="button" id="" class="requestApproval_btn">승인</button>
+				<button type="button" id="" class="requestApproval_btn">반려</button>
+				<textarea class="requestApproval_cnts" name="">승인 요청 드립니다.</textarea>
+				<p class="requestApproval_wordcnts">
+					<span class="word_count">1</span>/1000자
+				</p>
+				<textarea class="approval_opinion_cnts" name="">김작성 2015-02-27 19:00
+검토 후 승인 부탁합니다.</textarea>
+			</div>
+			
+			<div class="coop_approvalRequest_attach">
+				<a class="dropDown_txt">
+					<label>
+						<strong>첨부파일</strong>
+						(<span class="approvalRequest_attach_cnt">2</span>)
+					</label>
+				</a>
+				<span class="dropDown_arrow down"></span>
+				<div class="approvalRequest_docs_wrapper hide">
+					<ul>
+						<li class="attach_docs_list">
+							<a href="#">
+								<img src="/img/icon/ppt.png" alt="" title="">
+								회의록.docx
+							</a>
+							<div class="download_detail">
+								<span class="download_filesize">1.3MB</span>
+								<a href="#" class="download"><img src="/img/icon/attach_download1.png" alt="" title=""></a>
+							</div>
+						</li>
+						<li class="attach_docs_list">
+							<a href="#">
+								<img src="/img/icon/ppt.png" alt="" title="">
+								회의록.docx
+							</a>
+							<div class="download_detail">
+								<span class="download_filesize">1.3MB</span>
+								<a href="#" class="download"><img src="/img/icon/attach_download1.png" alt="" title=""></a>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+			
+			<div class="coop_infomation">
+				<a class="dropDown_txt">
+					<label><strong>협업정보</strong></label>
+				</a>
+				<span class="dropDown_arrow down"></span>
+				<div class="coop_infomation_wrapper hide">
+					협업정보
+				</div>
+			</div>
+			
+			<div class="coop_default_info">
+				<a class="dropDown_txt">
+					<label><strong>기본정보</strong></label>
+				</a>
+				<span class="dropDown_arrow down"></span>
+				<div class="coop_defaultInfo_wrapper hide">
+					기본정보
+				</div>
+			</div>
+			
+			<div class="coop_extAttr_info">
+				<a class="dropDown_txt">
+					<label><strong>확장속성정보</strong></label>
+				</a>
+				<span class="dropDown_arrow down"></span>
+				<div class="coop_extAttr_wrapper hide">
+					확장속성정보
+				</div>
+			</div>
+			
+			<div class="coop_currAuth_info">
+				<a class="dropDown_txt">
+					<label><strong>현재 설정된 권한명</strong></label>
+				</a>
+				<span class="dropDown_arrow down"></span>
+				<div class="coop_currAuth_wrapper hide">
+					현재 설정된 권한명
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 협업 업무상세조회 끝 -->
+  </div>
+</body>
+</html>

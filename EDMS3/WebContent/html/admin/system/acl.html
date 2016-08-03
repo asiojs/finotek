@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <title>index</title>
+  <script src="/js/jquery-2.1.3.min.js"></script>
+  <script src="/lib/jstree/jstree.js"></script>
+  <script src="/js/tree.js"></script>
+  <script src="/js/jquery-ui.js"></script>
+  <script src="/lib/jqgrid/js/jquery.jqGrid.min.js"></script>
+  <script src="/js/jquery.ddslick.custom.js"></script>
+  <script src="/js/jquery.cookie.js"></script>
+  <script src="/js/jquery.alerts.js"></script>
+  <script src="/js/admin/ecm.js"></script>
+
+  <link rel="stylesheet" href="/css/admin/ecm.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/jqtree-custom.css">
+  <link rel="stylesheet" href="/css/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery.alerts.css">
+  <link rel="stylesheet" href="/css/jquery.ddslick.custom.css">
+  <link rel="stylesheet" href="/lib/jqgrid/css/ui.jqgrid.css">
+</head>
+
+<body>
+	<div class="wrap">
+	    <header class="header">
+	    	<div class="header_subWrapper">
+	    		<div class="logo">
+					<h1><a href="#"><img src="/img/logo.png"></a></h1>
+				</div>
+				<div class="header_menu_wrapper">
+					<div class="header_icon">
+						<ul class="header_icon_menu">
+							<li class="main_menu">
+								<a href="#" class="system selected">시스템 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#" class="selected">그룹관리</a></li>
+										<li><a href="#">사용자관리</a></li>
+										<li><a href="#">메뉴접근제한관리</a></li>
+										<li><a href="#">환경설정 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="document">문서 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">문서유형 관리</a></li>
+										<li><a href="#">폴더 관리</a></li>
+										<li><a href="#">권한 관리(ACL)</a></li>
+										<li><a href="#">만기 문서 관리</a></li>
+										<li><a href="#">소유권 변경</a></li>
+										<li><a href="#">휴지통 관리</a></li>
+										<li><a href="#">중복 파일 관리</a></li>
+										<li><a href="#">대량문서 열람 검사 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="rGate">rGate 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">저장금지 확장자 관리</a></li>
+										<li><a href="#">저장 허용 프로그램 관리</a></li>
+										<li><a href="#">로컬 저장 허용 관리</a></li>
+										<li><a href="#">USB 저장 허용 관리</a></li>
+									</ul>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="header_user">
+						<ul class="header_user_menu">
+							<li class="user_info">
+								<a href="#">
+									<img src="/img/icon/user_info.png" alt="">
+									<strong>관리자</strong>님 환영합니다.
+								</a>
+							</li>
+							<li class="user_account">
+								<a href="#"><img src="/img/icon/admin/pwd.png" alt=""></a>
+							</li>
+							<li class="user_logout">
+								<a href="#"><img src="/img/icon/user_logout.png" alt=""></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+	    	</div>
+		</header>
+		<div class="cnt_wrapper">
+			<div class="depth_navigation">
+				문서관리 &gt; 권한(ACL) 관리
+			</div>
+			
+			<div class="acl_sub_wrapper">
+				<div class="sub_left">
+					<div class="srch_area">
+						<div class="srch_form">
+							<form>
+								<label class="srch_auth_lbl">권한명
+									<input type="text" id="" name="" class="srch_auth_keyword">
+								</label>
+								<label class="srch_owner_lbl">소유자
+									<input type="text" id="" name="" class="srch_auth_keyword">
+								</label>
+								<button type="button" class="srch_auth_btn bold">검색</button>
+							</form>
+						</div>
+						<div class="srch_result_wrapper">
+							<div class="right">
+								<button type="button" id="" name="" class="register_auth_btn">등록</button>
+								<button type="button" id="" name="" class="delete_auth_btn">삭제</button>
+								<button type="button" id="" name="" class="copy_auth_btn">복사</button>
+							</div>
+							<div class="srch_result">
+								jqGrid 영역
+								<table id="">
+									<tr>
+										<th><input type="checkbox" id="" name="" class="" value=""></th>
+										<th>권한명</th>
+										<th>공개대상</th>
+										<th>그룹여부</th>
+										<th>공개범위</th>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="pg_subWrapper">
+						<div class="pg_navi_wrapper">
+			            	<ul class="pg_navi">
+			                	<li class="first"><a href="#"><img src="/img/icon/pg_first.png" alt="" title=""></a></li>
+			                    <li class="prev"><a href="#"><img src="/img/icon/pg_prev.png" alt="" title=""></a></li>
+			                	<li class="curr"><a href="#">1</a></li>
+			                    <li><a href="#">2</a></li>
+			                    <li><a href="#">3</a></li>
+			                    <li><a href="#">4</a></li>
+			                    <li><a href="#">5</a></li>
+			                    <li class="next"><a href="#"><img src="/img/icon/pg_next.png" alt="" title=""></a></li>
+								<li class="last"><a href="#"><img src="/img/icon/pg_last.png" alt="" title=""></a></li>
+			                </ul>    
+			           	</div>	
+					</div>
+				</div>
+				
+				<div class="sub_right">
+					<div class="acl_config_info">
+						<table>
+							<tr>
+								<th><span class="bold">연구소 권한</span></th>
+								<td colspan="3">
+									<button type="button" id="" name="" class="delete_auth_btn">삭제</button>
+									<button type="button" id="" name="" class="copy_auth_btn">복사</button>
+								</td>
+							</tr>
+							<tr>
+								<th>권한명</th>
+								<td colspan="3">
+									<input type="text" id="" name="" class="doc_authName">
+								</td>
+							</tr>
+							<tr>
+								<th>공개범위</th>
+								<td>
+									<select id="" name="" class="">
+										<option value="">부서</option>
+									</select>
+									<input type="text" id="" name="" class="doc_openRange readonly" readonly="readonly">
+									<button type="button" id="" class="">선택</button>
+								</td>
+							</tr>
+							<tr>
+								<th>기본여부</th>
+								<td>
+									<label><input type="radio" name="" class="" value="" checked="checked">예</label>
+									<label><input type="radio" name="" class="" value="">아니오</label>
+								</td>
+								<th>등록일자</th>
+								<td>2014.08.01</td>
+							</tr>
+						</table>
+					</div>
+					
+					<div class="acl_config_list">
+						<div>
+							<button type="button" id="" name="" class="add_aclUser btn">추가</button>
+							<button type="button" id="" name="" class="delete_aclUser btn">삭제</button>
+						</div>
+						
+						<div class="acl_config_tbl">
+							jqGrid 영역
+							<table id=""></table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btnGrp">
+				<button type="button" class="btn1 bold">저장</button>
+				<button type="button" class="btn1">취소</button>
+			</div>
+		</div>
+		<footer class="footer">
+			<p class="copyright">Copyright eXsoft All Rights Reserved.</p>
+		</footer>
+		
+		<!-- ACL 등록 시작 -->
+	   	<div class="register_acl_wrapper hide"></div>
+	   	<div class="register_acl hide">
+	   		<div class="window_title">
+	   			권한 등록
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="register_acl_cnts">
+	        	<table>
+	        		<tr>
+	        			<th>권한명<span class="required">*</span></th>
+	        			<td colspan="3"><input type="text" id="" name="" class=""></td>
+	        		</tr>
+	        		<tr>
+	        			<th>공유범위<span class="required">*</span></th>
+	        			<td colspan="3">
+	        				<p>
+		        				<label><input type="radio" name="" class="" value="">공유안함</label>
+		        				<label><input type="radio" name="" class="" value="">부서공유</label>
+		        				<label><input type="radio" name="" class="" value="">하위부서공유</label>
+		        				<label><input type="radio" name="" class="" value="">전사공유</label>
+	        				</p>
+	        				<input type="text" id="" name="" class="acl_folder_choose readonly" readonly="readonly">
+	        				<button type="button" id="" class="acl_folderChoose_btn">선택</button>
+	        			</td>
+	        		</tr>
+	        		<tr>
+	        			<th>등록자</th>
+	        			<td>홍길동</td>
+	        			<th>등록일자</th>
+	        			<td>2014.08.01</td>
+	        		</tr>
+	        	</table>
+	        	<div class="register_acl_btnGrp">
+	        		<button type="button" id="" class="add_aclUser_popup">추가</button>
+	        		<button type="button" id="" class="remove_aclUser_popup">제외</button>
+	        	</div>
+	        	<div class="register_acl_field">
+	        		** jqGrid 영역 **
+	        		<table id=""></table>
+	        	</div>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="register_acl_btn bold">저장</button>
+        		<button type="button" id="" class="cancel_acl_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- ACL 등록 끝 -->
+		
+		<!-- ACL 복사 시작 -->
+	   	<div class="copy_acl_wrapper hide"></div>
+	   	<div class="copy_acl hide">
+	   		<div class="window_title">
+	   			권한 복사
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="copy_acl_cnts">
+	        	<table>
+	        		<tr>
+	        			<th>권한명<span class="required">*</span></th>
+	        			<td colspan="3"><input type="text" id="" name="" class=""></td>
+	        		</tr>
+	        		<tr>
+	        			<th>공유범위<span class="required">*</span></th>
+	        			<td colspan="3">
+	        				<p>
+		        				<label><input type="radio" name="" class="" value="">공유안함</label>
+		        				<label><input type="radio" name="" class="" value="">부서공유</label>
+		        				<label><input type="radio" name="" class="" value="">하위부서공유</label>
+		        				<label><input type="radio" name="" class="" value="">전사공유</label>
+	        				</p>
+	        				<input type="text" id="" name="" class="acl_folder_choose readonly" readonly="readonly">
+	        				<button type="button" id="" class="acl_folderChoose_btn">선택</button>
+	        			</td>
+	        		</tr>
+	        		<tr>
+	        			<th>등록자</th>
+	        			<td>홍길동</td>
+	        			<th>복사일자</th>
+	        			<td>2014.08.01</td>
+	        		</tr>
+	        	</table>
+	        	<div class="copy_acl_btnGrp">
+	        		<button type="button" id="" class="add_aclUser_popup">추가</button>
+	        		<button type="button" id="" class="remove_aclUser_popup">제외</button>
+	        	</div>
+	        	<div class="copy_acl_field">
+	        		** jqGrid 영역 **
+	        		<table id=""></table>
+	        	</div>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="copy_acl_btn bold">저장</button>
+        		<button type="button" id="" class="cancel_acl_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- ACL 복사 끝 -->
+	   	
+		<!-- ACL 사용자 추가 시작 -->
+	   	<div class="aclUser_add_wrapper hide"></div>
+	   	<div class="aclUser_add hide">
+	   		<div class="window_subtitle">
+	   			권한 설정
+	            <a href="#" class="window_close"><img src="/img/icon/window_close1.png" alt="" title=""></a>
+	        </div>
+	        <div class="aclUser_add_cnts">
+	        	<div class="aclUser_left">
+	        		<div class="aclUser_user_wrapper">
+		        		<div class="aclUser_group">
+		        			<div class="title center">그룹</div>
+		        		</div>
+		        		<div class="aclUser_users">
+		        			<div class="title center">사용자</div>
+		        		</div>
+	        		</div>
+	        		<div>
+	        			<div class="aclUser_srch_form">
+	        				<div>
+	        					<form id="">
+	        						사용자/부서
+	        						<input type="text" id="" name="" class="">
+		        					<button type="button" id="" class="">검색</button>
+	        					</form>
+	        				</div>
+	        				<table id="">
+	        					<tr>
+	        						<th>1</th>
+	        						<th>2</th>
+	        						<th>3</th>
+	        					</tr>
+	        					<tr>
+	        						<td>1</td>
+	        						<td>2</td>
+	        						<td>3</td>
+	        					</tr>
+	        				</table>
+	        			</div>
+	        		</div>
+	        	</div>
+	        	<div class="aclUser_center">
+	        		<div>
+	        			<a href="#">
+	        				<img src="/img/icon/add_user.png" alt="" title="">
+	        			</a>
+	        			<a href="#">
+	        				<img src="/img/icon/sub_user.png" alt="" title="">
+	        			</a>
+	        		</div>
+	        	</div>
+	        	<div class="aclUser_right">
+	        		<div class="aclUser_apply">
+						적용대상
+						<table id="">
+							<tr>
+								<th></th>
+								<th></th>
+							</tr>
+							<tr>
+								<td></td>
+								<td></td>
+							</tr>
+						</table>	        		
+	        		</div>
+	        		<div class="aclUser_authority">
+	        			권한설정
+						<table id="">
+							<tr>
+								<th></th>
+								<th></th>
+							</tr>
+							<tr>
+								<td></td>
+								<td></td>
+							</tr>
+						</table>
+	        		</div>
+	        	</div>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="aclUser_add_btn bold">저장</button>
+        		<button type="button" id="" class="aclUser_add_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- ACL 사용자 추가 끝 -->
+	</div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.common.dao.HistoryDao">
+
+	<!-- 문서유형/폴더/권한 이력을 등록한다.. :: XR_HISTORY -->
+	<insert id="historyWrite" parameterType="History">
+		INSERT INTO XR_HISTORY	
+		(
+			HISTORY_SEQ,ACTOR_ID,ACTOR_NM,GROUP_ID,GROUP_NM,ACTION_ID,TARGET_TYPE,TARGET_ID,ACTION_PLACE
+		) 
+		VALUES 
+		( 
+			#{history_seq},#{actor_id},#{actor_nm},#{group_id},#{group_nm},#{action_id},#{target_type},#{target_id},#{action_place}
+		)
+	</insert>
+	
+	<!-- 문서이력을 등록한다.. :: XR_DOCUMENT_HT -->
+	<insert id="documentHtWrite" parameterType="DocumentHT">
+		INSERT INTO XR_DOCUMENT_HT	
+		(
+			DOC_SEQ,ROOT_ID,ACTOR_ID,ACTOR_NM,GROUP_ID,GROUP_NM,ACTION_ID,TARGET_ID,TYPE_ID,CONNECT_IP,ACTION_PLACE,
+			BEFORE_ID,BEFORE_NM,AFTER_ID,AFTER_NM,DOC_NAME,VERSION_NO
+		) 
+		VALUES 
+		( 
+			#{doc_seq},#{root_id},#{actor_id},#{actor_nm},#{group_id},#{group_nm},#{action_id},#{target_id},#{type_id},#{connect_ip},#{action_place},
+			#{before_id},#{before_nm},#{after_id},#{after_nm},#{doc_name},#{version_no}
+		)
+	</insert>
+	
+	<!-- 첨부파일 이력을 등록한다. XR_PAGE_HT -->
+	<insert id="pageHtWrite" parameterType="PageHt">
+		INSERT INTO XR_PAGE_HT
+		(PAGE_SEQ,DOC_ID,ACTOR_ID,ACTOR_NM,GROUP_ID,GROUP_NM,ACTION_ID,TARGET_ID,CONNECT_IP,ACTION_PLACE)
+		VALUES
+		(#{page_seq},#{doc_id},#{actor_id},#{actor_nm},#{group_id},#{group_nm},#{action_id},#{target_id},#{connect_ip},#{action_place})
+	</insert>
+	
+	<!-- 문서이력 목록을 조회한다.. :: XR_DOCUMENT_HT 삭제대상 -->
+	<select id="documentHtList" parameterType="HashMap" resultType="DocumentHT">
+		SELECT
+			DOC_SEQ,ROOT_ID,ACTOR_ID,ACTOR_NM,GROUP_ID,GROUP_NM,ACTION_ID,TARGET_ID,TYPE_ID,CONNECT_IP,ACTION_PLACE,
+			BEFORE_ID,BEFORE_NM,AFTER_ID,AFTER_NM,DOC_NAME,VERSION_NO,ACTION_DATE
+		FROM
+			XR_DOCUMENT_HT
+		WHERE
+			TARGET_ID = #{doc_id}
+		ORDER BY 
+			ACTION_DATE DESC
+	</select>
+	
+	<!-- 문서이력  목록 수 :: XR_DOCUMENT_HT -->
+	<select id="docHtPagingCount" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(DOC_SEQ)
+		FROM XR_DOCUMENT_HT		
+		WHERE TARGET_ID = #{doc_id}
+	</select>
+	
+	<!-- 문서이력  목록 :: XR_DOCUMENT_HT -->
+	<select id="docHtList" parameterType="HashMap" resultType="DocumentHT">
+		SELECT			
+			DOC_SEQ,ROOT_ID,ACTOR_ID,ACTOR_NM,GROUP_ID,GROUP_NM,ACTION_ID,TARGET_ID,TYPE_ID,CONNECT_IP,ACTION_PLACE,
+			BEFORE_ID,BEFORE_NM,AFTER_ID,AFTER_NM,DOC_NAME,VERSION_NO,ACTION_DATE,ACTION_NAME		
+		FROM
+		(
+			SELECT
+				H.DOC_SEQ,H.ROOT_ID,H.ACTOR_ID,H.ACTOR_NM,H.GROUP_ID,H.GROUP_NM,H.ACTION_ID,H.TARGET_ID,H.TYPE_ID,H.CONNECT_IP,H.ACTION_PLACE,
+				H.BEFORE_ID,H.BEFORE_NM,H.AFTER_ID,H.AFTER_NM,H.DOC_NAME,H.VERSION_NO,H.ACTION_DATE,C.CODE_NM AS ACTION_NAME,
+		 		CEIL((ROW_NUMBER() OVER(ORDER BY H.${orderCol} ${orderType} )) / ${page_size} ) PAGENUM
+			FROM XR_DOCUMENT_HT H INNER JOIN XR_CODE C ON H.ACTION_ID = C.CODE_ID 
+			WHERE H.TARGET_ID = #{doc_id} AND C.GCODE_ID='ACTION_ID' 
+		)LIST				
+		WHERE LIST.PAGENUM = #{nPage}				
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.common.dao.MenuDao">
+	
+	<!-- 메뉴권한 공통 조건 -->
+	<sql id="whereMenuAuthCommon">
+		<where>			
+			<if test="role_id != null and role_id != ''">
+				AND ROLE_ID = #{role_id}
+			</if>			
+			<if test="gcode_id != null and gcode_id != ''">
+				AND GCODE_ID = #{gcode_id}
+			</if>
+			<if test="menu_cd != null and menu_cd != ''">
+				AND MENU_CD = #{menu_cd}
+			</if>					
+		</where> 				
+	</sql>
+	
+	<!--메뉴권한 목록 카운트 -->
+	<select id="menuAuthList" parameterType="HashMap" resultType="MenuAuth">
+		 SELECT 
+        	ROLE_ID,GCODE_ID,MENU_CD,MENU_NM_KO,SU_MENU_CD,ORD,
+			PART,CODE_NM,MENU_LEVEL,MENU_NM,LINK_PATH,IS_USE,IS_APPLIANCE
+		FROM
+		(
+			SELECT 
+				A.ROLE_ID,A.GCODE_ID,A.MENU_CD,M.ORD,M.MENU_NM_KO,M.SU_MENU_CD,A.PART,
+				C.CODE_NM,M.MENU_NM_KO AS MENU_NM,M.MENU_LEVEL,M.LINK_PATH,M.IS_USE,M.IS_APPLIANCE
+			FROM XR_MENU_AUTH A 
+	        	INNER JOIN XR_MENU M ON A.MENU_CD = M.MENU_CD
+	        	INNER JOIN XR_CODE C ON A.PART = C.CODE_ID AND C.GCODE_ID='MENU_PART'
+		) LIST 
+		<where>
+			<if test="role_id != null and role_id != ''">
+				AND ROLE_ID = #{role_id}
+			</if>			
+			<if test="is_use != null and is_use != ''">
+				AND IS_USE = #{is_use}
+			</if>
+			<if test="is_appliance != null and is_appliance != ''">
+				AND IS_APPLIANCE = #{is_appliance}
+			</if>						
+		</where>			
+		ORDER BY SU_MENU_CD DESC,MENU_LEVEL ASC,ORD ASC
+	</select>
+	
+	<!--메뉴권한 목록 카운트 -->
+	<select id="menuList" parameterType="HashMap" resultType="Menu">
+		SELECT 
+			MENU_CD,MENU_NM_KO,MENU_NM_EN,MENU_NM_JA,MENU_NM_ZH,MENU_NM_KO AS MENU_NM,
+			SU_MENU_CD,LINK_PATH,ICON,ORD,IS_USE,MENU_TYPE,MENU_LEVEL,IS_APPLIANCE
+		FROM XR_MENU
+		<where>
+			<if test="is_menu_auth != null and is_menu_auth != ''">
+				AND IS_MENU_AUTH = #{is_menu_auth}
+			</if>			
+			<if test="is_appliance != null and is_appliance != ''">
+				AND IS_APPLIANCE = #{is_appliance}
+			</if>			
+		</where>			
+		ORDER BY SU_MENU_CD ASC,MENU_LEVEL ASC,ORD ASC	
+	</select>
+	
+	<!-- 메뉴권한 삭제 처리 -->
+	<delete id="menuAuthDelete" parameterType="MenuAuth">
+		DELETE FROM XR_MENU_AUTH
+		<include refid="whereMenuAuthCommon" />
+	</delete>
+	
+	<!-- 하위메뉴권한 삭제 처리 -->
+	<delete id="subMenuAuthDelete" parameterType="MenuAuth">
+		DELETE FROM XR_MENU_AUTH
+		<where>			
+			<if test="role_id != null and role_id != ''">
+				AND ROLE_ID = #{role_id}
+			</if>			
+			<if test="gcode_id != null and gcode_id != ''">
+				AND GCODE_ID = #{gcode_id}
+			</if>
+			<if test="menu_cd != null and menu_cd != ''">				
+				AND MENU_CD IN 
+				(
+					SELECT 
+						A.MENU_CD
+              		FROM XR_MENU_AUTH A 
+						INNER JOIN XR_MENU M ON A.MENU_CD = M.MENU_CD AND M.SU_MENU_CD=#{menu_cd}
+				)				
+			</if>		
+		</where> 				
+	</delete>
+		
+	 <!-- 메뉴권한 등록처리 :: XR_MENU_AUTH -->
+	<insert id="menuAuthWrite" parameterType="MenuAuth">
+		INSERT INTO XR_MENU_AUTH (
+				ROLE_ID,GCODE_ID,MENU_CD,PART
+		) VALUES (
+				#{role_id},#{gcode_id},#{menu_cd},#{part}
+		)
+	</insert>
+	
+	<!-- 메뉴권한 목록 정보 가져오기 -->
+	<select id="menuAuthDetail" parameterType="HashMap" resultType="MenuAuth">
+		SELECT
+			ROLE_ID,GCODE_ID,MENU_CD,MENU_LEVEL,SU_MENU_CD,PART
+		FROM 
+		(	
+			SELECT 
+				A.ROLE_ID,A.GCODE_ID,A.MENU_CD,A.PART,M.MENU_LEVEL,M.SU_MENU_CD
+			FROM XR_MENU_AUTH A INNER JOIN XR_MENU M ON A.MENU_CD = M.MENU_CD
+		) LIST
+		<include refid="whereMenuAuthCommon" />
+	</select>
+	
+	<!-- 메뉴 정보 가져오기 -->
+	<select id="menuDetail" parameterType="HashMap" resultType="Menu">
+		SELECT
+			M.MENU_CD,M.MENU_NM_KO,M.MENU_NM_KO AS MENU_NM,
+			M.ORD,M.IS_USE,M.MENU_TYPE,M.MENU_LEVEL,M.SU_MENU_CD,
+			( SELECT MENU_NM_KO FROM XR_MENU WHERE MENU_CD = M.SU_MENU_CD ) AS SU_MENU_NM
+		FROM XR_MENU M
+		<where>
+			<if test="menu_cd != null and menu_cd != ''">
+				AND M.MENU_CD = #{menu_cd}
+			</if>				
+		</where> 
+	</select>	
+
+</mapper>

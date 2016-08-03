@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="true" />						<!-- 설정에서 각 mapper 에 설정된 캐시를 전역적으로 사용할지 말지에 대한 여부 -->
+		<setting name="defaultExecutorType" value="REUSE" />			<!-- 디폴트 실행자(executor) 설정. SIMPLE 실행자는 특별히 하는 것이 없다. 
+																									REUSE 실행자는 PreparedStatement 를 재사용한다. BATCH 실행자는 구문을 재사용하고 수정을 배치 처리한다. -->
+		<setting name="multipleResultSetsEnabled" value="true"/>		<!-- 한개의 구문에서 여러개의 ResultSet 을 허용할지의 여부(드라이버가 해당 기능을 지원해야 함). -->
+		<setting name="defaultStatementTimeout" value="25000" />		<!-- 데이터베이스로의 응답을 얼마나 오래 기다릴지를 판단하는 타임아웃을 셋팅 -->
+		
+		<!--			  		
+		<setting name="useColumnLabel" value="true"/>						
+		<setting name="useGeneratedKeys" value="false"/>
+		<setting name="autoMappingBehavior" value="PARTIAL"/>		
+		<setting name="safeRowBoundsEnabled" value="false"/>
+		<setting name="mapUnderscoreToCamelCase" value="false"/>
+		<setting name="localCacheScope" value="SESSION"/>
+		<setting name="jdbcTypeForNull" value="OTHER"/>
+		<setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>
+		-->	
+	</settings>	
+	
+	<typeAliases>
+		<typeAlias type="org.apache.commons.collections.map.CaseInsensitiveMap" alias="CaseMap" />
+		<typeAlias type="java.lang.String" alias="String" />
+		<typeAlias type="java.util.Map" alias="Map" />
+		<typeAlias type="java.util.HashMap" alias="HashMap" />
+		<typeAlias type="java.lang.Integer" alias="Int"/>
+		<typeAlias type="java.lang.Long" alias="Long"/>								
+		<typeAlias type="java.lang.Double" alias="Double"/>		
+		
+		<!-- VO Define list -->
+		
+		<typeAlias type="kr.co.exsoft.user.vo.UserVO" alias="User"/>
+		<typeAlias type="kr.co.exsoft.user.vo.LoginLogVO" alias="LoginLog"/>
+		<typeAlias type="kr.co.exsoft.user.vo.GroupVO" alias="Group"/>
+		<typeAlias type="kr.co.exsoft.user.vo.ConnectLogVO" alias="ConnectLog"/>		
+		<typeAlias type="kr.co.exsoft.user.vo.GroupHtVO" alias="GroupHt"/>
+		<typeAlias type="kr.co.exsoft.user.vo.GroupedVO" alias="Grouped"/>
+		<typeAlias type="kr.co.exsoft.user.vo.UserConfigVO" alias="UserConfig"/>
+		<typeAlias type="kr.co.exsoft.user.vo.QuickMenuVO" alias="QuickMenu"/>
+			
+		<typeAlias type="kr.co.exsoft.folder.vo.FolderVO" alias="Folder"/>		
+		<typeAlias type="kr.co.exsoft.folder.vo.FavoriteFolderVO" alias="FavoriteFolder"/>
+			
+		<typeAlias type="kr.co.exsoft.permission.vo.AclVO" alias="Acl"/>
+		<typeAlias type="kr.co.exsoft.permission.vo.AclItemVO" alias="AclItem"/>		
+		<typeAlias type="kr.co.exsoft.permission.vo.AclExItemVO" alias="AclExItem"/>
+			
+		<typeAlias type="kr.co.exsoft.quartz.vo.AuditConfigVO" alias="AuditConfig"/><!-- DEL -->
+		<typeAlias type="kr.co.exsoft.quartz.vo.AuditTrailVO" alias="AuditTrail"/>
+		<typeAlias type="kr.co.exsoft.quartz.vo.BatchWorkVO" alias="BatchWork"/>
+					
+		<typeAlias type="kr.co.exsoft.document.vo.AttrVO" alias="Attr"/>
+		<typeAlias type="kr.co.exsoft.document.vo.AttrItemVO" alias="AttrItem"/>
+		<typeAlias type="kr.co.exsoft.document.vo.DocumentVO" alias="Document"/>
+		<typeAlias type="kr.co.exsoft.document.vo.PageVO" alias="Page"/>
+		<typeAlias type="kr.co.exsoft.document.vo.TypeVO" alias="Type"/>
+		<typeAlias type="kr.co.exsoft.document.vo.TempDocVO" alias="Temp"/>
+		
+		
+		<typeAlias type="kr.co.exsoft.common.vo.CodeVO" alias="Code"/>
+		<typeAlias type="kr.co.exsoft.common.vo.ConfVO" alias="Conf"/>		
+		<typeAlias type="kr.co.exsoft.common.vo.LangCodeVO" alias="LangCode"/>		
+		<typeAlias type="kr.co.exsoft.common.vo.MapVO" alias="MapVO"/>
+		<typeAlias type="kr.co.exsoft.common.vo.HistoryVO" alias="History"/>		
+		<typeAlias type="kr.co.exsoft.common.vo.SessionVO" alias="Session"/>		
+		<typeAlias type="kr.co.exsoft.common.vo.MenuVO" alias="Menu"/>
+		<typeAlias type="kr.co.exsoft.common.vo.MenuAuthVO" alias="MenuAuth"/>
+		<typeAlias type="kr.co.exsoft.common.vo.DocumentHtVO" alias="DocumentHt"/>
+		<typeAlias type="kr.co.exsoft.common.vo.PageHtVO" alias="PageHt"/>	
+		<typeAlias type="kr.co.exsoft.common.vo.CommentVO" alias="Comment"/>
+		<typeAlias type="kr.co.exsoft.common.vo.RecentlyObjectVO" alias="RecentlyObject"/>	
+				
+		<typeAlias type="kr.co.exsoft.rgate.vo.FilesysVO" alias="Filesys"/>
+		<typeAlias type="kr.co.exsoft.rgate.vo.RGateListVO" alias="RGateList"/>	
+		<typeAlias type="kr.co.exsoft.rgate.vo.RGateMappingVO" alias="RGateMapping"/>	
+		<typeAlias type="kr.co.exsoft.rgate.vo.RGateProcessUsingVO" alias="RGateProcessUsing"/>	
+		<typeAlias type="kr.co.exsoft.rgate.vo.RGateProcessVO" alias="RGateProcess"/>		
+
+		<typeAlias type="kr.co.exsoft.statistics.vo.DocumentUserHtVO" alias="UserDocHt"/>
+		<typeAlias type="kr.co.exsoft.statistics.vo.DocumentGroupHtVO" alias="GroupDocHt"/>	
+		<typeAlias type="kr.co.exsoft.statistics.vo.DocumentDecadeVO" alias="DecadeDocHt"/>
+		<typeAlias type="kr.co.exsoft.statistics.vo.DocumentStatusVO" alias="DocumentStatus"/>
+			
+		<typeAlias type="kr.co.exsoft.note.vo.NoteVO" alias="Note"/>
+		<typeAlias type="kr.co.exsoft.note.vo.NoteManageVO" alias="NoteManage"/>
+		<typeAlias type="kr.co.exsoft.process.vo.ProcessVO" alias="Process"/>
+		<typeAlias type="kr.co.exsoft.process.vo.ProcessExecutorVO" alias="ProcessExecutor"/>
+		
+		<typeAlias type="kr.co.exsoft.quartz.vo.FileQueueDeleteVO" alias="FileQueue"/>
+				
+	</typeAliases>
+
+</configuration>

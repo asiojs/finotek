@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+  <title>index</title>
+  <script src="/js/jquery-2.1.3.min.js"></script>
+  <script src="/lib/jstree/jstree.js"></script>
+  <script src="/js/tree.js"></script>
+  <script src="/js/jquery-ui.js"></script>
+  <script src="/lib/jqgrid/js/jquery.jqGrid.min.js"></script>
+  <script src="/js/jquery.ddslick.custom.js"></script>
+  <script src="/js/jquery.cookie.js"></script>
+  <script src="/js/jquery.alerts.js"></script>
+  <script src="/js/admin/ecm.js"></script>
+
+  <link rel="stylesheet" href="/css/admin/ecm.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/jqtree-custom.css">
+  <link rel="stylesheet" href="/css/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery.alerts.css">
+  <link rel="stylesheet" href="/css/jquery.ddslick.custom.css">
+  <link rel="stylesheet" href="/lib/jqgrid/css/ui.jqgrid.css">
+</head>
+
+<body>
+	<div class="wrap">
+	    <header class="header">
+	    	<div class="header_subWrapper">
+	    		<div class="logo">
+					<h1><a href="#"><img src="/img/logo.png"></a></h1>
+				</div>
+				<div class="header_menu_wrapper">
+					<div class="header_icon">
+						<ul class="header_icon_menu">
+							<li class="main_menu">
+								<a href="#" class="system selected">시스템 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#" class="selected">그룹관리</a></li>
+										<li><a href="#">사용자관리</a></li>
+										<li><a href="#">메뉴접근제한관리</a></li>
+										<li><a href="#">환경설정 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="document">문서 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">문서유형 관리</a></li>
+										<li><a href="#">폴더 관리</a></li>
+										<li><a href="#">권한 관리(ACL)</a></li>
+										<li><a href="#">만기 문서 관리</a></li>
+										<li><a href="#">소유권 변경</a></li>
+										<li><a href="#">휴지통 관리</a></li>
+										<li><a href="#">중복 파일 관리</a></li>
+										<li><a href="#">대량문서 열람 검사 관리</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="main_menu">
+								<a href="#" class="rGate">rGate 관리</a>
+								<div class="subMenu_element">
+									<ul>
+										<li><a href="#">저장금지 확장자 관리</a></li>
+										<li><a href="#">저장 허용 프로그램 관리</a></li>
+										<li><a href="#">로컬 저장 허용 관리</a></li>
+										<li><a href="#">USB 저장 허용 관리</a></li>
+									</ul>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="header_user">
+						<ul class="header_user_menu">
+							<li class="user_info">
+								<a href="#">
+									<img src="/img/icon/user_info.png" alt="">
+									<strong>관리자</strong>님 환영합니다.
+								</a>
+							</li>
+							<li class="user_account">
+								<a href="#"><img src="/img/icon/admin/pwd.png" alt=""></a>
+							</li>
+							<li class="user_logout">
+								<a href="#"><img src="/img/icon/user_logout.png" alt=""></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+	    	</div>
+		</header>
+		<div class="cnt_wrapper">
+			<div class="depth_navigation">
+				문서관리 &gt; 문서유형 관리
+			</div>
+			
+			<div class="doc_sub_wrapper">
+				<div class="sub_left">
+					<div class="srch_form">
+						<form>
+							<span class="srch_doc_lbl">문서유형명</span>
+							<input type="text" id="" name="" class="srch_doc_keyword bold">
+							<button type="button" class="srch_doc_btn btn bold">검색</button>
+						</form>
+					</div>
+					<div class="srch_result_wrapper">
+						<div class="left">
+							<button type="button" id="" name="" class="register_docuType_btn">등록</button>
+							<button type="button" id="" name="" class="delete_docuType_btn">삭제</button>
+							<a href="#" class="menu_refresh"><img src="/img/icon/menu_refresh.png" alt="" title=""></a>
+						</div>
+						<div class="srch_result">
+							<table>
+								<thead>
+								<tr>
+									<th><input type="checkbox" id="" name="" class="" value=""></th>
+									<th>문서유형ID</th>
+									<th>문서유형명</th>
+									<th>상태</th>
+								</tr>
+								</thead>
+								<tbody>
+								<tr>
+									<td><input type="checkbox" id="" name="" class="" value=""></td>
+									<td>XR_DOCUMENT</td>
+									<td>일반문서</td>
+									<td>사용</td>
+								</tr>
+								<tr>
+									<td><input type="checkbox" id="" name="" class="" value=""></td>
+									<td>XR_DOCUMENT</td>
+									<td>일반문서</td>
+									<td>중지</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="pg_subWrapper">
+						<div class="pg_navi_wrapper">
+			            	<ul class="pg_navi">
+			                	<li class="first"><a href="#"><img src="/img/icon/pg_first.png" alt="" title=""></a></li>
+			                    <li class="prev"><a href="#"><img src="/img/icon/pg_prev.png" alt="" title=""></a></li>
+			                	<li class="curr"><a href="#">1</a></li>
+			                    <li><a href="#">2</a></li>
+			                    <li><a href="#">3</a></li>
+			                    <li><a href="#">4</a></li>
+			                    <li><a href="#">5</a></li>
+			                    <li class="next"><a href="#"><img src="/img/icon/pg_next.png" alt="" title=""></a></li>
+								<li class="last"><a href="#"><img src="/img/icon/pg_last.png" alt="" title=""></a></li>
+			                </ul>    
+			           	</div>					
+					</div>
+				</div>
+					
+				
+				<div class="sub_right">
+					<div class="doc_config_info">
+						<table>
+							<colgroup>
+								<col width="108"/>
+								<col width="774"/>
+							</colgroup>
+							<tr>
+							<th><span class="bold">이미지문서</span></th>
+							<th><button type="button" id="" name="" class="delete_docuTypeGroup">삭제</button></th>
+							</tr>
+							<tr>
+							<th class="normal">문서유형 ID<span class="required">*</span></th>
+							<td>	<input type="text" id="" name="" class="docType_id"></td>
+							</tr>
+							<tr>
+							<th class="normal">문서유형명<span class="required">*</span></th>
+							<td><input type="text" id="" name="" class="docType_name"></td>
+							</tr>
+							<tr>
+							<th class="normal">정렬순서</th>
+							<td>
+								<select id="group_order">
+									<option>0</option>
+									<option>1</option>
+									<option>2</option>
+								</select>
+							</td>
+							</tr>
+							<tr>
+							<th class="normal">사용여부</th>
+							<td>
+								<select id="use_yn">
+									<option>0</option>
+									<option>1</option>
+									<option>2</option>
+								</select>
+							</td>
+							</tr>
+							<tr>
+							<th class="normal">등록자</th>
+							<td>홍길동</td>
+							</tr>
+							<tr>
+							<th class="normal">등록일</th>
+							<td>2015-01-29</td>
+							</tr>
+						</table>
+					</div>
+					
+					<div class="doc_config_list">
+						<div class="config_list_btnGrp">
+							<button type="button" id="" name="" class="btn bold">추가</button>
+							<button type="button" id="" name="" class="btn">삭제</button>
+						</div>
+						
+						<table id="">
+						<colgroup>
+							<col width="36"/>
+							<col width="135"/>
+							<col width="135"/>
+							<col width="94"/>
+							<col width="94"/>
+							<col width="94"/>
+							<col width="94"/>
+							<col width="110"/>
+							<col width="83"/>
+						</colgroup>
+						<tr>
+							<th><input type="checkbox" id="" name="" class="checkAll" value=""></th>
+							<th>속성ID</th>
+							<th>속성명</th>
+							<th>길이</th>
+							<th>필수</th>
+							<th>편집</th>
+							<th>검색</th>
+							<th>입력형태</th>
+							<th>항목설정</th>
+						</tr>	
+						<tr>
+							<td><input type="checkbox" id="" name="" class="" value=""></td>
+							<td><input type="text" name="" class="attr_id" value=""></td>
+							<td><input type="text" name="" class="attr_nm" value=""></td>
+							<td><input type="text" name="" class="attr_size" value=""></td>
+							<td>
+								<select id="attr_required1">
+									<option>T</option>							
+									<option>F</option>							
+								</select>
+							</td>
+							<td>
+								<select id="attr_editable1">
+									<option>T</option>							
+									<option>F</option>							
+								</select>
+							</td>
+							<td>
+								<select id="attr_searchable1">
+									<option>T</option>							
+									<option>F</option>							
+								</select>
+							</td>
+							<td>
+								<select id="attr_inputType1">
+									<option>RADIO</option>							
+									<option>INPUT</option>							
+									<option>CHECK</option>							
+									<option>TEXT</option>							
+								</select>
+							</td>
+							<td><button type="button" id="" name="" class="btn bold">설정</button></td>
+						</tr>	
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="btnGrp">
+				<button type="button" class="btn1 bold">확인</button>
+				<button type="button" class="btn1">취소</button>
+			</div>
+		</div>
+		<footer class="footer">
+			<p class="copyright">Copyright eXsoft All Rights Reserved.</p>
+		</footer>
+		
+		<!-- 문서유형 등록 시작 -->
+	   	<div class="register_docuType_wrapper hide"></div>
+	   	<div class="register_docuType hide">
+	   		<div class="window_title">
+	   			문서유형 등록
+	            <a href="#" class="window_close"><img src="/img/icon/window_close.png" alt="" title=""></a>
+	        </div>
+	        <div class="register_docuType_cnts">
+	        	<table>
+	        		<tr>
+	        			<th>문서유형ID</th>
+	        			<td><input type="text" id="" name="" class=""></td>
+	        			<th>문서유형명</th>
+	        			<td><input type="text" id="" name="" class=""></td>
+	        		</tr>
+	        		<tr>
+	        			<th>사용여부</th>
+	        			<td>
+	        				<select id="" name="" class="">
+	        					<option value="">사용</option>
+	        					<option value="">미사용</option>
+	        				</select>
+	        			</td>
+	        			<th>정렬순서</th>
+	        			<td>
+	        				<select id="" name="" class="">
+	        					<option value="">0</option>
+	        					<option value="">1</option>
+	        				</select>
+	        			</td>
+	        		</tr>
+	        		<tr>
+	        			<th>등록자</th>
+	        			<td>관리자</td>
+	        			<th>등록일자</th>
+	        			<td>2014-10-21</td>
+	        		</tr>
+	        	</table>
+	        	<div class="register_docuType_btnGrp">
+	        		<button type="button" id="" class="">추가</button>
+	        		<button type="button" id="" class="">삭제</button>
+	        		<button type="button" id="" class="">위</button>
+	        		<button type="button" id="" class="">아래</button>
+	        	</div>
+	        	<div class="register_docuType_field">
+	        		** jqGrid 영역 **
+	        		<table id="">
+		        		<tr>
+		        			<th><input type="checkbox" id="" name="" class="" value=""></th>
+		        			<th>속성ID</th>
+		        			<th>속성명</th>
+		        			<th>길이</th>
+		        			<th>필수</th>
+		        			<th>편집</th>
+		        			<th>검색</th>
+		        			<th>입력유형</th>
+		        			<th>항목설정</th>
+		        		</tr>
+		        		<tr>
+		        			<td><input type="checkbox" id="" name="" class="" value=""></td>
+		        			<td><input type="text" id="" name="" class="" value=""></td>
+		        			<td><input type="text" id="" name="" class="" value=""></td>
+		        			<td><input type="text" id="" name="" class="" value=""></td>
+		        			<td>
+		        				<select id="" name="" class="">
+		        					<option value="">T</option>
+		        					<option value="">F</option>
+		        				</select>
+		        			</td>
+		        			<td>
+		        				<select id="" name="" class="">
+		        					<option value="">T</option>
+		        					<option value="">F</option>
+		        				</select>
+		        			</td>
+		        			<td>
+		        				<select id="" name="" class="">
+		        					<option value="">T</option>
+		        					<option value="">F</option>
+		        				</select>
+		        			</td>
+		        			<td>
+		        				<select id="" name="" class="">
+		        					<option value="">RADIO</option>
+		        					<option value="">INPUT</option>
+		        					<option value="">CHECK</option>
+		        				</select>
+		        			</td>
+		        			<td><button type="button" id="" name="" class="register_docuCateType_btn">설정</button></td>
+		        		</tr>
+		        	</table>
+	        	</div>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="register_docuType_btn bold">등록</button>
+        		<button type="button" id="" class="cancel_docuType_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 문서유형 등록 끝 -->
+	   	
+	   	<!-- 항목 설정 시작 -->
+	   	<div class="register_docuCateType_wrapper hide"></div>
+	   	<div class="register_docuCateType hide">
+	   		<div class="window_subtitle">
+	   			항목 설정
+	            <a href="#" class="window_close"><img src="/img/icon/window_close1.png" alt="" title=""></a>
+	        </div>
+	        <div class="register_docuCateType_cnts">
+	        	<div class="register_docuCateType_btnGrp">
+	        		<button type="button" id="" class="">추가</button>
+	        		<button type="button" id="" class="">삭제</button>
+	        	</div>
+        		<table>
+	        		<tr>
+	        			<th><input type="checkbox" id="" name="" class="" value=""></th>
+	        			<th>항목명</th>
+	        			<th>정렬순서</th>
+	        			<th>기본여부</th>
+	        		</tr>
+	        		<tr>
+	        			<td>	<input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>	<input type="text" id="" name="" class="" value=""></td>
+	        			<td>	<input type="text" id="" name="" class="" value="">	</td>
+	        			<td>	<input type="checkbox" id="" name="" class="" value=""></td>
+	        		</tr>
+	        		<tr>
+	        			<td>	<input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>	<input type="text" id="" name="" class="" value=""></td>
+	        			<td>	<input type="text" id="" name="" class="" value="">	</td>
+	        			<td>	<input type="checkbox" id="" name="" class="" value=""></td>
+	        		</tr>
+	        		<tr>
+	        			<td>	<input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>	<input type="text" id="" name="" class="" value=""></td>
+	        			<td>	<input type="text" id="" name="" class="" value="">	</td>
+	        			<td>	<input type="checkbox" id="" name="" class="" value=""></td>
+	        		</tr>
+	        		<tr>
+	        			<td>	<input type="checkbox" id="" name="" class="" value=""></td>
+	        			<td>	<input type="text" id="" name="" class="" value=""></td>
+	        			<td>	<input type="text" id="" name="" class="" value="">	</td>
+	        			<td>	<input type="checkbox" id="" name="" class="" value=""></td>
+	        		</tr>
+	        	</table>
+	        </div>
+        	<div class="btnGrp">
+        		<button type="button" id="" class="register_docuType_btn bold">등록</button>
+        		<button type="button" id="" class="cancel_docuType_btn cancel">취소</button>
+        	</div>
+	    </div>
+	   	<!-- 항목 설정 끝 -->
+	</div>
+</body>
+</html>

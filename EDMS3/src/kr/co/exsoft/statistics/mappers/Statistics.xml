@@ -1,0 +1,771 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.statistics.dao.StatisticsDao">
+
+	<!-- 사용자별 등록/활용 현황 -->
+	<sql id="userDocStatistics">
+		SELECT 
+	       		H.USER_ID,H.USER_NM,H.GROUP_ID,H.GROUP_NM,H.TYPE_ID,T.TYPE_NAME,
+	       		SUM(H.CREATE_CNT) AS CREATE_CNT,SUM(H.READ_CNT) AS READ_CNT,
+	       		SUM(H.UPDATE_CNT) AS UPDATE_CNT,SUM(H.DELETE_CNT) AS DELETE_CNT
+	    	FROM XR_DOCUMENT_USER_HT H
+	       		INNER JOIN XR_TYPE T ON H.TYPE_ID = T.TYPE_ID
+				<if test="part != 'ALL'">
+					INNER JOIN XR_GROUPED G ON H.USER_ID =G.USER_ID
+				</if>
+			<where>
+				<if test="strKeyword != null and strKeyword != ''">
+					<choose>
+						<when test="strIndex == 'USER'">
+							AND H.USER_NM LIKE '%${strKeyword}%'
+						</when>
+						<when test="strIndex == 'GROUP'">
+							AND H.GROUP_NM LIKE '%${strKeyword}%'
+						</when>
+					</choose>				
+				</if>					
+				<if test="sdate != null and sdate != ''">
+					AND H.UDATE >= #{sdate}
+				</if>
+				<if test="edate != null and edate != ''">
+					<![CDATA[ AND H.UDATE <= #{edate}  ]]>
+				</if>		
+				<if test="authGroupList != null and authGroupList != ''">
+					 AND H.GROUP_ID IN 
+					<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+						#{item}
+					</foreach>		
+				</if>
+			</where>	
+	    	GROUP BY H.USER_ID,H.USER_NM,H.GROUP_NM,H.GROUP_ID,H.TYPE_ID,T.TYPE_NAME
+	</sql>
+	
+	<select id="userDocStatisticsCnt" parameterType="HashMap" resultType="Int">
+		SELECT 
+	      	COUNT(USER_ID) AS CNT
+	  	FROM
+	  	(    
+			<include refid="userDocStatistics" />				
+		) DATA
+	</select>
+		
+	<select id="userDocStatisticsList" parameterType="HashMap" resultType="UserDocHt">
+		SELECT
+			USER_ID,USER_NM,GROUP_ID,GROUP_NM,TYPE_ID,TYPE_NAME,CREATE_CNT,READ_CNT,UPDATE_CNT,DELETE_CNT
+		FROM
+		(
+			SELECT 
+	      		USER_ID,USER_NM,GROUP_ID,GROUP_NM,TYPE_ID,TYPE_NAME,CREATE_CNT,READ_CNT,UPDATE_CNT,DELETE_CNT,
+				CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM   
+	  		FROM
+	  		(    
+	    		<include refid="userDocStatistics" />	
+	  		) DATA
+		) LIST 
+		WHERE LIST.PAGENUM = #{nPage}								
+	</select>
+	
+	<!-- 부서별 등록/활용 현황 :: 다국어처리고려-->	
+	<sql id="groupDocStatistics">
+		SELECT 
+			H.GROUP_ID,G.GROUP_NAME_KO AS GROUP_NM,H.TYPE_ID,T.TYPE_NAME,
+			SUM(H.CREATE_CNT) AS CREATE_CNT,SUM(H.READ_CNT) AS READ_CNT,
+			SUM(H.UPDATE_CNT) AS UPDATE_CNT,SUM(H.DELETE_CNT) AS DELETE_CNT
+		 FROM XR_DOCUMENT_GROUP_HT H
+			INNER JOIN XR_TYPE T ON H.TYPE_ID = T.TYPE_ID
+            INNER JOIN XR_GROUP G ON H.GROUP_ID = G.GROUP_ID
+		<where>					
+			<if test="strKeyword != null and strKeyword != ''">
+				AND G.GROUP_NAME_KO LIKE '%${strKeyword}%'					
+			</if>					
+			<if test="sdate != null and sdate != ''">
+				AND H.GDATE >= #{sdate}
+			</if>
+			<if test="edate != null and edate != ''">
+				<![CDATA[ AND H.GDATE <= #{edate}  ]]>
+			</if>		
+			<if test="authGroupList != null and authGroupList != ''">
+				 AND H.GROUP_ID IN 
+				<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+					#{item}
+				</foreach>		
+			</if>
+		</where>	
+		GROUP BY H.GROUP_ID,G.GROUP_NAME_KO,H.TYPE_ID,T.TYPE_NAME  
+	</sql>
+		
+	<select id="groupDocStatisticsCnt" parameterType="HashMap" resultType="Int">
+		SELECT 
+	      	COUNT(GROUP_ID) AS CNT
+	  	FROM
+	  	(    
+			<include refid="groupDocStatistics" />				
+		) DATA
+	</select>
+		
+	<select id="groupDocStatisticsList" parameterType="HashMap" resultType="GroupDocHt">
+		SELECT
+			GROUP_ID,GROUP_NM,TYPE_ID,TYPE_NAME,CREATE_CNT,READ_CNT,UPDATE_CNT,DELETE_CNT
+		FROM
+		(
+			SELECT 
+	      		GROUP_ID,GROUP_NM,TYPE_ID,TYPE_NAME,CREATE_CNT,READ_CNT,UPDATE_CNT,DELETE_CNT,
+				CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM   
+	  		FROM
+	  		(    
+	    		<include refid="groupDocStatistics" />	
+	  		) DATA
+		) LIST 
+		WHERE LIST.PAGENUM = #{nPage}			
+	</select>
+	
+	<!-- 기간별(사용자) 등록/활용 현황 -->
+	<select id="decadeUserDocStatisticsList" parameterType="HashMap" resultType="DecadeDocHt">
+		SELECT 
+			UDATE,ORDER_STR,CREATE_CNT,READ_CNT,UPDATE_CNT,DELETE_CNT,ISTYPE,ISGROUP
+		FROM 
+		(
+			SELECT 			
+				<choose>
+					<when test="term == 'daily'">	H.UDATE, H.UDATE AS ORDER_STR, 'daily' AS ISTYPE,'USER' AS ISGROUP, </when>
+					<otherwise>	SUBSTR(H.UDATE,0,7) AS UDATE,	SUBSTR(H.UDATE,0,7) AS ORDER_STR,'monthly' AS ISTYPE,'USER' AS ISGROUP, </otherwise>
+				</choose>		
+		      	SUM(H.CREATE_CNT) AS CREATE_CNT,SUM(H.READ_CNT) AS READ_CNT,
+		       	SUM(H.UPDATE_CNT) AS UPDATE_CNT,SUM(H.DELETE_CNT) AS DELETE_CNT
+			FROM XR_DOCUMENT_USER_HT H
+			<if test="part != 'ALL'">
+				INNER JOIN XR_GROUPED G ON H.USER_ID =G.USER_ID
+			</if>	
+			<where>
+				<if test="strKeyword != null and strKeyword != '' and strIndex == 'USER'">
+					AND H.USER_NM LIKE '%${strKeyword}%'			
+				</if>						
+				<if test="sdate != null and sdate != ''">
+					AND H.UDATE >= #{sdate}
+				</if>
+				<if test="edate != null and edate != ''">
+					<![CDATA[ AND H.UDATE <= #{edate}  ]]>
+				</if>		
+				<if test="authGroupList != null and authGroupList != ''">
+					 AND H.GROUP_ID IN 
+					<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+						#{item}
+					</foreach>		
+				</if>
+			</where>			
+			<choose>
+				<when test="term == 'daily'">	GROUP BY H.UDATE	</when>
+				<otherwise>	GROUP BY SUBSTR(H.UDATE,0,7)	</otherwise>
+			</choose>
+		) LIST
+		ORDER BY ${orderCol} ${orderType}
+	</select>
+	
+	
+	<!-- 기간별(부서) 등록/활용 현황 -->
+	<select id="decadeGroupDocStatisticsList" parameterType="HashMap" resultType="DecadeDocHt">
+		SELECT 
+			GDATE,ORDER_STR,CREATE_CNT,READ_CNT,UPDATE_CNT,DELETE_CNT,ISTYPE,ISGROUP
+		FROM 
+		(
+			SELECT 			
+				<choose>
+					<when test="term == 'daily'">	H.GDATE, H.GDATE AS ORDER_STR, 'daily' AS ISTYPE,'GROUP' AS ISGROUP, </when>
+					<otherwise>	SUBSTR(H.GDATE,0,7) AS GDATE,	SUBSTR(H.GDATE,0,7) AS ORDER_STR,'monthly' AS ISTYPE,'GROUP' AS ISGROUP, </otherwise>
+				</choose>		
+		      	SUM(H.CREATE_CNT) AS CREATE_CNT,SUM(H.READ_CNT) AS READ_CNT,
+		       	SUM(H.UPDATE_CNT) AS UPDATE_CNT,SUM(H.DELETE_CNT) AS DELETE_CNT
+			FROM XR_DOCUMENT_GROUP_HT H
+				INNER JOIN XR_GROUP G ON H.GROUP_ID = G.GROUP_ID
+			<where>
+				<if test="strKeyword != null and strKeyword != '' and strIndex == 'GROUP'">
+					AND G.GROUP_NAME_KO LIKE '%${strKeyword}%'					
+				</if>						
+				<if test="sdate != null and sdate != ''">
+					AND H.GDATE >= #{sdate}
+				</if>
+				<if test="edate != null and edate != ''">
+					<![CDATA[ AND H.GDATE <= #{edate}  ]]>
+				</if>		
+				<if test="authGroupList != null and authGroupList != ''">
+					 AND H.GROUP_ID IN 
+					<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+						#{item}
+					</foreach>		
+				</if>
+			</where>		
+			<choose>
+				<when test="term == 'daily'">	GROUP BY H.GDATE	</when>
+				<otherwise>	GROUP BY SUBSTR(H.GDATE,0,7)	</otherwise>
+			</choose>		
+		) LIST
+		ORDER BY ${orderCol} ${orderType}	
+	</select>
+		
+	<!-- 사용자/문서함별 소유 현황 || 문서함/폴더별 보유 현황 :: 다국어처리 -->
+	<!-- 사용자/문서함별 소유 현황 || 문서함/폴더별 보유 현황 공통 Where 조건 SQL -->
+	<sql id="userFoldertatisticsWhere">
+		<if test="sdate != null and sdate != ''">
+			<![CDATA[ AND D.CREATE_DATE >=  TO_DATE(#{sdate},'YYYY-MM-DD')  ]]>
+		</if>		
+		<if test="edate != null and edate != ''">
+			<![CDATA[ AND D.CREATE_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999  ]]>
+		</if>
+		<!-- 사용자/문서함별 보유 현황 검색 조건 -->
+		<if test="strKeyword != null and strKeyword != ''">
+			<choose>
+			<when test="strIndex == 'USER'">
+				AND U.USER_NAME_KO LIKE '%${strKeyword}%'
+			</when>
+			<when test="strIndex == 'GROUP'">
+				AND G.GROUP_NAME_KO LIKE '%${strKeyword}%'
+			</when>
+			</choose>				
+		</if>						
+		<!-- 문서함/폴더별 보유 현황 검색 조건 -->		
+		<if test="strFolderIdx != null and strFolderIdx != ''">
+			AND M.MAP_ID = #{strFolderIdx}
+		</if>		
+		<if test="authGroupList != null and authGroupList != ''">
+			 AND G.GROUP_ID IN 
+			<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+				#{item}
+			</foreach>		
+		</if>
+	</sql>
+	
+	<!-- 사용자/문서함별 소유 현황 || 문서함/폴더별 보유 현황 현재문서 및 현재문서 총 첨부 파일수 -->
+	<sql id="userFoldertatisticsIn">
+		SELECT 
+			<choose>
+			<when test="workType == 'USER'">
+				M.MAP_ID,M.MAP_NM_KO AS MAP_NM,D.OWNER_ID,U.USER_NAME_KO AS USER_NM,G.GROUP_NAME_KO AS GROUP_NM,
+				G.GROUP_ID,COUNT(D.DOC_ID) AS DOC_CNT,SUM(D.PAGE_CNT) AS PAGE_CNT
+			</when>
+			<when test="workType == 'FOLDER'">
+				M.MAP_ID,M.MAP_NM_KO AS MAP_NM,F.FOLDER_NAME_KO AS GROUP_NM,
+				F.FOLDER_ID,COUNT(D.DOC_ID) AS DOC_CNT,SUM(D.PAGE_CNT) AS PAGE_CNT
+			</when>
+			</choose>					
+		FROM XR_DOCUMENT D
+			INNER JOIN XR_FOLDER F ON F.FOLDER_ID = D.FOLDER_ID
+			INNER JOIN XR_MAP M ON M.MAP_ID = F.MAP_ID AND M.MAP_TYPE = 'FOLDER'
+			INNER JOIN XR_USER U ON U.USER_ID = D.OWNER_ID
+			INNER JOIN XR_GROUPED GR ON GR.USER_ID = D.OWNER_ID AND GR.IS_DEFAULT='T'	
+			INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID       
+		WHERE D.IS_CURRENT = 'T' 
+		<include refid="userFoldertatisticsWhere" />		
+		<choose>
+			<when test="workType == 'USER'">
+				GROUP BY M.MAP_ID,M.MAP_NM_KO,D.OWNER_ID,U.USER_NAME_KO,G.GROUP_ID,G.GROUP_NAME_KO
+			</when>	
+			<when test="workType == 'FOLDER'">
+				GROUP BY M.MAP_ID,M.MAP_NM_KO,F.FOLDER_ID,F.FOLDER_NAME_KO
+			</when>
+		</choose>				
+	</sql>
+	
+	<!-- 사용자/문서함별 소유 현황 || 문서함/폴더별 보유 현황 전체문서 용량-->
+	<sql id="userFoldertatisticsOut">
+		SELECT 
+			<choose>
+			<when test="workType == 'USER'">
+				M.MAP_ID,M.MAP_NM_KO AS MAP_NM,D.OWNER_ID,U.USER_NAME_KO AS USER_NM,G.GROUP_NAME_KO AS GROUP_NM,
+				G.GROUP_ID,SUM(D.PAGE_TOTAL) AS PAGE_TOTAL
+			</when>
+			<when test="workType == 'FOLDER'">
+				M.MAP_ID,M.MAP_NM_KO AS MAP_NM,F.FOLDER_NAME_KO AS GROUP_NM,
+				F.FOLDER_ID,SUM(D.PAGE_TOTAL) AS PAGE_TOTAL	
+			</when>
+			</choose>				
+		FROM XR_DOCUMENT D
+			INNER JOIN XR_FOLDER F ON F.FOLDER_ID = D.FOLDER_ID
+			INNER JOIN XR_MAP M ON M.MAP_ID = F.MAP_ID AND MAP_TYPE = 'FOLDER'
+			INNER JOIN XR_USER U ON U.USER_ID = D.OWNER_ID
+			INNER JOIN XR_GROUPED GR ON GR.USER_ID = D.OWNER_ID AND GR.IS_DEFAULT='T'	
+			INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID     
+		<where>
+			<include refid="userFoldertatisticsWhere" />				
+		</where>	 
+		<choose>
+			<when test="workType == 'USER'">
+				GROUP BY M.MAP_ID,M.MAP_NM_KO,D.OWNER_ID,U.USER_NAME_KO,G.GROUP_ID,G.GROUP_NAME_KO
+			</when>	
+			<when test="workType == 'FOLDER'">
+				GROUP BY M.MAP_ID,M.MAP_NM_KO,F.FOLDER_ID,F.FOLDER_NAME_KO
+			</when>
+		</choose>				     			
+	</sql>
+	
+	<!-- 사용자/문서함별 소유 현황 || 문서함/폴더별 보유 현황 리스트 수 -->
+	<select id="userFoldertatisticsCnt" parameterType="HashMap" resultType="Int">
+		SELECT
+    		COUNT(*) AS CNT
+		FROM 
+		(
+			<include refid="userFoldertatisticsIn" />				
+		) LIST 
+				LEFT OUTER JOIN
+		( 
+			<include refid="userFoldertatisticsOut" />		
+		) OUTLIST ON 
+		<choose>
+		<when test="workType == 'USER'">
+			LIST.OWNER_ID = OUTLIST.OWNER_ID AND LIST.GROUP_ID = OUTLIST.GROUP_ID AND LIST.MAP_ID = OUTLIST.MAP_ID	
+		</when>
+		<when test="workType == 'FOLDER'">
+			LIST.FOLDER_ID = OUTLIST.FOLDER_ID AND LIST.MAP_ID = OUTLIST.MAP_ID	
+		</when>	
+		</choose>
+	</select>
+	
+	<!-- 사용자/문서함별 소유 현황 || 문서함/폴더별 보유 현황 리스트 -->
+	<select id="userFolderStatisticsList" parameterType="HashMap" resultType="DocumentStatus">			
+		SELECT 
+		<choose>
+			<when test="workType == 'USER'">
+			USER_NM,OWNER_ID,GROUP_NM,GROUP_ID,MAP_NM,MAP_ID,DOC_CNT,PAGE_CNT,PAGE_TOTAL
+			</when>
+			<when test="workType == 'FOLDER'">
+			GROUP_NM,FOLDER_ID,MAP_NM,MAP_ID,DOC_CNT,PAGE_CNT,PAGE_TOTAL
+			</when>
+		</choose>
+		FROM
+		(
+			SELECT
+			<choose>
+				<when test="workType == 'USER'">
+	    			LIST.USER_NM,LIST.OWNER_ID,LIST.GROUP_NM,LIST.GROUP_ID,LIST.MAP_NM,LIST.MAP_ID,LIST.DOC_CNT,LIST.PAGE_CNT,OUTLIST.PAGE_TOTAL,
+					CEIL((ROW_NUMBER() OVER(ORDER BY LIST.${orderCol} )) / ${page_size} ) PAGENUM   
+				</when>	
+				<when test="workType == 'FOLDER'">
+					LIST.GROUP_NM,LIST.FOLDER_ID,LIST.MAP_NM,LIST.MAP_ID,LIST.DOC_CNT,LIST.PAGE_CNT,OUTLIST.PAGE_TOTAL 
+				</when>
+			</choose>
+			FROM 
+			(
+				<include refid="userFoldertatisticsIn" />				
+			) LIST 
+					LEFT OUTER JOIN
+			( 
+				<include refid="userFoldertatisticsOut" />		
+			) OUTLIST ON 
+			<choose>
+			<when test="workType == 'USER'">
+				LIST.OWNER_ID = OUTLIST.OWNER_ID AND LIST.GROUP_ID = OUTLIST.GROUP_ID AND LIST.MAP_ID = OUTLIST.MAP_ID	
+			</when>
+			<when test="workType == 'FOLDER'">
+				LIST.FOLDER_ID = OUTLIST.FOLDER_ID AND LIST.MAP_ID = OUTLIST.MAP_ID	
+			</when>	
+			</choose>
+		)LIST 
+		<if test="workType == 'USER'">
+		WHERE LIST.PAGENUM = #{nPage}
+		</if>			
+	</select>
+	
+	<!-- 문서함/폴더별 보유현황 기준 폴더LIST :: MYPAGE/MYDEPT/PROJECT -->
+	<sql id="statisticsFolderListWhere">
+		<where>			
+			<if test="strFolderIdx != null and strFolderIdx != ''">
+				AND F.MAP_ID = #{strFolderIdx}	
+			</if> 
+			<choose>				
+			<when test="strFolderIdx == 'MYDEPT'">
+				 AND F.FOLDER_TYPE = #{strFolderIdx} AND F.FOLDER_ID != F.PARENT_ID  
+			</when>
+				<when test="strFolderIdx == 'PROJECT'">
+				 AND F.FOLDER_TYPE = 'DOCUMENT' AND F.FOLDER_ID != F.PARENT_ID  AND F.PARENT_ID = #{project_root_id}
+			</when>
+			</choose>
+			<choose>				
+			<when test="strFolderIdx == 'MYDEPT'">
+				<if test="authGroupList != null and authGroupList != ''">
+					 AND F.FOLDER_ID IN  
+					<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+						REPLACE(#{item},'GRP','FOL')
+					</foreach>		
+				</if>	
+			</when>
+			<when test="strFolderIdx == 'MYPAGE'">
+				<if test="authGroupList != null and authGroupList != ''">
+					 AND G.GROUP_ID IN  
+					<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+						#{item}
+					</foreach>		
+				</if>			
+			</when>
+			</choose>
+		</where>		
+	</sql>
+	
+	<select id="statisticsFolderListCnt" parameterType="HashMap" resultType="Int">
+		SELECT 
+			COUNT(F.FOLDER_ID) AS CNT 
+		FROM XR_FOLDER F
+		<choose>
+		<when test="strFolderIdx == 'MYPAGE'">
+			 INNER JOIN XR_USER U ON F.FOLDER_ID = U.USER_ID 
+			 INNER JOIN XR_GROUPED G ON G.USER_ID = U.USER_ID AND IS_DEFAULT='T'
+		</when>
+		</choose>
+		<include refid="statisticsFolderListWhere" />		
+	</select>
+
+	<select id="statisticsFolderList" parameterType="HashMap" resultType="CaseMap">
+		SELECT 
+			FOLDER_ID,FOLDER_NM
+		FROM
+		(
+			SELECT 
+				F.FOLDER_ID,FOLDER_NAME_KO AS FOLDER_NM,
+				CEIL((ROW_NUMBER() OVER(ORDER BY F.${orderCol} )) / ${page_size} ) PAGENUM     
+			FROM XR_FOLDER F
+			<choose>
+				<when test="strFolderIdx == 'MYPAGE'">
+					INNER JOIN XR_USER U ON F.FOLDER_ID = U.USER_ID 
+					INNER JOIN XR_GROUPED G ON G.USER_ID = U.USER_ID AND IS_DEFAULT='T'
+				</when>
+			</choose>
+			<include refid="statisticsFolderListWhere" />		
+		) LIST 
+		WHERE LIST.PAGENUM = #{nPage}
+	</select>
+	
+	<!-- 프로젝트 폴더 ROOT_ID -->
+	<select id="statisticsProjectRootId" parameterType="HashMap" resultType="String">
+		SELECT 
+			FOLDER_ID
+		FROM XR_FOLDER
+		<where>
+			<if test="strFolderIdx != null and strFolderIdx != ''">
+				AND MAP_ID = #{strFolderIdx} AND FOLDER_ID=PARENT_ID
+			</if>		
+		</where>		
+	</select>
+	
+	<!-- 문서유형별 보유현황 / 보안등급별 보유 현황 공통 조건 쿼리 -->
+	<sql id="typeLevelCommonWhere">
+		<if test="sdate != null and sdate != ''">
+			<![CDATA[ AND D.CREATE_DATE >=  TO_DATE(#{sdate},'YYYY-MM-DD')  ]]>
+		</if>		
+		<if test="edate != null and edate != ''">
+			<![CDATA[ AND D.CREATE_DATE < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999 ]]>
+		</if>
+		<if test="strKeyword != null and strKeyword != ''">
+			<choose>
+			<when test="strIndex == 'USER'">
+				AND U.USER_NAME_KO LIKE '%${strKeyword}%'
+			</when>
+			<when test="strIndex == 'GROUP'">
+				AND G.GROUP_NAME_KO LIKE '%${strKeyword}%'
+			</when>
+			</choose>				
+		</if>			
+		<if test="authGroupList != null and authGroupList != ''">
+			 AND G.GROUP_ID IN 
+			<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+				#{item}
+			</foreach>		
+		</if>				
+	</sql>
+	
+	<!-- 문서유형별 보유 현황 -->
+	<select id="statisticsTypeList" parameterType="HashMap" resultType="DocumentStatus">
+		SELECT
+			DOC_TYPE,TYPE_NAME,MAP_NM,MAP_ID,SUM(DOC_CNT) AS DOC_CNT,SUM(PAGE_CNT) AS PAGE_CNT,SUM(PAGE_TOTAL) AS PAGE_TOTAL
+		FROM
+		(
+			SELECT 
+				LIST.DOC_TYPE,LIST.TYPE_NAME,LIST.USER_NM,LIST.OWNER_ID,LIST.MAP_NM,LIST.MAP_ID,
+				LIST.DOC_CNT,LIST.PAGE_CNT,OUTLIST.PAGE_TOTAL 
+        	FROM	
+			(
+				SELECT 
+        			M.MAP_ID,M.MAP_NM_KO AS MAP_NM,D.OWNER_ID,U.USER_NAME_KO AS USER_NM,DOC_TYPE, T.TYPE_NAME,
+					COUNT(D.DOC_ID) AS DOC_CNT,SUM(D.PAGE_CNT) AS PAGE_CNT 
+				FROM XR_DOCUMENT D 
+					INNER JOIN XR_FOLDER F ON F.FOLDER_ID = D.FOLDER_ID
+		            INNER JOIN XR_MAP M ON M.MAP_ID = F.MAP_ID AND M.MAP_TYPE = 'FOLDER' 
+		            INNER JOIN XR_USER U ON U.USER_ID = D.OWNER_ID 
+		            INNER JOIN XR_GROUPED GR ON GR.USER_ID = D.OWNER_ID AND GR.IS_DEFAULT='T' 
+		            INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID 
+		 			INNER JOIN XR_TYPE T ON T.TYPE_ID = D.DOC_TYPE
+				WHERE D.IS_CURRENT = 'T' 
+				<include refid="typeLevelCommonWhere" />				
+				GROUP BY D.DOC_TYPE, T.TYPE_NAME,D.OWNER_ID,U.USER_NAME_KO,M.MAP_ID,M.MAP_NM_KO
+			) LIST LEFT OUTER JOIN				
+			(
+				SELECT         	
+            		M.MAP_ID,M.MAP_NM_KO AS MAP_NM,D.DOC_TYPE, T.TYPE_NAME,D.OWNER_ID,U.USER_NAME_KO AS USER_NM,SUM(D.PAGE_TOTAL) AS PAGE_TOTAL
+        		FROM XR_DOCUMENT D 
+					INNER JOIN XR_FOLDER F ON F.FOLDER_ID = D.FOLDER_ID 
+        			INNER JOIN XR_MAP M ON M.MAP_ID = F.MAP_ID AND M.MAP_TYPE = 'FOLDER' 
+        			INNER JOIN XR_USER U ON U.USER_ID = D.OWNER_ID 
+        			INNER JOIN XR_GROUPED GR ON GR.USER_ID = D.OWNER_ID AND GR.IS_DEFAULT='T' 
+        			INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID
+        			INNER JOIN XR_TYPE T ON T.TYPE_ID = D.DOC_TYPE		
+				<where>
+					<include refid="typeLevelCommonWhere" />				
+				</where>								
+				GROUP BY D.DOC_TYPE, T.TYPE_NAME,D.OWNER_ID,U.USER_NAME_KO,M.MAP_ID,M.MAP_NM_KO					
+		 	) OUTLIST ON LIST.OWNER_ID = OUTLIST.OWNER_ID AND LIST.MAP_ID = OUTLIST.MAP_ID AND LIST.DOC_TYPE = OUTLIST.DOC_TYPE				
+		) DATAS
+				
+		GROUP BY DOC_TYPE,TYPE_NAME,MAP_ID,MAP_NM 
+		ORDER BY TYPE_NAME ASC
+	</select>
+	
+	<!-- 보안등급별  보유 현황 목록/카운트 -->		
+	<sql id="typeLevelSelect">
+		SELECT
+			LIST.CODE_NM,LIST.SECURITY_LEVEL,LIST.USER_NM,LIST.OWNER_ID,LIST.DOC_CNT,LIST.PAGE_CNT,OUTLIST.PAGE_TOTAL
+		FROM
+		(
+			SELECT 	        
+			<choose>
+			<when test="strIndex == 'USER'">
+				D.SECURITY_LEVEL,C.CODE_NM,D.OWNER_ID,U.USER_NAME_KO AS USER_NM, COUNT(D.DOC_ID) AS DOC_CNT,SUM(D.PAGE_CNT) AS PAGE_CNT	
+			</when>
+			<when test="strIndex == 'GROUP'">
+				D.SECURITY_LEVEL,C.CODE_NM,G.GROUP_ID AS OWNER_ID,G.GROUP_NAME_KO AS USER_NM, COUNT(D.DOC_ID) AS DOC_CNT,SUM(D.PAGE_CNT) AS PAGE_CNT
+			</when>
+			</choose>	
+			FROM XR_DOCUMENT D 
+				INNER JOIN XR_FOLDER F ON F.FOLDER_ID = D.FOLDER_ID 	 
+				INNER JOIN XR_USER U ON U.USER_ID = D.OWNER_ID INNER JOIN XR_GROUPED GR ON GR.USER_ID = D.OWNER_ID AND GR.IS_DEFAULT='T' 
+	    		INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID  
+				INNER JOIN XR_CODE C ON C.CODE_ID = D.SECURITY_LEVEL AND C.GCODE_ID = 'SECURITY_LEVEL'
+			WHERE D.IS_CURRENT = 'T'	
+				<include refid="typeLevelCommonWhere" />					
+			<choose>
+			<when test="strIndex == 'USER'">
+				GROUP BY D.SECURITY_LEVEL,C.CODE_NM,D.OWNER_ID,U.USER_NAME_KO
+			</when>		
+			<when test="strIndex == 'GROUP'">
+				GROUP BY D.SECURITY_LEVEL,C.CODE_NM,G.GROUP_ID,G.GROUP_NAME_KO
+			</when>
+			</choose>				 				
+		) LIST LEFT OUTER JOIN		
+		(
+			SELECT 	    		
+			<choose>
+			<when test="strIndex == 'USER'">
+				D.SECURITY_LEVEL,C.CODE_NM,D.OWNER_ID,U.USER_NAME_KO AS USER_NM,SUM(D.PAGE_TOTAL) AS PAGE_TOTAL
+			</when>
+			<when test="strIndex == 'GROUP'">
+				D.SECURITY_LEVEL,C.CODE_NM,G.GROUP_ID AS OWNER_ID,G.GROUP_NAME_KO AS USER_NM,SUM(D.PAGE_TOTAL) AS PAGE_TOTAL
+			</when>
+			</choose>	
+	    	FROM XR_DOCUMENT D 
+	    		INNER JOIN XR_FOLDER F ON F.FOLDER_ID = D.FOLDER_ID 
+			    INNER JOIN XR_USER U ON U.USER_ID = D.OWNER_ID 
+	    		INNER JOIN XR_GROUPED GR ON GR.USER_ID = D.OWNER_ID AND GR.IS_DEFAULT='T' 
+	    		INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID 				  		
+				INNER JOIN XR_CODE C ON C.CODE_ID = D.SECURITY_LEVEL AND C.GCODE_ID = 'SECURITY_LEVEL'	 
+			<where>
+				<include refid="typeLevelCommonWhere" />				
+			</where>												
+			<choose>
+			<when test="strIndex == 'USER'">
+				GROUP BY D.SECURITY_LEVEL,C.CODE_NM,D.OWNER_ID,U.USER_NAME_KO
+			</when>		
+			<when test="strIndex == 'GROUP'">				
+				GROUP BY D.SECURITY_LEVEL,C.CODE_NM,G.GROUP_ID,G.GROUP_NAME_KO
+			</when>
+			</choose>				 			 
+		) OUTLIST ON LIST.OWNER_ID = OUTLIST.OWNER_ID AND LIST.SECURITY_LEVEL = OUTLIST.SECURITY_LEVEL					
+	</sql>
+	
+	
+	<select id="statisticsSecurityCnt" parameterType="HashMap" resultType="Int">
+		SELECT
+		   COUNT(*) AS CNT
+		FROM
+		(
+			SELECT 
+				CODE_NM,SECURITY_LEVEL,USER_NM,OWNER_ID,SUM(DOC_CNT) AS DOC_CNT,SUM(PAGE_CNT) AS PAGE_CNT,SUM(PAGE_TOTAL) AS PAGE_TOTAL
+			FROM
+			(	
+				<include refid="typeLevelSelect" />				
+			) DATAS
+					
+			GROUP BY SECURITY_LEVEL,CODE_NM,OWNER_ID,USER_NM
+					
+		) DATALIST 											
+	</select>
+	
+	<select id="statisticsSecurityList" parameterType="HashMap" resultType="DocumentStatus">
+		SELECT
+		   CODE_NM,SECURITY_LEVEL,USER_NM,OWNER_ID,DOC_CNT,PAGE_CNT,PAGE_TOTAL
+		FROM
+		(
+			SELECT 
+				CODE_NM,SECURITY_LEVEL,USER_NM,OWNER_ID,SUM(DOC_CNT) AS DOC_CNT,SUM(PAGE_CNT) AS PAGE_CNT,SUM(PAGE_TOTAL) AS PAGE_TOTAL,				   
+				CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM   
+			FROM
+			(	
+				<include refid="typeLevelSelect" />							
+			) DATAS
+					
+			GROUP BY SECURITY_LEVEL,CODE_NM,OWNER_ID,USER_NM
+					
+		) DATALIST WHERE DATALIST.PAGENUM = #{nPage}													
+	</select>
+	
+	<!-- 문서 Quota 현황 -->
+	<select id="statisticsQuotaList" parameterType="HashMap" resultType="DocumentStatus">
+		SELECT 
+			<choose>
+			<when test="strIndex == 'USER'">
+				D.OWNER_ID,U.USER_NAME_KO AS USER_NM,F.FOLDER_ID,SUM(D.PAGE_TOTAL) AS PAGE_TOTAL
+			</when>
+			<when test="strIndex == 'GROUP'">
+				F.FOLDER_ID,F.FOLDER_NAME_KO AS GROUP_NM,SUM(D.PAGE_TOTAL) AS PAGE_TOTAL					
+			</when>
+			</choose>											
+		FROM XR_DOCUMENT D 
+			INNER JOIN XR_FOLDER F ON F.FOLDER_ID = D.FOLDER_ID 
+    		INNER JOIN XR_MAP M ON M.MAP_ID = F.MAP_ID AND M.MAP_TYPE = 'FOLDER' 
+    		INNER JOIN XR_USER U ON U.USER_ID = D.OWNER_ID 
+    		INNER JOIN XR_GROUPED GR ON GR.USER_ID = D.OWNER_ID AND GR.IS_DEFAULT='T' 
+    		INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID
+		<where>
+			<if test="authGroupList != null and authGroupList != ''">
+				 AND G.GROUP_ID IN 
+				<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+					#{item}
+				</foreach>		
+			</if>				
+		</where>
+		<choose>
+			<when test="strIndex == 'USER'">
+				GROUP BY OWNER_ID,U.USER_NAME_KO,F.FOLDER_ID
+			</when>
+			<when test="strIndex == 'GROUP'">
+				GROUP BY F.FOLDER_ID,F.FOLDER_NAME_KO
+			</when>
+		</choose>		
+	</select>
+	
+	<!-- 문서 Quota 현황 개인/부서 목록 리스트 -->
+	<sql id="statisticsQuotaPageCommon">
+		SELECT
+		<choose>
+			<when test="strIndex == 'USER'">
+			U.USER_ID AS PART_ID,U.USER_NAME_KO AS PART_NM,F.FOLDER_ID,F.STORAGE_QUOTA,
+			CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM	
+		FROM XR_USER U 
+			INNER JOIN XR_FOLDER F ON U.USER_ID = F.FOLDER_ID
+	    	INNER JOIN XR_GROUPED GR ON GR.USER_ID = U.USER_ID AND GR.IS_DEFAULT='T' 
+	    	INNER JOIN XR_GROUP G ON G.GROUP_ID = GR.GROUP_ID				
+			</when>
+			<when test="strIndex == 'GROUP'">
+			F.FOLDER_ID AS PART_ID,G.GROUP_NAME_KO AS PART_NM,F.FOLDER_ID,F.STORAGE_QUOTA,
+			CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM	
+		FROM XR_GROUP G
+			INNER JOIN XR_FOLDER F ON  F.FOLDER_ID = REPLACE(G.GROUP_ID,'GRP','FOL')
+			</when>
+		</choose>
+		<where>
+			<if test="authGroupList != null and authGroupList != ''">
+				 AND G.GROUP_ID IN 
+				<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+					#{item}
+				</foreach>		
+			</if>							
+		</where>
+	</sql>
+	
+	<select id="statisticsQuotaPageCnt" parameterType="HashMap" resultType="Int">
+		SELECT
+			COUNT(PART_ID) AS CNT
+		FROM
+		(
+			<include refid="statisticsQuotaPageCommon" />				
+		)LIST
+	</select>
+	
+	<select id="statisticsQuotaPageList" parameterType="HashMap" resultType="CaseMap">
+		SELECT
+			PART_ID,PART_NM,STORAGE_QUOTA
+		FROM
+		(
+			<include refid="statisticsQuotaPageCommon" />				
+		)LIST WHERE LIST.PAGENUM = #{nPage} 								
+	</select>
+	
+	<!-- 로그인 이력 -->
+	<sql id="loginLogCommonWhere">
+		<where>
+		<if test="sdate != null and sdate != ''">
+			<![CDATA[ AND L.CONNECT_TIME >=  TO_DATE(#{sdate},'YYYY-MM-DD')  ]]>
+		</if>		
+		<if test="edate != null and edate != ''">
+			<![CDATA[ AND L.CONNECT_TIME < TO_DATE(#{edate},'YYYY-MM-DD')+0.99999  ]]>
+		</if>
+		<if test="strKeyword != null and strKeyword != ''">
+			<choose>
+			<when test="strIndex == 'USER'">
+				AND L.USER_NM LIKE '%${strKeyword}%'
+			</when>
+			<when test="strIndex == 'GROUP'">
+				AND L.GROUP_NM LIKE '%${strKeyword}%'
+			</when>
+			</choose>				
+		</if>			
+		<if test="authGroupList != null and authGroupList != ''">
+			 AND L.GROUP_ID IN 
+			<foreach item="item" index="index" collection="authGroupList" separator="," open=" ( " close=")" >
+				#{item}
+			</foreach>		
+		</if>		
+		</where>		
+	</sql>
+	
+	<select id="loginLogPageCnt" parameterType="HashMap" resultType="Int">
+		SELECT 
+	 		COUNT(L.CONNECT_LOG_SEQ) AS CNT		
+	 	FROM XR_CONNECT_LOG L INNER JOIN XR_CODE C ON L.CERT_YN = C.CODE_ID AND C.GCODE_ID='CERT'
+		<include refid="loginLogCommonWhere" />		
+	</select>
+	
+	 <select id="loginLogPageList" parameterType="HashMap" resultType="ConnectLog">
+	 	SELECT
+	 		USER_ID,USER_NM,GROUP_ID,GROUP_NM,LOGIN_TYPE,CONNECT_IP,CERT_YN,CONNECT_TIME,CERT_NM
+	 	FROM 
+	 	(
+	 		SELECT 
+	 			L.USER_ID,L.USER_NM,L.GROUP_ID,L.GROUP_NM,L.LOGIN_TYPE,L.CONNECT_IP,L.CERT_YN,
+	 			TO_CHAR(L.CONNECT_TIME, 'YYYY-MM-DD HH24:MI:SS') CONNECT_TIME,C.CODE_NM AS CERT_NM,
+	 			CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM	
+	 		FROM XR_CONNECT_LOG L INNER JOIN XR_CODE C ON L.CERT_YN = C.CODE_ID AND C.GCODE_ID='CERT'
+	 		<include refid="loginLogCommonWhere" />		
+	 	) LIST WHERE LIST.PAGENUM = #{nPage}			
+	 </select>
+	 
+	 <!-- 내문서 현황 :: 1차 고도화 -->
+	 <select id="myStatisticsList" parameterType="HashMap" resultType="UserDocHt">
+	 	SELECT
+	 		H.USER_ID,U.USER_NAME_KO AS USER_NM,H.TYPE_ID,T.TYPE_NAME,
+			SUM(H.CREATE_CNT) AS CREATE_CNT,SUM(H.READ_CNT) AS READ_CNT,
+			SUM(H.UPDATE_CNT) AS UPDATE_CNT,SUM(H.DELETE_CNT) AS DELETE_CNT
+	 	FROM XR_DOCUMENT_USER_HT H
+	 	INNER JOIN XR_USER U ON H.USER_ID = U.USER_ID    
+	 	INNER JOIN XR_TYPE T ON T.TYPE_ID = H.TYPE_ID
+	 	<where>	
+	 		<if test="user_id != null and user_id != ''">
+				AND H.USER_ID = #{user_id}
+			</if>				
+			<if test="sdate != null and sdate != ''">
+				<![CDATA[ AND H.UDATE >= #{sdate}  ]]>
+			</if>
+			<if test="edate != null and edate != ''">
+				<![CDATA[ AND H.UDATE <= #{edate}  ]]>
+			</if>					
+		</where>	
+		GROUP BY H.USER_ID,U.USER_NAME_KO,H.USER_ID,H.TYPE_ID,T.TYPE_NAME
+		ORDER BY ${orderCol} ${orderType}	
+	 </select>
+	 
+</mapper>

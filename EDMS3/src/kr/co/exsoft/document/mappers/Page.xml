@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.exsoft.document.dao.PageDao">
+	
+	<!-- 중복파일 목록 카운트 -->
+	<select id="duplicatePageCount" parameterType="HashMap" resultType="Int">
+		SELECT
+			COUNT(PAGE_NAME) AS CNT
+		FROM
+		(		
+			SELECT 
+					P.PAGE_NAME, P.PAGE_SIZE,COUNT(P.PAGE_NAME) AS PAGE_COUNT
+			FROM XR_PAGE P 
+					INNER JOIN XR_FILED F ON P.PAGE_ID = F.PAGE_ID
+					INNER JOIN XR_DOCUMENT D ON F.DOC_ID = D.DOC_ID		
+			WHERE D.IS_CURRENT = 'T' AND D.DOC_STATUS = 'C'
+			<if test="strKeyword != null and strKeyword != ''">
+				AND 	P.PAGE_NAME LIKE '%${strKeyword}%'
+			</if>		
+			<if test="sdate != null and sdate != ''">
+				<![CDATA[ AND D.CREATE_DATE >=  TO_DATE(#{sdate},'YYYY-MM-DD')  ]]>
+			</if>		
+			<if test="edate != null and edate != ''">
+				<![CDATA[ AND D.CREATE_DATE  <  TO_DATE(#{edate},'YYYY-MM-DD')+0.99999   ]]>
+			</if>
+			GROUP BY P.PAGE_NAME, P.PAGE_SIZE			
+			<![CDATA[ 
+				HAVING COUNT(PAGE_NAME) > 1  
+			]]>
+		)LIST
+	</select>
+	
+	<!-- 중복파일 목록 가져오기 -->
+	<select id="duplicatePageList" parameterType="HashMap" resultType="Page">
+		SELECT
+			PAGE_NAME, PAGE_SIZE,PAGE_COUNT
+		FROM
+		(		
+			SELECT 
+					P.PAGE_NAME, P.PAGE_SIZE,COUNT(P.PAGE_NAME) AS PAGE_COUNT,	
+					CEIL((ROW_NUMBER() OVER(ORDER BY ${orderCol} ${orderType} )) / ${page_size} ) PAGENUM    
+			FROM XR_PAGE P 
+					INNER JOIN XR_FILED F ON P.PAGE_ID = F.PAGE_ID
+					INNER JOIN XR_DOCUMENT D ON F.DOC_ID = D.DOC_ID		
+			WHERE D.IS_CURRENT = 'T' AND D.DOC_STATUS = 'C'
+			<if test="strKeyword != null and strKeyword != ''">
+					AND P.PAGE_NAME LIKE '%${strKeyword}%'
+			</if>		
+			<if test="sdate != null and sdate != ''">
+				<![CDATA[ AND D.CREATE_DATE >=  TO_DATE(#{sdate},'YYYY-MM-DD')  ]]>
+			</if>		
+			<if test="edate != null and edate != ''">
+				<![CDATA[ AND D.CREATE_DATE  <  TO_DATE(#{edate},'YYYY-MM-DD')+0.99999   ]]>
+			</if>
+			GROUP BY P.PAGE_NAME, P.PAGE_SIZE		
+			<![CDATA[ 
+				HAVING COUNT(PAGE_NAME) > 1  
+			]]>
+		)LIST
+		WHERE LIST.PAGENUM = #{nPage}		
+	</select>
+	
+	<!-- 페이지 속성 정보 변경 처리 -->
+	<update id="pageInfoUpdate" parameterType="HashMap">
+		UPDATE XR_PAGE			
+		<set>
+			<if test="is_deleted != null and is_deleted != ''">
+				IS_DELETED = #{is_deleted} ,		
+			</if>				
+		</set>
+		<where>			
+			<if test="page_id != null and page_id != ''">
+				AND PAGE_ID = #{page_id}	
+			</if>				
+		</where> 				
+	</update>		
+	
+	<!-- XR_FILED 페이지 리스트 가져오기. -->
+	<select id="xrPageList" parameterType="HashMap" resultType="CaseMap">
+		SELECT 
+			P.PAGE_ID, P.PAGE_NAME, P.PAGE_EXTENSION, P.PAGE_SIZE, P.CONTENT_PATH, P.VOLUME_ID, P.VOLUME_TYPE, P.DOC_ID 
+		FROM XR_PAGE P 
+				INNER JOIN XR_FILED F ON P.PAGE_ID = F.PAGE_ID	
+		<where>					
+			<if test="doc_id != null and doc_id != ''">
+				AND F.DOC_ID = #{doc_id}	
+			</if>			
+		</where> 				
+	</select>
+	
+	<!-- XR_FILED :: 문서-파일 정보 삭제처리 -->
+	<delete id="xrFiledDelete" parameterType="HashMap">
+		DELETE FROM XR_FILED 
+		<where>			
+			<if test="doc_id != null and doc_id != ''">
+				AND DOC_ID = #{doc_id}	
+			</if>			
+			<if test="page_id != null and page_id != ''">
+				AND PAGE_ID = #{page_id}	
+			</if>				
+		</where> 				
+	</delete>
+	
+		
+	<!-- 문서첨부파일리스트 :: 공통 -->
+	<select id="comDocPageList" parameterType="HashMap" resultType="Page">
+		SELECT 
+			P.PAGE_ID,P.PAGE_NAME,P.PAGE_EXTENSION,P.PAGE_SIZE,P.VOLUME_ID,P.CONTENT_PATH,P.VOLUME_TYPE
+		FROM XR_PAGE P 
+			INNER JOIN XR_FILED F ON P.PAGE_ID = F.PAGE_ID			
+		<where>
+			<if test="doc_id != null and doc_id != ''">
+				F.DOC_ID =#{doc_id}
+			</if>
+		</where>		
+	</select>	
+	
+	<!-- XR_PAGE :: 파일 정보 삭제처리 -->
+	<delete id="xrPageDelete" parameterType="HashMap">
+		DELETE FROM XR_PAGE
+		<where>			
+			<if test="page_id != null and page_id != ''">
+				AND PAGE_ID = #{page_id}	
+			</if>				
+			<if test="is_deleted != null and is_deleted != ''">
+				AND IS_DELETED = #{is_deleted}	
+			</if>				
+		</where> 				
+	</delete>
+	
+	<!-- XR_PAGE :: 파일 정보 등록처리 -->
+	<insert id="writePage" parameterType="Page">
+		INSERT INTO XR_PAGE (PAGE_ID,PAGE_NAME,PAGE_EXTENSION,PAGE_SIZE,VOLUME_ID,CONTENT_PATH)
+		VALUES (#{page_id},#{page_name},#{page_extension},#{page_size},#{volume_id},#{content_path})
+	</insert>
+	
+	<!-- XR_FILED :: 문서-파일 정보 등록처리 -->
+	<insert id="writeXrFiled" parameterType="HashMap">
+		INSERT INTO XR_FILED (DOC_ID,PAGE_ID) VALUES (#{doc_id},#{page_id})
+	</insert>
+	
+	<!-- XR_PAGE :: 첨부문서 목록 정보 가져오기 -->
+	<select id="downPageList" parameterType="HashMap" resultType="Page">
+		SELECT 
+			P.PAGE_ID,P.PAGE_NAME,P.PAGE_EXTENSION,P.PAGE_SIZE,P.VOLUME_ID,P.CONTENT_PATH,P.IS_BODY,P.IS_DELETED,F.DOC_ID AS REF_DOC_ID,D.DOC_NAME
+		FROM XR_PAGE P 
+			INNER JOIN XR_FILED F ON P.PAGE_ID = F.PAGE_ID
+			INNER JOIN XR_DOCUMENT D ON F.DOC_ID = D.DOC_ID
+		<where>
+			<if test="page_list != null"> 
+				P.PAGE_ID IN 
+				<foreach item="item" index="index" collection="page_list" separator="," open=" ( " close=")" >
+					#{item}
+				</foreach>		
+			 </if>									 	
+		</where>
+	</select>
+	
+	<!-- XR_PAGE :: 파일정보 조회 -->
+	<select id="pageDetailInfo" parameterType="HashMap" resultType="Page">
+		SELECT
+			PAGE_ID,PAGE_NAME,PAGE_EXTENSION,PAGE_SIZE,VOLUME_ID,CONTENT_PATH,IS_BODY,IS_DELETED
+		FROM XR_PAGE
+		<where>
+			<if test="page_id != null and page_id != ''">
+				AND PAGE_ID = #{page_id}	
+			</if>				
+			<if test="is_deleted != null and is_deleted != ''">
+				AND IS_DELETED = #{is_deleted}	
+			</if>				
+		</where>		
+	</select>
+	
+	<!-- doc_id리스트로  첨부파일 목록얻기 -->
+	<select id="docPageListForURLMail" parameterType="HashMap" resultType="Page">
+		SELECT 
+			P.PAGE_ID,P.PAGE_NAME,P.PAGE_EXTENSION,P.PAGE_SIZE,P.VOLUME_ID,P.CONTENT_PATH,P.VOLUME_TYPE
+		FROM XR_PAGE P 
+			INNER JOIN XR_FILED F ON P.PAGE_ID = F.PAGE_ID			
+		<where>
+			<if test="doc_id_list != null"> 
+				F.DOC_ID IN (${doc_id_list})
+			 </if>	
+		</where>		
+	</select>	
+	
+</mapper>
