@@ -200,6 +200,7 @@ jQuery(function() {
        	</div>
     </div>
    	<!-- 환경설정 끝 -->
+   	<!-- GIT TEST -->
   </div>
 </body>
 </html>
